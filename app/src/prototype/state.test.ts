@@ -90,7 +90,7 @@ describe('prototype state and persistence', () => {
   it('migrates version 2 location-profile state', () => {
     const value = JSON.stringify({ version: 2, state: persistableState(completedState()) })
     const restored = restoreState({ getItem: () => value })
-    expect(restored.state.profile.location?.source).toBe('map')
+    expect(restored.state.profile.location?.source).toBe('city')
     expect(restored.notice).toContain('version 2')
   })
 
@@ -151,7 +151,7 @@ describe('prototype state and persistence', () => {
     expect(completed.recommendationHistory[0].status).toBe('completed')
   })
 
-  it('migrates version 1 country fields to a manual coarse location', () => {
+  it('migrates version 1 country fields to incomplete regional setup', () => {
     const legacy = persistableState(completedState())
     const value = JSON.stringify({
       version: 1,
@@ -171,12 +171,7 @@ describe('prototype state and persistence', () => {
       },
     })
     const restored = restoreState({ getItem: () => value })
-    expect(restored.state.profile.location).toMatchObject({
-      source: 'map',
-      latitude: null,
-      longitude: null,
-      displayLabel: 'Portland, Oregon, United States',
-    })
+    expect(restored.state.profile.location).toBeNull()
     expect(restored.notice).toContain('version 1')
   })
 
@@ -196,23 +191,18 @@ describe('prototype state and persistence', () => {
     expect(removePersistedState({ removeItem: () => { throw new Error('denied') } })).toMatchObject({ ok: false })
   })
 
-  it('coarsens exact coordinates before persistence', () => {
+  it('preserves an already normalized region for persistence', () => {
     expect(
       coarsenLocationForStorage({
-        source: 'device',
-        latitude: 45.5231,
-        longitude: -122.6765,
-        accuracyMeters: 25,
-        areaId: null,
-        precisionKm: null,
+        source: 'device', latitude: 45.5, longitude: -122.7,
+        areaId: 'grid-v1:45.5:-122.7', precisionKm: 10,
+        displayName: 'Portland, Oregon, United States', countryCode: 'US', admin1Code: 'OR',
         timeZone: 'America/Los_Angeles',
-        units: 'us',
-        displayLabel: 'Approximate device location',
+        produceRegionId: 'us-pacific-northwest', units: 'us',
       }),
     ).toMatchObject({
       latitude: 45.5,
       longitude: -122.7,
-      accuracyMeters: 10_000,
       areaId: 'grid-v1:45.5:-122.7',
       precisionKm: 10,
     })
@@ -228,15 +218,10 @@ function completedState(values: Partial<PrototypeState> = {}): PrototypeState {
       preferredName: 'Alex',
       birthYear: '1990',
       location: {
-        source: 'map',
-        latitude: 45.5,
-        longitude: -122.7,
-        accuracyMeters: 10_000,
-        areaId: 'grid-v1:45.5:-122.7',
-        precisionKm: 10,
-        timeZone: 'America/Los_Angeles',
-        units: 'us',
-        displayLabel: 'Portland area',
+        source: 'city', latitude: 45.5, longitude: -122.7,
+        areaId: 'grid-v1:45.5:-122.7', precisionKm: 10,
+        displayName: 'Portland, Oregon, United States', countryCode: 'US', admin1Code: 'OR',
+        timeZone: 'America/Los_Angeles', produceRegionId: 'us-pacific-northwest', units: 'us',
       },
       dietaryPattern: 'Omnivore',
       hasFoodAllergies: false,

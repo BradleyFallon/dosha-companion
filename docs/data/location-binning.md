@@ -10,12 +10,18 @@ Treat device coordinates and map-pin coordinates as transient input. Before brow
   "latitude": 45.5,
   "longitude": -122.7,
   "precisionKm": 10,
+  "displayName": "Portland, Oregon, United States",
+  "countryCode": "US",
+  "admin1Code": "OR",
   "timeZone": "America/Los_Angeles",
-  "displayLabel": "Portland area"
+  "produceRegionId": "us-pacific-northwest",
+  "units": "us"
 }
 ```
 
-The grid is nominally about 10 km. Its east-west width varies by latitude, so `precisionKm` describes the privacy/product tier rather than a surveyed radius. Manual city or region entry may initially have only a label and browser time zone until a geocoder resolves it to a coarse area.
+The grid is nominally about 10 km. Its east-west width varies by latitude, so `precisionKm` describes the privacy/product tier rather than a surveyed radius. Device, map, and city entry all resolve to this complete shape before setup continues.
+
+City search uses Open-Meteo's geocoding endpoint. Device and map confirmation use one user-triggered Nominatim reverse lookup at the already coarsened point, then Open-Meteo resolves the time zone. The public Nominatim endpoint must never be used for autocomplete, bulk lookup, or requests above its published limit; the provider URL stays isolated in the adapter so a production deployment can replace it with a contracted or self-hosted service.
 
 This is a useful default because it is precise enough to select a sunset calculation point and a regional weather forecast while avoiding storage of a home-scale location. It is not precise enough for street-level services, and weather can still vary sharply near mountains, coasts, and urban boundaries.
 

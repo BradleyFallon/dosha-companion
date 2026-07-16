@@ -133,6 +133,10 @@ progress::-moz-progress-bar { background: var(--accent); }
 .manual-location { margin: 20px 0 8px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 9px; }
 .manual-location summary { min-height: 32px; color: var(--accent); font-weight: 700; cursor: pointer; }
 .manual-location form { margin-top: 12px; }
+.city-search { margin-top: 22px; }
+.city-results { display: grid; margin: 12px 0 18px; padding: 0; list-style: none; gap: 8px; }
+.city-results button { display: flex; min-height: 52px; width: 100%; padding: 10px 12px; flex-direction: column; align-items: flex-start; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; background: white; cursor: pointer; }
+.city-results span { color: var(--muted); font-size: .86rem; }
 .centered-action { display: block; margin: 12px auto; }
 .location-status { margin: 18px 0 0; padding: 11px 13px; border-radius: 7px; background: var(--accent-soft); color: var(--accent); font-size: .9rem; }
 .location-error { margin-top: 16px; }

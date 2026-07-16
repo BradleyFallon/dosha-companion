@@ -111,7 +111,7 @@ export function SettingsScreen() {
       </form>
       <section className="settings-location" aria-labelledby="settings-location-title">
         <h2 className="section-title-with-icon" id="settings-location-title"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Location and units</h2>
-        <p>{state.profile.location?.displayLabel ?? 'No regional location saved'} · {state.profile.location?.units === 'metric' ? 'Metric' : 'US'} units</p>
+        <p>{state.profile.location?.displayName ?? 'No regional location saved'} · {state.profile.location?.units === 'metric' ? 'Metric' : 'US'} units</p>
         <Link className="button secondary icon-label" to="/profile/location?return=settings"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Edit or remove location</Link>
       </section>
       <section className="settings-data" aria-labelledby="settings-data-title">

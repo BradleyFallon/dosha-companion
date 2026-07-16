@@ -118,7 +118,7 @@ export function TodayScreen() {
           </Link>
           <Link to="/profile/location">
             <LocationIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" />
-            <span><strong>Local rhythms</strong><small>{state.profile.location?.displayLabel || (state.profile.location?.areaId ? 'General area saved' : 'Add a general area')}</small></span>
+            <span><strong>Local rhythms</strong><small>{state.profile.location?.displayName || 'Add a general area'}</small></span>
             <ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" />
           </Link>
         </div>

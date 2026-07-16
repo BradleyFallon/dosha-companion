@@ -15,7 +15,7 @@ export function getProfileReadiness(profile: ProfileState) {
   const missing: ProfileRequirement[] = []
   if (!profile.preferredName.trim()) missing.push('preferredName')
   if (!profile.birthYear || birthYearError(profile.birthYear)) missing.push('birthYear')
-  if (!profile.location || profile.location.source === 'skipped') missing.push('location')
+  if (!profile.location) missing.push('location')
   if (!profile.dietaryPattern) missing.push('dietaryPattern')
   if (profile.hasFoodAllergies === null) missing.push('allergyStatus')
   if (profile.hasFoodAllergies === true && !profile.allergies.trim()) missing.push('allergyDetails')

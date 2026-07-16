@@ -3,216 +3,122 @@ import maplibregl, { type Map as MapLibreMap, type Marker } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { BackLink, Screen } from '../components/Layout'
+import { normalizeCity, normalizeCoordinates, searchCities, type CityResult } from '../location/regions'
 import { usePrototype } from '../prototype/PrototypeContext'
-import type { LocationProfile } from '../prototype/state'
+import type { RegionalLocation } from '../prototype/state'
+import { LocationIcon, PrivacyIcon, SearchIcon } from '../ui/icons'
 import { StepHeader } from './Onboarding'
-import { LocationIcon, PrivacyIcon } from '../ui/icons'
 
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright'
-const DEFAULT_MAP_LOCATION = { latitude: 39.5, longitude: -98.35 }
+const DEFAULT_MAP_LOCATION = { latitude: 45.5, longitude: -122.7 }
 
-function currentTimeZone() {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
-}
-
-function inferredUnits(): LocationProfile['units'] {
-  const region = navigator.language.split('-')[1]?.toUpperCase()
-  return region === 'US' || region === 'LR' || region === 'MM' ? 'us' : 'metric'
-}
-
-function blankLocation(
-  source: LocationProfile['source'],
-  units: LocationProfile['units'],
-): LocationProfile {
-  return {
-    source,
-    latitude: null,
-    longitude: null,
-    accuracyMeters: null,
-    areaId: null,
-    precisionKm: null,
-    timeZone: currentTimeZone(),
-    units,
-    displayLabel: null,
-  }
+interface LocationDraft {
+  source: 'device' | 'map'
+  latitude: number
+  longitude: number
+  units: RegionalLocation['units']
 }
 
 export function LocationProfileScreen() {
   const { state, dispatch } = usePrototype()
   const navigate = useNavigate()
   const routeLocation = useLocation()
-  const editingExistingProfile = state.profileCompleted
+  const editing = state.profileCompleted
   const returnToSettings = new URLSearchParams(routeLocation.search).get('return') === 'settings'
-  const returnPath = returnToSettings
-    ? '/settings'
-    : editingExistingProfile
-      ? '/balance'
-      : '/profile/food'
-  const saved = state.profile.location
-  const [selection, setSelection] = useState<LocationProfile | null>(
-    saved?.source !== 'skipped' ? saved : null,
-  )
-  const [units, setUnits] = useState<LocationProfile['units']>(
-    saved?.units ?? inferredUnits(),
-  )
+  const returnPath = returnToSettings ? '/settings' : editing ? '/balance' : '/profile/food'
+  const [selection, setSelection] = useState<LocationDraft | RegionalLocation | null>(state.profile.location)
+  const [units, setUnits] = useState<RegionalLocation['units']>(state.profile.location?.units ?? inferredUnits())
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
-  const [manualLabel, setManualLabel] = useState('')
   const [locating, setLocating] = useState(false)
+  const [resolving, setResolving] = useState(false)
+  const [cityQuery, setCityQuery] = useState('')
+  const [cityResults, setCityResults] = useState<CityResult[]>([])
 
-  const secureLocationAvailable = window.isSecureContext
-
-  useEffect(() => {
-    document.querySelector<HTMLElement>('.location-screen h1')?.focus()
-  }, [selection])
+  useEffect(() => { document.querySelector<HTMLElement>('.location-screen h1')?.focus() }, [selection])
 
   function useDeviceLocation() {
     setError('')
-    setStatus('')
-
-    if (!secureLocationAvailable) {
-      setError('Device location requires HTTPS. Choose on map, search manually, or skip for now.')
+    if (!window.isSecureContext || !navigator.geolocation) {
+      setError('Device location is unavailable. Choose on map or search for your city.')
       return
     }
-    if (!navigator.geolocation) {
-      setError('This browser does not provide device location. Choose on map or skip for now.')
-      return
-    }
-
     setLocating(true)
     setStatus('Waiting for location permission…')
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setSelection({
-          source: 'device',
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracyMeters: position.coords.accuracy,
-          areaId: null,
-          precisionKm: null,
-          timeZone: currentTimeZone(),
-          units,
-          displayLabel: 'Approximate device location',
-        })
-        setLocating(false)
-        setStatus('Location selected. Check the pin before continuing.')
-      },
-      (positionError) => {
-        const message =
-          positionError.code === positionError.PERMISSION_DENIED
-            ? 'Location permission was not granted. Choose on map or skip for now.'
-            : positionError.code === positionError.TIMEOUT
-              ? 'Finding your location took too long. Try again or choose on map.'
-              : 'Your location is currently unavailable. Choose on map or skip for now.'
-        setError(message)
-        setStatus('')
-        setLocating(false)
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 10_000,
-        maximumAge: 300_000,
-      },
-    )
+    navigator.geolocation.getCurrentPosition((position) => {
+      setSelection({ source: 'device', latitude: position.coords.latitude, longitude: position.coords.longitude, units })
+      setLocating(false)
+      setStatus('Check the general area before continuing.')
+    }, () => {
+      setLocating(false)
+      setStatus('')
+      setError('Location permission was not granted. Choose on map or search for your city.')
+    }, { enableHighAccuracy: false, timeout: 10_000, maximumAge: 300_000 })
   }
 
   function chooseOnMap() {
     setError('')
-    setSelection({
-      source: 'map',
-      ...DEFAULT_MAP_LOCATION,
-      accuracyMeters: null,
-      areaId: null,
-      precisionKm: null,
-      timeZone: currentTimeZone(),
-      units,
-      displayLabel: 'Approximate selected area',
-    })
+    setSelection({ source: 'map', ...DEFAULT_MAP_LOCATION, units })
     setStatus('Move the pin to your general area.')
   }
 
-  function chooseManual(event: FormEvent) {
+  async function findCity(event: FormEvent) {
     event.preventDefault()
-    const label = manualLabel.trim()
-    if (!label) {
-      setError('Enter a city or region, or use another location option.')
-      return
+    if (cityQuery.trim().length < 2) return setError('Enter a city or region.')
+    setError('')
+    setStatus('Searching cities…')
+    try {
+      const results = await searchCities(cityQuery)
+      setCityResults(results)
+      setStatus(results.length ? 'Choose the matching city.' : '')
+      if (!results.length) setError('No matching cities were found.')
+    } catch (reason) {
+      setStatus('')
+      setError(reason instanceof Error ? reason.message : 'City search is unavailable right now.')
     }
-    setError('')
-    setSelection({
-      ...blankLocation('map', units),
-      displayLabel: label,
-    })
-    setStatus('Manual location selected.')
   }
 
-  function confirmLocation() {
+  async function confirmLocation() {
     if (!selection) return
-    dispatch({
-      type: 'update-profile',
-      values: { location: { ...selection, units } },
-    })
-    navigate(returnPath)
-  }
-
-  function chooseAgain() {
-    setSelection(null)
-    setStatus('')
+    setResolving(true)
     setError('')
+    setStatus('Saving your regional location…')
+    try {
+      const normalized = 'areaId' in selection
+        ? { ...selection, units }
+        : await normalizeCoordinates({ ...selection, units })
+      dispatch({ type: 'update-profile', values: { location: normalized } })
+      navigate(returnPath)
+    } catch (reason) {
+      setResolving(false)
+      setStatus('')
+      setError(reason instanceof Error ? reason.message : 'Regional details could not be loaded.')
+    }
   }
 
   return (
     <Screen className="location-screen">
-      <BackLink
-        to={returnToSettings ? '/settings' : editingExistingProfile ? '/balance' : '/profile/name'}
-        label={returnToSettings ? 'Settings' : editingExistingProfile ? 'My Balance' : 'Back'}
-      />
-      {editingExistingProfile ? null : <StepHeader step={2} />}
+      <BackLink to={returnToSettings ? '/settings' : editing ? '/balance' : '/profile/name'} label={returnToSettings ? 'Settings' : editing ? 'My Balance' : 'Back'} />
+      {editing ? null : <StepHeader step={2} />}
       {selection ? (
-        <LocationConfirmation
-          location={{ ...selection, units }}
-          onChange={setSelection}
-          onConfirm={confirmLocation}
-          onChooseAgain={chooseAgain}
-          units={units}
-          onUnitsChange={setUnits}
-        />
+        <>
+          <p className="eyebrow">Regional location</p>
+          <h1 tabIndex={-1}>{'displayName' in selection ? selection.displayName : selection.source === 'device' ? 'Approximate device area' : 'Selected map area'}</h1>
+          <LocationMap location={selection} onChange={(longitude, latitude) => setSelection({ source: selection.source === 'device' ? 'device' : 'map', longitude, latitude, units })} />
+          <p className="map-help">Drag the pin or tap the map to adjust the general area. Exact coordinates are discarded.</p>
+          <fieldset className="inline-options location-units"><legend>Units</legend><label><input type="radio" name="units" checked={units === 'us'} onChange={() => setUnits('us')} /> US</label><label><input type="radio" name="units" checked={units === 'metric'} onChange={() => setUnits('metric')} /> Metric</label></fieldset>
+          <button className="button primary icon-label" type="button" disabled={resolving} onClick={confirmLocation}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />{resolving ? 'Saving region…' : 'Use this regional location'}</button>
+          <button className="button secondary" type="button" onClick={() => { setSelection(null); setStatus(''); setError('') }}>Choose again</button>
+        </>
       ) : (
         <>
-          <p className="eyebrow">Optional location</p>
-          <h1 tabIndex={-1}>Use your location</h1>
-          <p className="lede">This may help adjust future guidance for your local season, time of day, and climate.</p>
-          {!secureLocationAvailable ? (
-            <p className="secure-context-note" role="note">
-              Device location is unavailable on this connection because it is not HTTPS. Map selection and skipping still work.
-            </p>
-          ) : null}
-          <button
-            className="button primary location-primary icon-label"
-            type="button"
-            onClick={useDeviceLocation}
-            disabled={locating || !secureLocationAvailable}
-          >
-            <LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />{locating ? 'Finding your location…' : 'Use my current location'}
-          </button>
-          <div className="choice-divider" aria-hidden="true"><span>or</span></div>
+          <p className="eyebrow">Regional location</p><h1 tabIndex={-1}>Choose your general area</h1>
+          <p className="lede">Used for local time, daylight, weather, season, and regional food content.</p>
+          <button className="button primary location-primary icon-label" type="button" onClick={useDeviceLocation} disabled={locating}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />{locating ? 'Finding your area…' : 'Use my current location'}</button>
           <button className="button secondary icon-label" type="button" onClick={chooseOnMap}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Choose on map</button>
-          <p className="privacy-line"><PrivacyIcon aria-hidden="true" className="icon-leading" focusable="false" />We will not make your location public or track it continuously.</p>
-          <details className="manual-location">
-            <summary>Search manually instead</summary>
-            <form onSubmit={chooseManual}>
-              <label htmlFor="manual-location">City or region</label>
-              <input
-                id="manual-location"
-                type="search"
-                placeholder="For example, Portland, Oregon"
-                value={manualLabel}
-                onChange={(event) => setManualLabel(event.target.value)}
-              />
-              <p className="field-hint">This saves only the general label you enter.</p>
-              <button className="button secondary icon-label" type="submit"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Use manual location</button>
-            </form>
-          </details>
+          <form className="city-search" onSubmit={findCity}><label htmlFor="city-search">Search for your city</label><input id="city-search" type="search" value={cityQuery} onChange={(event) => setCityQuery(event.target.value)} placeholder="City or region" /><button className="button secondary icon-label" type="submit"><SearchIcon aria-hidden="true" className="icon-leading" focusable="false" />Search cities</button></form>
+          {cityResults.length ? <ul className="city-results">{cityResults.map((result) => <li key={result.id}><button type="button" onClick={() => setSelection(normalizeCity(result, units))}><strong>{result.name}</strong><span>{[result.admin1, result.country].filter(Boolean).join(', ')}</span></button></li>)}</ul> : null}
+          <p className="privacy-line"><PrivacyIcon aria-hidden="true" className="icon-leading" focusable="false" />Only a roughly 10 km region is saved. Location lookup uses Open-Meteo and OpenStreetMap data.</p>
         </>
       )}
       {status ? <p className="location-status" role="status" aria-live="polite">{status}</p> : null}
@@ -221,115 +127,28 @@ export function LocationProfileScreen() {
   )
 }
 
-function LocationConfirmation({
-  location,
-  onChange,
-  onConfirm,
-  onChooseAgain,
-  units,
-  onUnitsChange,
-}: {
-  location: LocationProfile
-  onChange: (location: LocationProfile) => void
-  onConfirm: () => void
-  onChooseAgain: () => void
-  units: LocationProfile['units']
-  onUnitsChange: (units: LocationProfile['units']) => void
-}) {
-  const hasCoordinates = location.latitude !== null && location.longitude !== null
-
-  return (
-    <>
-      <p className="eyebrow">Location selected</p>
-      <h1 tabIndex={-1}>{location.displayLabel ?? 'Approximate selected area'}</h1>
-      {hasCoordinates ? (
-        <LocationMap location={location} onChange={onChange} />
-      ) : (
-        <div className="manual-location-confirmation"><LocationIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" /><p>{location.displayLabel}</p></div>
-      )}
-      <p className="map-help">
-        {hasCoordinates ? 'Drag the pin or tap the map if this is not correct.' : 'Only this general label will be saved.'}
-      </p>
-      <fieldset className="inline-options location-units">
-        <legend>Units</legend>
-        <label><input type="radio" name="units" value="us" checked={units === 'us'} onChange={() => onUnitsChange('us')} /> US</label>
-        <label><input type="radio" name="units" value="metric" checked={units === 'metric'} onChange={() => onUnitsChange('metric')} /> Metric</label>
-      </fieldset>
-      <button className="button primary icon-label" type="button" onClick={onConfirm}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Use this location</button>
-      <button className="button secondary icon-label" type="button" onClick={onChooseAgain}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Choose again</button>
-      <p className="privacy-line"><PrivacyIcon aria-hidden="true" className="icon-leading" focusable="false" />Only a general area is saved on this device. You can change or remove it at any time.</p>
-    </>
-  )
-}
-
-function LocationMap({
-  location,
-  onChange,
-}: {
-  location: LocationProfile
-  onChange: (location: LocationProfile) => void
-}) {
+function LocationMap({ location, onChange }: { location: Pick<RegionalLocation, 'latitude' | 'longitude'> | LocationDraft; onChange: (longitude: number, latitude: number) => void }) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MapLibreMap | null>(null)
   const markerRef = useRef<Marker | null>(null)
-
+  const initialLocationRef = useRef(location)
+  const onChangeRef = useRef(onChange)
+  onChangeRef.current = onChange
   useEffect(() => {
-    if (!containerRef.current || location.latitude === null || location.longitude === null) return
-
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: MAP_STYLE,
-      center: [location.longitude, location.latitude],
-      zoom: location.source === 'device' ? 11 : 3,
-      attributionControl: { compact: true },
-    })
-    const marker = new maplibregl.Marker({ draggable: true })
-      .setLngLat([location.longitude, location.latitude])
-      .addTo(map)
-
-    function updateLocation(longitude: number, latitude: number) {
-      onChange({
-        ...location,
-        source: location.source === 'device' ? 'device' : 'map',
-        longitude,
-        latitude,
-        accuracyMeters: location.source === 'device' ? location.accuracyMeters : null,
-        displayLabel:
-          location.source === 'device'
-            ? 'Approximate device location'
-            : 'Approximate selected area',
-      })
-    }
-
-    marker.on('dragend', () => {
-      const point = marker.getLngLat()
-      updateLocation(point.lng, point.lat)
-    })
-    map.on('click', (event) => {
-      marker.setLngLat(event.lngLat)
-      updateLocation(event.lngLat.lng, event.lngLat.lat)
-    })
+    if (!containerRef.current) return
+    const initial = initialLocationRef.current
+    const map = new maplibregl.Map({ container: containerRef.current, style: MAP_STYLE, center: [initial.longitude, initial.latitude], zoom: 8, attributionControl: { compact: true } })
+    const marker = new maplibregl.Marker({ draggable: true }).setLngLat([initial.longitude, initial.latitude]).addTo(map)
+    marker.on('dragend', () => { const point = marker.getLngLat(); onChangeRef.current(point.lng, point.lat) })
+    map.on('click', (event) => { marker.setLngLat(event.lngLat); onChangeRef.current(event.lngLat.lng, event.lngLat.lat) })
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
-
-    mapRef.current = map
-    markerRef.current = marker
-
-    return () => {
-      marker.remove()
-      map.remove()
-      markerRef.current = null
-      mapRef.current = null
-    }
-    // Map is intentionally created once for this confirmation state.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    mapRef.current = map; markerRef.current = marker
+    return () => { marker.remove(); map.remove(); mapRef.current = null; markerRef.current = null }
   }, [])
+  return <div ref={containerRef} className="location-map" role="group" aria-label="Map showing an adjustable regional pin" />
+}
 
-  return (
-    <div
-      ref={containerRef}
-      className="location-map"
-      role="group"
-      aria-label="Map showing an adjustable location pin"
-    />
-  )
+function inferredUnits(): RegionalLocation['units'] {
+  const region = navigator.language.split('-')[1]?.toUpperCase()
+  return region === 'US' || region === 'LR' || region === 'MM' ? 'us' : 'metric'
 }

@@ -5,21 +5,25 @@ import { getAssessmentQuestions } from '../quiz/assessment'
 import { getProfileReadiness } from '../profile/readiness'
 
 export const STORAGE_KEY = 'dosha-companion-prototype-state'
-export const STORAGE_VERSION = 6
+export const STORAGE_VERSION = 7
 
 export type SaveStatus = 'saved' | 'saving' | 'not-saved'
 
-export interface LocationProfile {
-  source: 'device' | 'map' | 'skipped'
-  latitude: number | null
-  longitude: number | null
-  accuracyMeters: number | null
-  areaId: string | null
-  precisionKm: number | null
+export interface RegionalLocation {
+  source: 'device' | 'map' | 'city'
+  areaId: string
+  latitude: number
+  longitude: number
+  precisionKm: 10
+  displayName: string
+  countryCode: string
+  admin1Code: string | null
   timeZone: string
+  produceRegionId: string | null
   units: 'us' | 'metric'
-  displayLabel: string | null
 }
+
+export type LocationProfile = RegionalLocation
 
 export interface ProfileState {
   preferredName: string
@@ -304,24 +308,7 @@ export function serializeState(state: PrototypeState): string {
 export function coarsenLocationForStorage(
   location: LocationProfile | null,
 ): LocationProfile | null {
-  if (!location || location.latitude === null || location.longitude === null) {
-    return location
-  }
-
-  const latitude = Number((Math.round(location.latitude * 10) / 10).toFixed(1))
-  const longitude = Number((Math.round(location.longitude * 10) / 10).toFixed(1))
-
-  return {
-    ...location,
-    latitude,
-    longitude,
-    accuracyMeters:
-      location.accuracyMeters === null
-        ? 10_000
-        : Math.max(Math.round(location.accuracyMeters), 10_000),
-    areaId: `grid-v1:${latitude.toFixed(1)}:${longitude.toFixed(1)}`,
-    precisionKm: 10,
-  }
+  return location
 }
 
 export function persistState(
@@ -407,23 +394,7 @@ export function restoreState(
 
 function migrateV1(rawState: Record<string, unknown>) {
   const rawProfile = isRecord(rawState.profile) ? rawState.profile : {}
-  const label = [rawProfile.city, rawProfile.region, rawProfile.country]
-    .filter((value): value is string => typeof value === 'string' && Boolean(value.trim()))
-    .map((value) => value.trim())
-    .join(', ')
-  const location: LocationProfile | null = label
-    ? {
-        source: 'map',
-        latitude: null,
-        longitude: null,
-        accuracyMeters: null,
-        areaId: null,
-        precisionKm: null,
-        timeZone: browserTimeZone(),
-        units: rawProfile.units === 'metric' ? 'metric' : 'us',
-        displayLabel: label,
-      }
-    : null
+  const location: LocationProfile | null = null
 
   return {
     ...rawState,
@@ -561,44 +532,29 @@ function validIsoDate(value: unknown): value is string {
 
 function sanitizeLocation(value: unknown): LocationProfile | null {
   if (!isRecord(value)) return null
-  const source = value.source === 'device' || value.source === 'map' || value.source === 'skipped'
+  const source = value.source === 'device' || value.source === 'map' || value.source === 'city'
     ? value.source
     : null
   if (source === null) return null
   const latitude = nullableNumber(value.latitude, -90, 90)
   const longitude = nullableNumber(value.longitude, -180, 180)
-  const displayLabel = source === 'skipped'
-    ? null
-    : sanitizeNullableString(value.displayLabel, 120)
-  if (source === 'device' && (latitude === null || longitude === null)) return null
-  if (source === 'map' && (latitude === null || longitude === null) && !displayLabel) return null
-
-  const coarse = latitude === null || longitude === null
-    ? null
-    : coarsenLocationForStorage({
-        source,
-        latitude,
-        longitude,
-        accuracyMeters: nullableNumber(value.accuracyMeters, 0, 1_000_000),
-        areaId: null,
-        precisionKm: null,
-        timeZone: sanitizeString(value.timeZone, 100) || browserTimeZone(),
-        units: value.units === 'metric' ? 'metric' : 'us',
-        displayLabel,
-      })
+  const areaId = sanitizeString(value.areaId, 80)
+  const displayName = sanitizeString(value.displayName, 120)
+  const countryCode = sanitizeString(value.countryCode, 2).toUpperCase()
+  if (latitude === null || longitude === null || !areaId || !displayName || !/^[A-Z]{2}$/.test(countryCode)) return null
 
   return {
     source,
-    latitude: source === 'skipped' ? null : coarse?.latitude ?? null,
-    longitude: source === 'skipped' ? null : coarse?.longitude ?? null,
-    accuracyMeters: source === 'skipped'
-      ? null
-      : coarse?.accuracyMeters ?? null,
-    areaId: source === 'skipped' ? null : coarse?.areaId ?? null,
-    precisionKm: source === 'skipped' ? null : coarse?.precisionKm ?? null,
+    latitude,
+    longitude,
+    areaId,
+    precisionKm: 10,
+    displayName,
+    countryCode,
+    admin1Code: sanitizeNullableString(value.admin1Code, 80),
     timeZone: sanitizeString(value.timeZone, 100) || browserTimeZone(),
+    produceRegionId: sanitizeNullableString(value.produceRegionId, 80),
     units: value.units === 'metric' ? 'metric' : 'us',
-    displayLabel,
   }
 }
 
@@ -678,7 +634,7 @@ export function createDemoState(now = new Date()): PrototypeState {
     profile: {
       preferredName: 'Demo Editor',
       birthYear: '1990',
-      location: { source: 'map', latitude: 45.5, longitude: -122.7, accuracyMeters: 10_000, areaId: 'grid-v1:45.5:-122.7', precisionKm: 10, timeZone: 'America/Los_Angeles', units: 'us', displayLabel: 'Portland area' },
+      location: { source: 'city', latitude: 45.5, longitude: -122.7, areaId: 'grid-v1:45.5:-122.7', precisionKm: 10, displayName: 'Portland, Oregon, United States', countryCode: 'US', admin1Code: 'OR', timeZone: 'America/Los_Angeles', produceRegionId: 'us-pacific-northwest', units: 'us' },
       dietaryPattern: 'Vegetarian',
       hasFoodAllergies: false,
       allergies: '',

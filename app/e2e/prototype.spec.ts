@@ -1,6 +1,13 @@
 import { expect, test, type Page } from '@playwright/test'
 
+async function mockLocationServices(page: Page) {
+  await page.route('**/nominatim.openstreetmap.org/reverse**', (route) => route.fulfill({ json: { display_name: 'Portland, Oregon, United States', address: { city: 'Portland', state: 'Oregon', country: 'United States', country_code: 'us', 'ISO3166-2-lvl4': 'OR' } } }))
+  await page.route('**/geocoding-api.open-meteo.com/v1/search**', (route) => route.fulfill({ json: { results: [{ id: 1, name: 'Portland', latitude: 45.523, longitude: -122.676, country_code: 'US', country: 'United States', admin1: 'Oregon', admin1_id: 4100, timezone: 'America/Los_Angeles' }] } }))
+  await page.route('**/api.open-meteo.com/v1/forecast**', (route) => route.fulfill({ json: { timezone: 'America/Los_Angeles', current: { temperature_2m: 72, weather_code: 1 }, current_units: { temperature_2m: '°F' }, daily: { sunrise: ['2026-07-16T05:40'], sunset: ['2026-07-16T20:55'] } } }))
+}
+
 async function reachLocation(page: Page) {
+  await mockLocationServices(page)
   await page.goto('/')
   await page.getByRole('link', { name: 'Get started' }).click()
   await page.getByLabel('Preferred name').fill('Alex')
@@ -11,7 +18,7 @@ async function reachLocation(page: Page) {
 async function reachAssessment(page: Page, short = true) {
   await reachLocation(page)
   await page.getByRole('button', { name: 'Choose on map' }).click()
-  await page.getByRole('button', { name: 'Use this location' }).click()
+  await page.getByRole('button', { name: 'Use this regional location' }).click()
   await page.getByLabel('Dietary pattern').selectOption('Omnivore')
   await page.getByRole('group', { name: 'Do you have food allergies?' }).getByLabel('No').check()
   await page.getByRole('group', { name: 'Do you avoid any foods for other reasons?' }).getByLabel('No').check()
@@ -111,9 +118,9 @@ test('uses a one-shot device location and persists only a coarse position', asyn
   await reachLocation(page)
 
   await page.getByRole('button', { name: 'Use my current location' }).click()
-  await expect(page.getByRole('heading', { name: 'Approximate device location' })).toBeVisible()
-  await expect(page.getByRole('group', { name: 'Map showing an adjustable location pin' })).toBeVisible()
-  await page.getByRole('button', { name: 'Use this location' }).click()
+  await expect(page.getByRole('heading', { name: 'Approximate device area' })).toBeVisible()
+  await expect(page.getByRole('group', { name: 'Map showing an adjustable regional pin' })).toBeVisible()
+  await page.getByRole('button', { name: 'Use this regional location' }).click()
   await expect(page.getByRole('heading', { name: 'Food preferences and exclusions' })).toBeVisible()
 
   await expect
@@ -129,9 +136,12 @@ test('uses a one-shot device location and persists only a coarse position', asyn
       source: 'device',
       latitude: 45.5,
       longitude: -122.7,
-      accuracyMeters: 10_000,
       areaId: 'grid-v1:45.5:-122.7',
       precisionKm: 10,
+      displayName: 'Portland, Oregon, United States',
+      countryCode: 'US',
+      admin1Code: 'OR',
+      produceRegionId: 'us-pacific-northwest',
     })
 })
 
@@ -156,7 +166,8 @@ test('edits profile settings, preserves answers, and recalculates Today', async 
 
   await page.getByLabel('Preferred name').fill('Jordan')
   await page.getByLabel(/Dietary pattern/).selectOption('Vegan')
-  await page.getByLabel(/Allergies/).fill('Tree nuts')
+  await page.getByRole('group', { name: 'Do you have food allergies?' }).getByLabel('Yes').check()
+  await page.getByLabel('Food allergies').fill('Tree nuts')
   await page.getByRole('button', { name: 'Save profile changes' }).click()
   await expect(page.getByText('Saved on this device').first()).toBeVisible()
   await page.reload()
