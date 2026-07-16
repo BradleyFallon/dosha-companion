@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { BackLink, Screen } from '../components/Layout'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { nextResumePath } from '../prototype/resume'
@@ -8,7 +8,7 @@ import { birthYearBounds, birthYearError, birthYearInput } from '../profile/birt
 
 export function WelcomeScreen() {
   const { state } = usePrototype()
-  const hasProgress = state.accountCreated
+  const hasProgress = Boolean(state.profile.preferredName || state.profile.birthYear || state.profile.location)
 
   return (
     <Screen className="welcome-screen">
@@ -18,17 +18,8 @@ export function WelcomeScreen() {
       <p className="lede">
         A personalized Ayurvedic wellness companion for learning about your nature and checking in with your current balance.
       </p>
-      {hasProgress ? (
-        <Link className="button primary" to={nextResumePath(state)}>
-          Resume
-        </Link>
-      ) : (
-        <Link className="button primary" to="/create-account">
-          Create account
-        </Link>
-      )}
-      <Link className="button secondary" to="/create-account?mode=signin">
-        Sign in
+      <Link className="button primary" to={nextResumePath(state)}>
+        {hasProgress ? 'Resume' : 'Get started'}
       </Link>
       <details className="boundary-details">
         <summary>Read the wellness disclaimer</summary>
@@ -36,48 +27,6 @@ export function WelcomeScreen() {
           This app provides educational wellness information. It does not diagnose conditions or replace professional medical care.
         </p>
       </details>
-    </Screen>
-  )
-}
-
-export function AccountScreen() {
-  const { dispatch } = usePrototype()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const signIn = new URLSearchParams(location.search).get('mode') === 'signin'
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [accepted, setAccepted] = useState(false)
-  const [error, setError] = useState('')
-
-  function submit(event: FormEvent) {
-    event.preventDefault()
-    if (!email.includes('@') || !password || !accepted) {
-      setError('Enter an email and password, then confirm the wellness-education notice.')
-      return
-    }
-    dispatch({ type: 'account-created' })
-    navigate('/profile/name')
-  }
-
-  return (
-    <Screen>
-      <BackLink to="/" />
-      <p className="eyebrow">Your account</p>
-      <h1 tabIndex={-1}>{signIn ? 'Sign in' : 'Create your account'}</h1>
-      <p className="supporting">Account details entered here are not sent or saved.</p>
-      <form onSubmit={submit} noValidate>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
-        <label htmlFor="password">Password</label>
-        <input id="password" type="password" autoComplete={signIn ? 'current-password' : 'new-password'} value={password} onChange={(event) => setPassword(event.target.value)} />
-        <label className="check-row" htmlFor="terms">
-          <input id="terms" type="checkbox" checked={accepted} onChange={(event) => setAccepted(event.target.checked)} />
-          <span>I understand this is wellness education, not medical care.</span>
-        </label>
-        {error ? <p className="field-error" id="account-error" role="alert">{error}</p> : null}
-        <button className="button primary" type="submit">Continue</button>
-      </form>
     </Screen>
   )
 }
@@ -107,7 +56,7 @@ export function NameProfileScreen() {
       setError('Enter the name you would like us to use.')
       return
     }
-    const invalidYear = birthYearError(birthYear)
+    const invalidYear = birthYear ? birthYearError(birthYear) : `Enter a year from ${minimum} to ${maximum}.`
     if (invalidYear) {
       setYearError(invalidYear)
       return
@@ -119,14 +68,14 @@ export function NameProfileScreen() {
 
   return (
     <Screen>
-      <BackLink to="/create-account" />
+      <BackLink to="/" />
       <StepHeader step={1} />
       <h1 tabIndex={-1}>Let’s personalize the experience</h1>
       <form onSubmit={submit}>
         <label htmlFor="preferred-name">Preferred name</label>
         <input id="preferred-name" value={name} onChange={(event) => setName(event.target.value)} aria-describedby={error ? 'name-error' : undefined} />
         {error ? <p className="field-error" id="name-error" role="alert">{error}</p> : null}
-        <label htmlFor="birth-year">Year of birth <span className="optional">Optional</span></label>
+        <label htmlFor="birth-year">Year of birth</label>
         <input id="birth-year" type="text" inputMode="numeric" autoComplete="bday-year" pattern="[0-9]{4}" placeholder="YYYY" minLength={4} maxLength={4} value={birthYear} onChange={(event) => setBirthYear(birthYearInput(event.target.value))} aria-describedby={yearError ? 'birth-year-error' : 'birth-year-hint'} />
         {yearError ? <p className="field-error" id="birth-year-error" role="alert">{yearError}</p> : <p className="field-hint" id="birth-year-hint">Enter a year from {minimum} to {maximum}. We do not need your full birth date.</p>}
         <button className="button primary" type="submit">Continue</button>
@@ -139,12 +88,28 @@ export function FoodProfileScreen() {
   const { state, dispatch } = usePrototype()
   const navigate = useNavigate()
   const [dietaryPattern, setDietaryPattern] = useState(state.profile.dietaryPattern)
+  const [hasFoodAllergies, setHasFoodAllergies] = useState(state.profile.hasFoodAllergies)
   const [allergies, setAllergies] = useState(state.profile.allergies)
+  const [hasFoodExclusions, setHasFoodExclusions] = useState(state.profile.hasFoodExclusions)
   const [exclusions, setExclusions] = useState(state.profile.exclusions)
+  const [error, setError] = useState('')
 
   function submit(event: FormEvent) {
     event.preventDefault()
-    dispatch({ type: 'update-profile', values: { dietaryPattern, allergies, exclusions } })
+    if (!dietaryPattern || hasFoodAllergies === null || hasFoodExclusions === null) {
+      setError('Choose a dietary pattern and answer both food-safety questions.')
+      return
+    }
+    if (hasFoodAllergies && !allergies.trim()) {
+      setError('Enter your food allergies, or choose No.')
+      return
+    }
+    if (hasFoodExclusions && !exclusions.trim()) {
+      setError('Enter the foods you avoid, or choose No.')
+      return
+    }
+    setError('')
+    dispatch({ type: 'update-profile', values: { dietaryPattern, hasFoodAllergies, allergies: hasFoodAllergies ? allergies : '', hasFoodExclusions, exclusions: hasFoodExclusions ? exclusions : '' } })
     dispatch({ type: 'complete-profile' })
     navigate('/assessment')
   }
@@ -155,14 +120,15 @@ export function FoodProfileScreen() {
       <StepHeader step={3} />
       <h1 tabIndex={-1}>Food preferences and exclusions</h1>
       <form onSubmit={submit}>
-        <label htmlFor="diet">Dietary pattern <span className="optional">Optional</span></label>
+        <label htmlFor="diet">Dietary pattern</label>
         <select id="diet" value={dietaryPattern} onChange={(event) => setDietaryPattern(event.target.value)}>
-          <option value="">No preference</option><option>Omnivore</option><option>Vegetarian</option><option>Vegan</option><option>Pescatarian</option><option>Other</option>
+          <option value="">Choose a dietary pattern</option><option>Omnivore</option><option>Vegetarian</option><option>Vegan</option><option>Pescatarian</option><option>Other</option>
         </select>
-        <label htmlFor="allergies">Allergies <span className="optional">Optional</span></label>
-        <input id="allergies" placeholder="Enter allergies, or leave blank" value={allergies} onChange={(event) => setAllergies(event.target.value)} />
-        <label htmlFor="exclusions">Other exclusions <span className="optional">Optional</span></label>
-        <input id="exclusions" value={exclusions} onChange={(event) => setExclusions(event.target.value)} />
+        <fieldset className="required-choice"><legend>Do you have food allergies?</legend><label><input type="radio" name="has-allergies" checked={hasFoodAllergies === false} onChange={() => { setHasFoodAllergies(false); setAllergies('') }} /> No</label><label><input type="radio" name="has-allergies" checked={hasFoodAllergies === true} onChange={() => setHasFoodAllergies(true)} /> Yes</label></fieldset>
+        {hasFoodAllergies ? <><label htmlFor="allergies">Food allergies</label><input id="allergies" value={allergies} onChange={(event) => setAllergies(event.target.value)} /></> : null}
+        <fieldset className="required-choice"><legend>Do you avoid any foods for other reasons?</legend><label><input type="radio" name="has-exclusions" checked={hasFoodExclusions === false} onChange={() => { setHasFoodExclusions(false); setExclusions('') }} /> No</label><label><input type="radio" name="has-exclusions" checked={hasFoodExclusions === true} onChange={() => setHasFoodExclusions(true)} /> Yes</label></fieldset>
+        {hasFoodExclusions ? <><label htmlFor="exclusions">Foods you avoid</label><input id="exclusions" value={exclusions} onChange={(event) => setExclusions(event.target.value)} /></> : null}
+        {error ? <p className="field-error" role="alert">{error}</p> : null}
         <p className="field-hint">These preferences are stored only on this device and help filter food guidance.</p>
         <button className="button primary" type="submit">Save and continue</button>
       </form>

@@ -15,6 +15,7 @@ import {
   WarningIcon,
 } from '../ui/icons'
 import { birthYearBounds, birthYearError, birthYearInput } from '../profile/birthYear'
+import { getProfileReadiness } from '../profile/readiness'
 
 export function SettingsScreen() {
   const { state, dispatch, resetPrototype, seedDemo } = usePrototype()
@@ -22,7 +23,9 @@ export function SettingsScreen() {
   const [preferredName, setPreferredName] = useState(state.profile.preferredName)
   const [birthYear, setBirthYear] = useState(state.profile.birthYear)
   const [dietaryPattern, setDietaryPattern] = useState(state.profile.dietaryPattern)
+  const [hasFoodAllergies, setHasFoodAllergies] = useState(state.profile.hasFoodAllergies)
   const [allergies, setAllergies] = useState(state.profile.allergies)
+  const [hasFoodExclusions, setHasFoodExclusions] = useState(state.profile.hasFoodExclusions)
   const [exclusions, setExclusions] = useState(state.profile.exclusions)
   const [error, setError] = useState('')
   const [yearError, setYearError] = useState('')
@@ -35,22 +38,21 @@ export function SettingsScreen() {
       setError('Enter the name you would like us to use.')
       return
     }
-    const invalidYear = birthYearError(birthYear)
+    const invalidYear = birthYear ? birthYearError(birthYear) : `Enter a year from ${minimum} to ${maximum}.`
     if (invalidYear) {
       setYearError(invalidYear)
+      return
+    }
+    const values = { ...state.profile, preferredName: preferredName.trim(), birthYear, dietaryPattern, hasFoodAllergies, allergies: hasFoodAllergies ? allergies.trim() : '', hasFoodExclusions, exclusions: hasFoodExclusions ? exclusions.trim() : '' }
+    if (!getProfileReadiness(values).ready) {
+      setError('Complete every required profile and food-safety field.')
       return
     }
     setError('')
     setYearError('')
     dispatch({
       type: 'update-profile',
-      values: {
-        preferredName: preferredName.trim(),
-        birthYear,
-        dietaryPattern,
-        allergies: allergies.trim(),
-        exclusions: exclusions.trim(),
-      },
+      values,
     })
   }
 
@@ -94,22 +96,22 @@ export function SettingsScreen() {
         <label htmlFor="settings-name">Preferred name</label>
         <input id="settings-name" value={preferredName} onChange={(event) => setPreferredName(event.target.value)} aria-describedby={error ? 'settings-name-error' : undefined} />
         {error ? <p className="field-error" id="settings-name-error" role="alert">{error}</p> : null}
-        <label htmlFor="settings-birth-year">Year of birth <span className="optional">Optional</span></label>
+        <label htmlFor="settings-birth-year">Year of birth</label>
         <input id="settings-birth-year" type="text" inputMode="numeric" autoComplete="bday-year" pattern="[0-9]{4}" placeholder="YYYY" minLength={4} maxLength={4} value={birthYear} onChange={(event) => setBirthYear(birthYearInput(event.target.value))} aria-describedby={yearError ? 'settings-birth-year-error' : 'settings-birth-year-hint'} />
         {yearError ? <p className="field-error" id="settings-birth-year-error" role="alert">{yearError}</p> : <p className="field-hint" id="settings-birth-year-hint">Enter a year from {minimum} to {maximum}. We do not need your full birth date.</p>}
-        <label htmlFor="settings-diet">Dietary pattern <span className="optional">Optional</span></label>
+        <label htmlFor="settings-diet">Dietary pattern</label>
         <select id="settings-diet" value={dietaryPattern} onChange={(event) => setDietaryPattern(event.target.value)}>
-          <option value="">No preference</option><option>Omnivore</option><option>Vegetarian</option><option>Vegan</option><option>Pescatarian</option><option>Other</option>
+          <option value="">Choose a dietary pattern</option><option>Omnivore</option><option>Vegetarian</option><option>Vegan</option><option>Pescatarian</option><option>Other</option>
         </select>
-        <label htmlFor="settings-allergies">Allergies <span className="optional">Optional</span></label>
-        <input id="settings-allergies" value={allergies} onChange={(event) => setAllergies(event.target.value)} />
-        <label htmlFor="settings-exclusions">Other exclusions <span className="optional">Optional</span></label>
-        <input id="settings-exclusions" value={exclusions} onChange={(event) => setExclusions(event.target.value)} />
+        <fieldset className="required-choice"><legend>Do you have food allergies?</legend><label><input type="radio" name="settings-has-allergies" checked={hasFoodAllergies === false} onChange={() => { setHasFoodAllergies(false); setAllergies('') }} /> No</label><label><input type="radio" name="settings-has-allergies" checked={hasFoodAllergies === true} onChange={() => setHasFoodAllergies(true)} /> Yes</label></fieldset>
+        {hasFoodAllergies ? <><label htmlFor="settings-allergies">Food allergies</label><input id="settings-allergies" value={allergies} onChange={(event) => setAllergies(event.target.value)} /></> : null}
+        <fieldset className="required-choice"><legend>Do you avoid any foods for other reasons?</legend><label><input type="radio" name="settings-has-exclusions" checked={hasFoodExclusions === false} onChange={() => { setHasFoodExclusions(false); setExclusions('') }} /> No</label><label><input type="radio" name="settings-has-exclusions" checked={hasFoodExclusions === true} onChange={() => setHasFoodExclusions(true)} /> Yes</label></fieldset>
+        {hasFoodExclusions ? <><label htmlFor="settings-exclusions">Foods you avoid</label><input id="settings-exclusions" value={exclusions} onChange={(event) => setExclusions(event.target.value)} /></> : null}
         <button className="button primary icon-label" type="submit"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" />Save profile changes</button>
       </form>
       <section className="settings-location" aria-labelledby="settings-location-title">
         <h2 className="section-title-with-icon" id="settings-location-title"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Location and units</h2>
-        <p>{state.profile.location?.displayLabel ?? (state.profile.location?.source === 'skipped' ? 'Location skipped' : 'No location saved')} · {state.profile.location?.units === 'metric' ? 'Metric' : 'US'} units</p>
+        <p>{state.profile.location?.displayLabel ?? 'No regional location saved'} · {state.profile.location?.units === 'metric' ? 'Metric' : 'US'} units</p>
         <Link className="button secondary icon-label" to="/profile/location?return=settings"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Edit or remove location</Link>
       </section>
       <section className="settings-data" aria-labelledby="settings-data-title">

@@ -8,8 +8,7 @@ Low-fidelity interaction specification for the first mobile prototype. The canon
 
 ```mermaid
 flowchart TD
-    A[Welcome] --> B[Create account]
-    B --> C[Profile setup 1 of 3]
+    A[Welcome] --> C[Profile setup 1 of 3]
     C --> D[Profile setup 2 of 3]
     D --> E[Profile setup 3 of 3]
     E --> F[Assessment introduction]
@@ -30,7 +29,7 @@ flowchart TD
 ## Navigation model
 
 - Welcome, sign-up, profile setup, and assessment are focused flows without bottom navigation.
-- A back action appears where it will not discard required consent or account state.
+- A back action appears where it will not discard required profile state.
 - “Save and exit” appears from assessment introduction onward and returns to a resumable home/interstitial state.
 - Primary bottom navigation appears after the assessment reaches Results and the user enters Today.
 - Deep links into post-assessment screens redirect an incomplete user to the appropriate resume point.
@@ -39,10 +38,10 @@ flowchart TD
 
 | State | User sees | Primary action | Alternate actions |
 | ----- | --------- | -------------- | ----------------- |
-| Welcome | Product category, tagline, brief value, boundary link | Create account | Sign in; wellness disclaimer |
-| Profile 1 | Preferred name and optional year of birth | Continue | Back |
-| Profile 2 | Optional device location, adjustable map pin, and units | Use this location | Choose on map; manual search; skip; back |
-| Profile 3 | Dietary pattern, allergies, exclusions | Save and continue | Back; skip optional fields |
+| Welcome | Product category, tagline, brief value, boundary link | Get started | Wellness disclaimer |
+| Profile 1 | Preferred name and adult year of birth | Continue | Back |
+| Profile 2 | Required regional location and units | Use this location | Device, map, or city; back |
+| Profile 3 | Dietary pattern and explicit allergy/exclusion status | Save and continue | Back |
 | Assessment intro | Time, two sections, saving, skip, educational boundary | Begin assessment | Exit |
 | Baseline question | “Your usual nature,” progress, prompt, answers | Continue after selection | Not sure; skip; back; save and exit |
 | Transition | Explicit shift from lifetime to past-seven-days frame | Continue | Save and exit |

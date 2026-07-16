@@ -155,14 +155,6 @@ export function LocationProfileScreen() {
     navigate(returnPath)
   }
 
-  function skipLocation() {
-    dispatch({
-      type: 'update-profile',
-      values: { location: blankLocation('skipped', units) },
-    })
-    navigate(returnPath)
-  }
-
   function chooseAgain() {
     setSelection(null)
     setStatus('')
@@ -221,7 +213,6 @@ export function LocationProfileScreen() {
               <button className="button secondary icon-label" type="submit"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Use manual location</button>
             </form>
           </details>
-          <button className="text-button centered-action" type="button" onClick={skipLocation}>Skip for now</button>
         </>
       )}
       {status ? <p className="location-status" role="status" aria-live="polite">{status}</p> : null}

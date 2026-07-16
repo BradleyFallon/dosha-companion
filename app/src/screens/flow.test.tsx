@@ -15,6 +15,7 @@ function renderAt(path: string, values = {}) {
     profileCompleted: true,
     assessmentStarted: true,
     assessmentMode: 'short',
+    profile: completedProfile('Alex'),
     ...values,
   })
   return render(
@@ -253,20 +254,22 @@ function allOrdinaryAnswers() {
 function completedProfile(preferredName: string) {
   return {
     preferredName,
-    birthYear: '',
+    birthYear: '1990',
     location: {
-      source: 'skipped' as const,
-      latitude: null,
-      longitude: null,
-      accuracyMeters: null,
-      areaId: null,
-      precisionKm: null,
-      timeZone: 'UTC',
+      source: 'map' as const,
+      latitude: 45.5,
+      longitude: -122.7,
+      accuracyMeters: 10_000,
+      areaId: 'grid-v1:45.5:-122.7',
+      precisionKm: 10,
+      timeZone: 'America/Los_Angeles',
       units: 'us' as const,
-      displayLabel: null,
+      displayLabel: 'Portland area',
     },
-    dietaryPattern: '',
+    dietaryPattern: 'Omnivore',
+    hasFoodAllergies: false,
     allergies: '',
+    hasFoodExclusions: false,
     exclusions: '',
   }
 }

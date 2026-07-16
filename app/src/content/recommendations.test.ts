@@ -40,8 +40,9 @@ describe('catalog recommendation selector', () => {
   })
 
   it('withholds food whenever allergies or exclusions are present', () => {
-    expect(select({ profile: { ...state.profile, dietaryPattern: 'Vegan', allergies: 'Nuts' } }).food.status).toBe('withheld')
-    expect(select({ profile: { ...state.profile, exclusions: 'Soy' } }).food.status).toBe('withheld')
-    expect(select({ profile: { ...state.profile, dietaryPattern: 'Vegetarian' } }).food.status).toBe('shown')
+    const ready = { ...state.profile, dietaryPattern: 'Vegetarian', hasFoodAllergies: false, hasFoodExclusions: false }
+    expect(select({ profile: { ...ready, dietaryPattern: 'Vegan', hasFoodAllergies: true, allergies: 'Nuts' } }).food.status).toBe('withheld')
+    expect(select({ profile: { ...ready, hasFoodExclusions: true, exclusions: 'Soy' } }).food.status).toBe('withheld')
+    expect(select({ profile: ready }).food.status).toBe('shown')
   })
 })

@@ -60,9 +60,9 @@ These fields do not usually need to be asked repeatedly. Most support personaliz
 
 | Field                   |    Required | Suggested type             | How it is used                                                    | Dosha effect   | LLM access             |
 | ----------------------- | ----------: | -------------------------- | ----------------------------------------------------------------- | -------------- | ---------------------- |
-| `birth_year`            |    Optional | Four-digit year            | Derives age for life-stage relevance and safety handling          | None initially | Derived age band only  |
-| `location_profile`      |    Optional | Structured coarse location | Seasonal, time-of-day, climate, and measurement defaults           | None           | Generalized value only |
-| `dietary_pattern`       | Recommended | Enum                       | Filters food suggestions and articles                             | None           | Yes                    |
+| `birth_year`            |    Required | Four-digit year            | Derives age for life-stage relevance and safety handling          | None initially | Derived age band only  |
+| `location_profile`      |    Required | Structured coarse location | Seasonal, time-of-day, climate, and measurement defaults           | None           | Generalized value only |
+| `dietary_pattern`       |    Required | Enum                       | Filters food suggestions and articles                             | None           | Yes                    |
 | `food_allergies`        | Recommended | Multi-select               | Hard exclusion against unsafe food recommendations                | None           | Yes, as exclusions     |
 | `food_intolerances`     |    Optional | Multi-select               | Filters food and recipe recommendations                           | None           | Yes, as exclusions     |
 | `major_food_exclusions` |    Optional | Multi-select               | Respects ethical, religious, cultural, or personal restrictions   | None           | Yes                    |
@@ -70,7 +70,7 @@ These fields do not usually need to be asked repeatedly. Most support personaliz
 
 ### `birth_year`
 
-Collect the year only, never the full birth date. Accept an optional four-digit year for adults aged 18 through 120 and derive a current age or broad age band when a feature needs one.
+Collect the year only, never the full birth date. Require a four-digit year for adults aged 18 through 120 and derive a current age or broad age band when a feature needs one.
 
 Older saved age-band values cannot be converted into a truthful birth year and should migrate to an empty optional value.
 
@@ -363,8 +363,8 @@ A suitable payload may resemble:
 Collect immediately after account creation:
 
 1. Preferred name
-2. Optional year of birth
-3. Optional location through device, map, manual locality backup, or skip
+2. Year of birth
+3. Regional location through device, map, or city
 4. Preferred measurement units
 5. Dietary pattern
 6. Food allergies

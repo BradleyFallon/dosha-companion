@@ -90,7 +90,7 @@ describe('prototype state and persistence', () => {
   it('migrates version 2 location-profile state', () => {
     const value = JSON.stringify({ version: 2, state: persistableState(completedState()) })
     const restored = restoreState({ getItem: () => value })
-    expect(restored.state.profile.location?.source).toBe('skipped')
+    expect(restored.state.profile.location?.source).toBe('map')
     expect(restored.notice).toContain('version 2')
   })
 
@@ -226,17 +226,21 @@ function completedState(values: Partial<PrototypeState> = {}): PrototypeState {
     profile: {
       ...defaultState.profile,
       preferredName: 'Alex',
+      birthYear: '1990',
       location: {
-        source: 'skipped',
-        latitude: null,
-        longitude: null,
-        accuracyMeters: null,
-        areaId: null,
-        precisionKm: null,
+        source: 'map',
+        latitude: 45.5,
+        longitude: -122.7,
+        accuracyMeters: 10_000,
+        areaId: 'grid-v1:45.5:-122.7',
+        precisionKm: 10,
         timeZone: 'America/Los_Angeles',
         units: 'us',
-        displayLabel: null,
+        displayLabel: 'Portland area',
       },
+      dietaryPattern: 'Omnivore',
+      hasFoodAllergies: false,
+      hasFoodExclusions: false,
     },
     profileCompleted: true,
     assessmentStarted: true,

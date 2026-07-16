@@ -105,6 +105,10 @@ input:not([type="radio"]):not([type="checkbox"]), select { min-height: 48px; wid
 .inline-options legend { width: 100%; margin-bottom: 8px; }
 .inline-options label { display: flex; min-height: 44px; align-items: center; gap: 8px; font-weight: 500; }
 .inline-options input { width: 20px; height: 20px; }
+.required-choice { display: flex; margin: 8px 0 14px; padding: 0; flex-wrap: wrap; border: 0; gap: 8px 24px; }
+.required-choice legend { width: 100%; margin-bottom: 3px; }
+.required-choice label { display: flex; min-height: 44px; align-items: center; gap: 8px; font-weight: 500; }
+.required-choice input { width: 20px; height: 20px; }
 
 .step-header { display: grid; grid-template-columns: 1fr auto; margin-bottom: 30px; color: var(--muted); font-size: .86rem; font-weight: 750; }
 progress { width: 100%; height: 7px; margin: 8px 0 22px; grid-column: 1 / -1; border: 0; border-radius: 8px; overflow: hidden; color: var(--accent); background: #e4dfd5; }

@@ -6,7 +6,7 @@
 
 ### Sign up and profile setup
 
-Account entry keeps passwords out of persistence. Profile setup collects preferred name, optional year of birth, optional coarse location/units, dietary pattern, allergies, and exclusions. Settings permits later edits.
+The demo begins directly with profile setup. Preferred name, adult year of birth, regional location, dietary pattern, explicit allergy status, and explicit other-exclusion status are required. Allergy or exclusion details are required after Yes. Settings uses the same readiness rules for later edits.
 
 ### Initial questions and Results
 

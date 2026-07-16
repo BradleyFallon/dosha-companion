@@ -2,11 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 
 async function reachLocation(page: Page) {
   await page.goto('/')
-  await page.getByRole('link', { name: 'Create account' }).click()
-  await page.getByLabel('Email').fill('prototype@example.com')
-  await page.getByLabel('Password').fill('not-stored')
-  await page.getByLabel(/I understand this is wellness education/).check()
-  await page.getByRole('button', { name: 'Continue' }).click()
+  await page.getByRole('link', { name: 'Get started' }).click()
   await page.getByLabel('Preferred name').fill('Alex')
   await page.getByLabel('Year of birth').fill('1990')
   await page.getByRole('button', { name: 'Continue' }).click()
@@ -14,7 +10,11 @@ async function reachLocation(page: Page) {
 
 async function reachAssessment(page: Page, short = true) {
   await reachLocation(page)
-  await page.getByRole('button', { name: 'Skip for now' }).click()
+  await page.getByRole('button', { name: 'Choose on map' }).click()
+  await page.getByRole('button', { name: 'Use this location' }).click()
+  await page.getByLabel('Dietary pattern').selectOption('Omnivore')
+  await page.getByRole('group', { name: 'Do you have food allergies?' }).getByLabel('No').check()
+  await page.getByRole('group', { name: 'Do you avoid any foods for other reasons?' }).getByLabel('No').check()
   await page.getByRole('button', { name: 'Save and continue' }).click()
   if (short) await page.getByRole('link', { name: 'Switch to short mode' }).click()
   await page.getByRole('button', { name: 'Begin assessment' }).click()

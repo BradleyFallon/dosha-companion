@@ -2,9 +2,10 @@ import { initialAssessment } from '../generated/initialAssessment'
 import { checkInQuestionSets, recommendationCatalog } from '../generated/contentCatalog'
 import type { AssessmentMode } from '../quiz/assessment'
 import { getAssessmentQuestions } from '../quiz/assessment'
+import { getProfileReadiness } from '../profile/readiness'
 
 export const STORAGE_KEY = 'dosha-companion-prototype-state'
-export const STORAGE_VERSION = 5
+export const STORAGE_VERSION = 6
 
 export type SaveStatus = 'saved' | 'saving' | 'not-saved'
 
@@ -25,7 +26,9 @@ export interface ProfileState {
   birthYear: string
   location: LocationProfile | null
   dietaryPattern: string
+  hasFoodAllergies: boolean | null
   allergies: string
+  hasFoodExclusions: boolean | null
   exclusions: string
 }
 
@@ -90,13 +93,15 @@ export type PrototypeAction =
   | { type: 'reset'; status?: SaveStatus; notice?: string | null }
 
 export const defaultState: PrototypeState = {
-  accountCreated: false,
+  accountCreated: true,
   profile: {
     preferredName: '',
     birthYear: '',
     location: null,
     dietaryPattern: '',
+    hasFoodAllergies: null,
     allergies: '',
+    hasFoodExclusions: null,
     exclusions: '',
   },
   profileCompleted: false,
@@ -131,7 +136,7 @@ export function prototypeReducer(
         saveStatus: 'saving',
       }
     case 'complete-profile':
-      return { ...state, profileCompleted: true, saveStatus: 'saving' }
+      return { ...state, profileCompleted: getProfileReadiness(state.profile).ready, saveStatus: 'saving' }
     case 'start-assessment':
       return {
         ...state,
@@ -438,15 +443,16 @@ function sanitizeState(raw: Record<string, unknown>): PrototypeState {
     dietaryPattern: sanitizeEnum(rawProfile.dietaryPattern, [
       '', 'Omnivore', 'Vegetarian', 'Vegan', 'Pescatarian', 'Other',
     ]),
+    hasFoodAllergies: sanitizeFoodStatus(rawProfile.hasFoodAllergies, rawProfile.allergies),
     allergies: sanitizeString(rawProfile.allergies, 500),
+    hasFoodExclusions: sanitizeFoodStatus(rawProfile.hasFoodExclusions, rawProfile.exclusions),
     exclusions: sanitizeString(rawProfile.exclusions, 500),
   }
-  const accountCreated = raw.accountCreated === true
+  const accountCreated = true
+  const readiness = getProfileReadiness(profile)
   const profileCompleted =
     raw.profileCompleted === true &&
-    accountCreated &&
-    Boolean(profile.preferredName) &&
-    Boolean(profile.location)
+    readiness.ready
   const assessmentStarted = raw.assessmentStarted === true && profileCompleted
   const assessmentMode: AssessmentMode = raw.assessmentMode === 'short' ? 'short' : 'full'
   const validQuestionIds = new Set(initialAssessment.questions.map((question) => question.id))
@@ -617,6 +623,11 @@ function sanitizeBirthYear(value: unknown) {
   return year >= currentYear - 120 && year <= currentYear - 18 ? text : ''
 }
 
+function sanitizeFoodStatus(value: unknown, details: unknown) {
+  if (value === true || value === false) return value
+  return typeof details === 'string' && details.trim() ? true : null
+}
+
 function nullableNumber(value: unknown, minimum: number, maximum: number) {
   return typeof value === 'number' && Number.isFinite(value) && value >= minimum && value <= maximum
     ? value
@@ -666,10 +677,12 @@ export function createDemoState(now = new Date()): PrototypeState {
     accountCreated: true,
     profile: {
       preferredName: 'Demo Editor',
-      birthYear: '',
-      location: { source: 'skipped', latitude: null, longitude: null, accuracyMeters: null, areaId: null, precisionKm: null, timeZone: browserTimeZone(), units: 'us', displayLabel: null },
+      birthYear: '1990',
+      location: { source: 'map', latitude: 45.5, longitude: -122.7, accuracyMeters: 10_000, areaId: 'grid-v1:45.5:-122.7', precisionKm: 10, timeZone: 'America/Los_Angeles', units: 'us', displayLabel: 'Portland area' },
       dietaryPattern: 'Vegetarian',
+      hasFoodAllergies: false,
       allergies: '',
+      hasFoodExclusions: false,
       exclusions: '',
     },
     profileCompleted: true,

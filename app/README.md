@@ -2,7 +2,7 @@
 
 This directory contains a low-fidelity mobile-first prototype of the first product loop:
 
-> Welcome → simulated account → profile setup → assessment → coverage → interactive Today → check-ins → Learn and guided content search
+> Welcome → required profile setup → assessment → coverage → interactive Today → check-ins → Learn and guided content search
 
 It is a content-driven browser-local demo, not a production application. Coverage, repeatable current check-ins, recommendation rotation/history, Learn, deterministic content search, Settings export/reset, and a development demo seed are functional. Authentication, dosha scoring, expert approval, subscriptions, AI, and synchronization remain unavailable or simulated.
 
@@ -119,7 +119,7 @@ Questions can repair initial coverage or start a five- or seven-question repeata
 
 ## Settings and local persistence
 
-`/settings` edits preferred name, age band, dietary pattern, allergies, and exclusions without removing assessment answers. Location and units reuse the location chooser and return to Settings.
+`/settings` edits preferred name, birth year, dietary pattern, explicit allergy/exclusion status, and details without removing assessment answers. Location and units reuse the location chooser and return to Settings.
 
 Persisted state is version 4. It adds recommendation history, the active daily item, and dated check-ins. Restore logic validates their IDs, statuses, dates, set/question references, and answer relationships while retaining valid neighboring data. Versions 1–3 migrate through sanitization. Corrupt or incompatible snapshots start safely with a visible notice. Settings displays storage status, exports the allow-listed snapshot as JSON, and confirms before clearing all local data.
 
@@ -154,7 +154,7 @@ Profile setup offers four paths:
 - **Use my current location** calls `navigator.geolocation.getCurrentPosition()` once after an explicit click and permission prompt.
 - **Choose on map** opens a MapLibre map with a draggable pin. Tapping the map also moves the pin.
 - **Search manually instead** stores only the entered locality label; it does not call a geocoding service.
-- **Skip for now** stores no coordinates or label and continues onboarding.
+- A regional location is required before onboarding can continue.
 
 After onboarding, **My Balance → Edit or remove location** reopens the same chooser; selecting Skip removes the saved area.
 
@@ -170,7 +170,7 @@ For full phone testing, use one of these HTTPS options:
 2. Run Vite with a locally trusted HTTPS certificate.
 3. Expose the local server through a trusted HTTPS development tunnel.
 
-The plain Vite `Network` URL remains useful for checking layout and non-location flows on the same trusted Wi-Fi network. Open the printed LAN address in Safari, allow Node through the computer firewall if needed, and use **Choose on map** or **Skip for now**. Do not open `localhost` on the phone; there it refers to the phone itself.
+The plain Vite `Network` URL remains useful for checking layout on the same trusted Wi-Fi network. Open the printed LAN address in Safari, allow Node through the computer firewall if needed, and use **Choose on map** when device location is unavailable. Do not open `localhost` on the phone; there it refers to the phone itself.
 
 ## Prototype limitations
 

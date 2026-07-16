@@ -2,6 +2,7 @@ import type { ProfileState, RecommendationHistoryRecord } from '../prototype/sta
 import type { AssessmentCoverage } from '../quiz/coverage'
 import type { RecommendationContent } from '../generated/contentCatalog'
 import { getRecommendations } from './repository'
+import { getProfileReadiness } from '../profile/readiness'
 
 const CONTEXT_ANSWERS = {
   physicalChange: 'a_context_major_change_001_recent_illness_injury_medication',
@@ -93,6 +94,9 @@ function recommendationContext(submittedAnswers: Record<string, string>, coverag
 }
 
 function selectFoodRecommendation(profile: ProfileState, catalog: RecommendationContent[]): FoodRecommendation {
+  if (!getProfileReadiness(profile).foodReady) {
+    return { status: 'withheld', title: 'Complete your food preferences', body: 'Answer the dietary and food-safety questions before food guidance is selected.', reason: 'Required food preferences are incomplete.' }
+  }
   if (profile.allergies.trim() || profile.exclusions.trim()) {
     return {
       status: 'withheld',
