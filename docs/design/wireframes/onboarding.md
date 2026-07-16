@@ -83,21 +83,45 @@ Low-fidelity mobile layouts for welcome, account entry, profile setup, and the h
 | < Back                    Step 2 of 3 |
 | [====================--------------] |
 |                                      |
-| Where are you generally located?     |
+| Use your location                    |
 |                                      |
-| Country                              |
-| [ United States                   v] |
+| This helps adjust guidance for your  |
+| local season, time, and climate.     |
 |                                      |
-| Region                               |
-| [ California                      v] |
+| [ Use my current location          ] |
 |                                      |
-| City or postal prefix (optional)     |
-| [                                  ] |
+|                  or                  |
+|                                      |
+| [ Choose on map                    ] |
+|                                      |
+| We will not make your location       |
+| public or track it continuously.     |
+|                                      |
+| Search manually instead              |
+| Skip for now                         |
++--------------------------------------+
+```
+
+## Profile setup — location selected
+
+```text
++--------------------------------------+
+| < Back                    Step 2 of 3 |
+| [====================--------------] |
+|                                      |
+| LOCATION SELECTED                    |
+| Approximate device location          |
+|                                      |
+| [ map with movable pin             ] |
+|                                      |
+| Drag the pin or tap the map if this  |
+| is not correct.                      |
 |                                      |
 | Units                                |
 | (•) US        ( ) Metric             |
 |                                      |
-| [ Continue                         ] |
+| [ Use this location                ] |
+| [ Choose again                     ] |
 +--------------------------------------+
 ```
 
@@ -131,6 +155,7 @@ Low-fidelity mobile layouts for welcome, account entry, profile setup, and the h
 
 - Profile progress is saved between steps.
 - Validation appears below the relevant field without clearing other values.
+- Device location is requested only after an explicit action and uses a single lookup, not continuous tracking.
+- Exact coordinates may position the live pin, but persistence and downstream context use only a coarse area.
 - Allergies require an explicit “none” or skip path so an empty field is not misread.
 - Sign-in recovery, verification, and legal-copy details remain outside this first vertical slice.
-

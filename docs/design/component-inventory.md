@@ -21,8 +21,9 @@ This is a low-fidelity inventory of reusable interaction patterns. Names describ
 | Component | Purpose | Key states |
 | --------- | ------- | ---------- |
 | Step indicator | Show profile-setup step and total | Current, complete |
-| Text field | Preferred name or constrained location entry | Empty, filled, error, disabled |
-| Select field | Age band, region, dietary pattern, units | Closed, open, selected, error |
+| Text field | Preferred name or optional manual locality backup | Empty, filled, error, disabled |
+| Select field | Age band, dietary pattern, units | Closed, open, selected, error |
+| Location chooser | One-shot device lookup, map pin, manual backup, or skip | Prompting, locating, permission denied, selected, adjusted, skipped |
 | Multi-select chips/list | Allergies and exclusions | None selected, selected, expanded |
 | Consent row | Terms, privacy, and wellness acknowledgment | Unchecked, checked, error |
 
@@ -71,4 +72,3 @@ Every major surface needs:
 - Full-page unavailable state when required data cannot load
 - Offline state that distinguishes cached reading from unsaved actions
 - Unauthorized/session-expired state with a safe return path
-

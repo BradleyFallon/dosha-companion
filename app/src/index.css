@@ -100,6 +100,26 @@ progress::-moz-progress-bar { background: var(--accent); }
 .dev-control { display: flex; flex-direction: column; gap: 4px; border-style: dashed; font-size: .9rem; }
 .dev-control p { margin: 0; }
 
+.location-screen .step-header { margin-bottom: 24px; }
+.location-primary { margin-top: 14px; }
+.secure-context-note { margin: 16px 0; padding: 12px 14px; border-left: 4px solid #9a6b2f; background: #f6ead7; color: #4e402c; font-size: .92rem; }
+.choice-divider { display: flex; margin: 9px 0; align-items: center; gap: 12px; color: var(--muted); font-size: .86rem; }
+.choice-divider::before, .choice-divider::after { height: 1px; flex: 1; background: var(--line); content: ""; }
+.privacy-line { display: flex; margin: 15px 0; align-items: flex-start; gap: 8px; color: var(--muted); font-size: .88rem; }
+.manual-location { margin: 20px 0 8px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 9px; }
+.manual-location summary { min-height: 32px; color: var(--accent); font-weight: 700; cursor: pointer; }
+.manual-location form { margin-top: 12px; }
+.centered-action { display: block; margin: 12px auto; }
+.location-status { margin: 18px 0 0; padding: 11px 13px; border-radius: 7px; background: var(--accent-soft); color: var(--accent); font-size: .9rem; }
+.location-error { margin-top: 16px; }
+.location-map { width: 100%; height: min(52vh, 330px); min-height: 240px; margin: 16px 0 12px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: var(--radius); background: linear-gradient(135deg, #e8eee9 25%, #dce5df 25%, #dce5df 50%, #e8eee9 50%, #e8eee9 75%, #dce5df 75%); background-size: 30px 30px; }
+.location-map .maplibregl-canvas:focus-visible { outline: 3px solid var(--focus); outline-offset: -4px; }
+.map-help { color: var(--muted); font-size: .92rem; }
+.location-units { margin-top: 10px; }
+.manual-location-confirmation { display: flex; min-height: 150px; margin: 18px 0 12px; padding: 24px; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); border-radius: var(--radius); background: #f2eee6; text-align: center; }
+.manual-location-confirmation span { font-size: 2rem; }
+.manual-location-confirmation p { margin: 0; font-weight: 750; }
+
 .assessment-topline, .progress-copy { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .assessment-topline { min-height: 44px; margin-bottom: 24px; }
 .assessment-topline a { font-weight: 700; }

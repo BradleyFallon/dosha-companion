@@ -1,17 +1,24 @@
 import type { AssessmentMode } from '../quiz/assessment'
 
 export const STORAGE_KEY = 'dosha-companion-prototype-state'
-export const STORAGE_VERSION = 1
+export const STORAGE_VERSION = 2
 
 export type SaveStatus = 'saved' | 'saving' | 'not-saved'
+
+export interface LocationProfile {
+  source: 'device' | 'map' | 'skipped'
+  latitude: number | null
+  longitude: number | null
+  accuracyMeters: number | null
+  timeZone: string
+  units: 'us' | 'metric'
+  displayLabel: string | null
+}
 
 export interface ProfileState {
   preferredName: string
   ageBand: string
-  country: string
-  region: string
-  city: string
-  units: 'us' | 'metric'
+  location: LocationProfile | null
   dietaryPattern: string
   allergies: string
   exclusions: string
@@ -54,10 +61,7 @@ export const defaultState: PrototypeState = {
   profile: {
     preferredName: '',
     ageBand: '',
-    country: '',
-    region: '',
-    city: '',
-    units: 'us',
+    location: null,
     dietaryPattern: '',
     allergies: '',
     exclusions: '',
@@ -161,11 +165,15 @@ interface PersistedState {
 }
 
 export function serializeState(state: PrototypeState): string {
+  const profile = {
+    ...state.profile,
+    location: coarsenLocationForStorage(state.profile.location),
+  }
   const persisted: PersistedState = {
     version: STORAGE_VERSION,
     state: {
       accountCreated: state.accountCreated,
-      profile: state.profile,
+      profile,
       profileCompleted: state.profileCompleted,
       introSeen: state.introSeen,
       assessmentStarted: state.assessmentStarted,
@@ -179,6 +187,24 @@ export function serializeState(state: PrototypeState): string {
     },
   }
   return JSON.stringify(persisted)
+}
+
+export function coarsenLocationForStorage(
+  location: LocationProfile | null,
+): LocationProfile | null {
+  if (!location || location.latitude === null || location.longitude === null) {
+    return location
+  }
+
+  return {
+    ...location,
+    latitude: Number(location.latitude.toFixed(2)),
+    longitude: Number(location.longitude.toFixed(2)),
+    accuracyMeters:
+      location.accuracyMeters === null
+        ? 1_000
+        : Math.max(Math.round(location.accuracyMeters), 1_000),
+  }
 }
 
 export function persistState(

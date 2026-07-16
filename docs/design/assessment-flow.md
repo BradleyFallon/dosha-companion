@@ -41,7 +41,7 @@ flowchart TD
 | ----- | --------- | -------------- | ----------------- |
 | Welcome | Product category, tagline, brief value, boundary link | Create account | Sign in; wellness disclaimer |
 | Profile 1 | Preferred name and age band | Continue | Back |
-| Profile 2 | Region and units | Continue | Back |
+| Profile 2 | Optional device location, adjustable map pin, and units | Use this location | Choose on map; manual search; skip; back |
 | Profile 3 | Dietary pattern, allergies, exclusions | Save and continue | Back; skip optional fields |
 | Assessment intro | Time, two sections, saving, skip, educational boundary | Begin assessment | Exit |
 | Baseline question | “Your usual nature,” progress, prompt, answers | Continue after selection | Not sure; skip; back; save and exit |
@@ -120,4 +120,3 @@ The exact gate remains a scoring-model decision. The wireframe must not hardcode
 8. Reach results with sufficient coverage.
 9. Reach the missing-coverage state after several skips.
 10. Move from results to Today and identify the primary daily action.
-

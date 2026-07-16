@@ -61,9 +61,7 @@ These fields do not usually need to be asked repeatedly. Most support personaliz
 | Field                   |    Required | Suggested type             | How it is used                                                    | Dosha effect   | LLM access             |
 | ----------------------- | ----------: | -------------------------- | ----------------------------------------------------------------- | -------------- | ---------------------- |
 | `age_band`              | Recommended | Enum                       | Adjusts content tone, life-stage relevance, and safety handling   | None initially | Summary only           |
-| `country`               |         Yes | Country code               | Legal localization, seasonal interpretation, measurement defaults | None           | Yes                    |
-| `region`                | Recommended | State, province, or region | Climate and seasonal content selection                            | None           | Yes                    |
-| `city_or_postal_prefix` |    Optional | Short text                 | Weather classification and local or seasonal food suggestions     | None           | Generalized value only |
+| `location_profile`      |    Optional | Structured coarse location | Seasonal, time-of-day, climate, and measurement defaults           | None           | Generalized value only |
 | `dietary_pattern`       | Recommended | Enum                       | Filters food suggestions and articles                             | None           | Yes                    |
 | `food_allergies`        | Recommended | Multi-select               | Hard exclusion against unsafe food recommendations                | None           | Yes, as exclusions     |
 | `food_intolerances`     |    Optional | Multi-select               | Filters food and recipe recommendations                           | None           | Yes, as exclusions     |
@@ -110,9 +108,9 @@ Collecting it without a defined use adds sensitivity and privacy risk without im
 
 ### Location fields
 
-The app does not need exact GPS coordinates.
+Location is optional. The onboarding flow should prioritize a single permission-gated device lookup, then map selection, skipping, and manual locality search as a backup. It must not require typing country, region, and city fields.
 
-A city, region, or partial postal code can be used to derive:
+The client may use exact coordinates briefly to position an adjustable map pin, but persistent records should retain only the coarse location or locality needed to derive:
 
 * Current season
 * General climate
@@ -130,6 +128,8 @@ Derived weather should use broad categories such as:
 * Mild or temperate
 
 Location and weather should influence content selection rather than baseline dosha scoring.
+
+The structured profile should record the selection source (`device`, `map`, or `skipped`), coarse latitude and longitude when applicable, generalized accuracy, time zone, units, and an optional locality label. Do not request continuous location tracking. Let users edit or remove location later, and do not send exact coordinates to the LLM.
 
 ### Dietary fields
 
@@ -370,13 +370,11 @@ Collect immediately after account creation:
 
 1. Preferred name
 2. Age band
-3. Country
-4. Region
-5. Optional city or postal prefix
-6. Dietary pattern
-7. Food allergies
-8. Food intolerances or exclusions
-9. Preferred measurement units
+3. Optional location through device, map, manual locality backup, or skip
+4. Preferred measurement units
+5. Dietary pattern
+6. Food allergies
+7. Food intolerances or exclusions
 
 Do not collect sex assigned at birth, weight, height, medical conditions, medication use, or detailed symptoms during MVP onboarding.
 

@@ -80,7 +80,7 @@ export function AccountScreen() {
   )
 }
 
-function StepHeader({ step }: { step: number }) {
+export function StepHeader({ step }: { step: number }) {
   return (
     <div className="step-header">
       <span>Profile setup</span>
@@ -122,49 +122,6 @@ export function NameProfileScreen() {
           <option>18–24</option><option>25–34</option><option>35–44</option><option>45–54</option><option>55–64</option><option>65+</option><option>Prefer not to say</option>
         </select>
         <p className="field-hint">Used for appropriate content and safety—not dosha points.</p>
-        <button className="button primary" type="submit">Continue</button>
-      </form>
-    </Screen>
-  )
-}
-
-export function LocationProfileScreen() {
-  const { state, dispatch } = usePrototype()
-  const navigate = useNavigate()
-  const [country, setCountry] = useState(state.profile.country)
-  const [region, setRegion] = useState(state.profile.region)
-  const [city, setCity] = useState(state.profile.city)
-  const [units, setUnits] = useState(state.profile.units)
-  const [error, setError] = useState('')
-
-  function submit(event: FormEvent) {
-    event.preventDefault()
-    if (!country.trim()) {
-      setError('Enter a country or region to continue.')
-      return
-    }
-    dispatch({ type: 'update-profile', values: { country: country.trim(), region: region.trim(), city: city.trim(), units } })
-    navigate('/profile/food')
-  }
-
-  return (
-    <Screen>
-      <BackLink to="/profile/name" />
-      <StepHeader step={2} />
-      <h1 tabIndex={-1}>Where are you generally located?</h1>
-      <form onSubmit={submit}>
-        <label htmlFor="country">Country or region</label>
-        <input id="country" value={country} onChange={(event) => setCountry(event.target.value)} aria-describedby={error ? 'country-error' : undefined} />
-        {error ? <p className="field-error" id="country-error" role="alert">{error}</p> : null}
-        <label htmlFor="region">State or province <span className="optional">Optional</span></label>
-        <input id="region" value={region} onChange={(event) => setRegion(event.target.value)} />
-        <label htmlFor="city">City or postal prefix <span className="optional">Optional</span></label>
-        <input id="city" value={city} onChange={(event) => setCity(event.target.value)} />
-        <fieldset className="inline-options">
-          <legend>Units</legend>
-          <label><input type="radio" name="units" value="us" checked={units === 'us'} onChange={() => setUnits('us')} /> US</label>
-          <label><input type="radio" name="units" value="metric" checked={units === 'metric'} onChange={() => setUnits('metric')} /> Metric</label>
-        </fieldset>
         <button className="button primary" type="submit">Continue</button>
       </form>
     </Screen>

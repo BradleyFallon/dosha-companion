@@ -28,6 +28,7 @@ export function BalanceScreen() {
       <BalanceCard title="Your nature" timeframe="Usual adult tendencies" label="Vata–Pitta" emphasis={['prominent', 'prominent', 'present']} />
       <BalanceCard title="Your current balance" timeframe="Past seven days · updated today" label="Vata is more prominent" emphasis={['more prominent', 'present', 'less prominent']} />
       <Link className="button primary" to="/questions">Answer more questions</Link>
+      <Link className="button secondary" to="/profile/location">Edit or remove location</Link>
     </Screen>
   )
 }

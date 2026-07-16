@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   defaultState,
+  coarsenLocationForStorage,
   prototypeReducer,
   restoreState,
   serializeState,
@@ -56,5 +57,23 @@ describe('prototype state and persistence', () => {
     expect(restored.currentIndex).toBe(2)
     expect(restored.submittedAnswers.q_baseline_natural_pace_001).toBe('answer-1')
     expect(restored.selectedAnswerId).toBeNull()
+  })
+
+  it('coarsens exact coordinates before persistence', () => {
+    expect(
+      coarsenLocationForStorage({
+        source: 'device',
+        latitude: 45.5231,
+        longitude: -122.6765,
+        accuracyMeters: 25,
+        timeZone: 'America/Los_Angeles',
+        units: 'us',
+        displayLabel: 'Approximate device location',
+      }),
+    ).toMatchObject({
+      latitude: 45.52,
+      longitude: -122.68,
+      accuracyMeters: 1000,
+    })
   })
 })

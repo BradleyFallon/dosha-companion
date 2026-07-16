@@ -14,6 +14,7 @@ It is a usability artifact, not a production application. Authentication, scorin
 - Plain CSS and CSS custom properties
 - Typed reducer/context state with versioned `localStorage`
 - Papa Parse for build-time canonical CSV ingestion
+- MapLibre GL JS for optional map-based location selection
 - Vitest, React Testing Library, and Playwright
 
 The prototype stack decision is recorded in [`../decisions/0002-web-prototype-stack.md`](../decisions/0002-web-prototype-stack.md).
@@ -107,15 +108,30 @@ npm run preview
 
 The output is written to `dist/`. A deployment host must route unknown application paths back to `index.html` so direct loads such as `/assessment` or `/today` can reach React Router.
 
-## Test on an iPhone over the local network
+## Location prototype
 
-1. Connect the development computer and iPhone to the same trusted Wi-Fi network.
-2. Run `npm run dev` in `app/`.
-3. Find the `Network` URL printed by Vite, for example `http://192.168.1.20:5173`.
-4. Open that exact URL in Safari on the iPhone.
-5. If it does not load, allow incoming connections for Node in the computer firewall and confirm the Wi-Fi network does not isolate client devices.
+Profile setup offers four paths:
 
-Do not use the `localhost` URL on the phone; on the phone, `localhost` means the phone itself.
+- **Use my current location** calls `navigator.geolocation.getCurrentPosition()` once after an explicit click and permission prompt.
+- **Choose on map** opens a MapLibre map with a draggable pin. Tapping the map also moves the pin.
+- **Search manually instead** stores only the entered locality label; it does not call a geocoding service.
+- **Skip for now** stores no coordinates or label and continues onboarding.
+
+After onboarding, **My Balance → Edit or remove location** reopens the same chooser; selecting Skip removes the saved area.
+
+The application never calls `watchPosition()` and does not track movement. Device coordinates remain precise only in live page memory. The versioned local snapshot rounds coordinates to two decimal places and stores an accuracy floor of 1 km. Map previews currently load OpenFreeMap's public `bright` style through MapLibre; a production tile/style provider, request privacy policy, and locality-label service remain undecided.
+
+## Test on an iPhone
+
+Browser geolocation requires a secure context. `http://localhost` is treated specially on the development computer, but a phone opening a LAN address such as `http://192.168.1.20:5173` should not be expected to receive location access.
+
+For full phone testing, use one of these HTTPS options:
+
+1. Deploy the static prototype to an HTTPS preview host.
+2. Run Vite with a locally trusted HTTPS certificate.
+3. Expose the local server through a trusted HTTPS development tunnel.
+
+The plain Vite `Network` URL remains useful for checking layout and non-location flows on the same trusted Wi-Fi network. Open the printed LAN address in Safari, allow Node through the computer firewall if needed, and use **Choose on map** or **Skip for now**. Do not open `localhost` on the phone; there it refers to the phone itself.
 
 ## Prototype limitations
 
@@ -124,5 +140,5 @@ Do not use the `localhost` URL on the phone; on the phone, `localhost` means the
 - The Vata–Pitta result and “Vata is currently more prominent” state are static fixtures. Answers are not scored.
 - Today guidance is safe placeholder copy selected by no recommendation engine and is not attributed to AI.
 - The assistant and subscription state are static placeholders. There are no LLM, payment, or entitlement calls.
-- There is no backend, database, CMS, analytics SDK, weather/location API, recipe system, notification system, or medical logic.
+- There is no backend, database, CMS, analytics SDK, weather API, reverse-geocoding service, recipe system, notification system, or medical logic.
 - Error, offline, account recovery, and production privacy behavior need dedicated implementation after product validation.

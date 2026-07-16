@@ -4,7 +4,7 @@ import type { PrototypeState } from './state'
 export function nextResumePath(state: PrototypeState) {
   if (!state.accountCreated) return '/create-account'
   if (!state.profile.preferredName) return '/profile/name'
-  if (!state.profile.country) return '/profile/location'
+  if (!state.profile.location) return '/profile/location'
   if (!state.profileCompleted) return '/profile/food'
   if (!state.assessmentStarted) return '/assessment'
   if (state.resultsReached) return state.todayVisited ? '/today' : '/results'
