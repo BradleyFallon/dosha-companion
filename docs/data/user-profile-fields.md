@@ -66,7 +66,7 @@ These fields do not usually need to be asked repeatedly. Most support personaliz
 | `food_allergies`        | Recommended | Multi-select               | Hard exclusion against unsafe food recommendations                | None           | Yes, as exclusions     |
 | `food_intolerances`     |    Optional | Multi-select               | Filters food and recipe recommendations                           | None           | Yes, as exclusions     |
 | `major_food_exclusions` |    Optional | Multi-select               | Respects ethical, religious, cultural, or personal restrictions   | None           | Yes                    |
-| `units_preference`      |         Yes | Enum                       | Displays temperature, weight, quantity, and recipe units          | None           | Yes                    |
+| `temperature_unit_preference` | Optional | Automatic, °F, or °C | Overrides the location-derived weather display default | None | No |
 
 ### `birth_year`
 
@@ -102,7 +102,7 @@ Collecting it without a defined use adds sensitivity and privacy risk without im
 
 ### Location fields
 
-Location is optional. The onboarding flow should prioritize a single permission-gated device lookup, then map selection, skipping, and manual locality search as a backup. It must not require typing country, region, and city fields.
+Location is required for the regional experience. The onboarding flow should prioritize a single permission-gated device lookup, then map selection and manual locality search as alternatives. It must not require typing country, region, and city fields.
 
 The client may use exact coordinates briefly to position an adjustable map pin, but persistent records should retain only the coarse location or locality needed to derive:
 
@@ -111,7 +111,7 @@ The client may use exact coordinates briefly to position an adjustable map pin, 
 * Current weather category
 * Daylight or temperature context
 * Regional produce suggestions
-* Appropriate measurement units
+* An automatic temperature-unit default
 
 Derived weather should use broad categories such as:
 
@@ -123,7 +123,7 @@ Derived weather should use broad categories such as:
 
 Location and weather should influence content selection rather than baseline dosha scoring.
 
-The structured profile should record the selection source (`device`, `map`, or `skipped`), a versioned coarse-area ID, snapped area-center coordinates, nominal precision, time zone, units, and an optional locality label. Do not request continuous location tracking. Let users edit or remove location later, and do not send coordinates to the LLM. See [Location binning](location-binning.md).
+The structured profile should record the selection source (`device`, `map`, or `city`), a versioned coarse-area ID, snapped area-center coordinates, nominal precision, time zone, administrative and produce regions, and a locality label. Temperature units are a separate preference: default to Fahrenheit for US locations and Celsius elsewhere, then let users override that choice in Settings. Do not request continuous location tracking, and do not send coordinates to the LLM. See [Location binning](location-binning.md).
 
 ### Dietary fields
 

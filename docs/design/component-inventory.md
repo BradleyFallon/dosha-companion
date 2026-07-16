@@ -22,8 +22,8 @@ This is a low-fidelity inventory of reusable interaction patterns. Names describ
 | --------- | ------- | ---------- |
 | Step indicator | Show profile-setup step and total | Current, complete |
 | Text field | Preferred name, year of birth, or optional manual locality backup | Empty, filled, error, disabled |
-| Select field | Dietary pattern and units | Closed, open, selected, error |
-| Location chooser | One-shot device lookup, map pin, manual backup, or skip | Prompting, locating, permission denied, selected, adjusted, skipped |
+| Select field | Dietary pattern | Closed, open, selected, error |
+| Location chooser | One-shot device lookup, map pin, or city search | Prompting, locating, permission denied, selected, adjusted |
 | Multi-select chips/list | Allergies and exclusions | None selected, selected, expanded |
 | Consent row | Terms, privacy, and wellness acknowledgment | Unchecked, checked, error |
 

@@ -26,8 +26,9 @@ export function RouteFocus() {
 export function AppShell({ children }: { children: ReactNode }) {
   const { state, dismissRestoreNotice } = usePrototype()
   const location = useLocation()
+  const focusedQuiz = location.pathname.startsWith('/questions/check-in/')
   const showNavigation =
-    state.resultsReached && postResultPaths.some((path) => location.pathname.startsWith(path))
+    !focusedQuiz && state.resultsReached && postResultPaths.some((path) => location.pathname.startsWith(path))
 
   return (
     <div className="app-frame">

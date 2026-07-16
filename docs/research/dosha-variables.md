@@ -44,7 +44,7 @@ The schema below translates traditional domains into app-ready fields grouped in
 | `dietary_pattern` | Enum | Onboarding | Medium; health-adjacent | No dosha score; filters food content | omnivore, vegetarian, vegan, pescatarian, other | Review on change | Yes |
 | `food_allergies` | Multi-select | Onboarding | High; health data | No dosha score; strong safety filter | nuts, dairy, eggs, soy, gluten, shellfish, sesame, other | No decay; editable anytime | Yes, but only as filtered exclusions |
 | `major_food_exclusions` | Multi-select | Onboarding | Medium | No dosha score; content filtering | avoid spicy, avoid dairy, no onion/garlic, low-FODMAP, other | Review on change | Yes |
-| `units_preference` | Enum | Onboarding | Low | None | US, metric | No decay | Yes |
+| `temperature_unit_preference` | Enum | Settings | Low | None | automatic, Fahrenheit, Celsius | No decay | No |
 
 \* `sex_assigned_at_birth` is traditionally relevant in some Ayurvedic contexts, but for a consumer wellness MVP it should be **optional, expert-justified, low-weight if used at all, and excluded from default LLM context** because the value is sensitive and often not necessary for initial recommendations. Health and related data can fall into specially protected categories depending on jurisdiction.[^hhs-hipaa][^ftc-hbnr][^ico-health]
 

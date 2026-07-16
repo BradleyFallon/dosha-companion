@@ -30,11 +30,11 @@ export async function searchCities(query: string, signal?: AbortSignal): Promise
   })
 }
 
-export function normalizeCity(result: CityResult, units: RegionalLocation['units']): RegionalLocation {
-  return normalizeRegion({ source: 'city', latitude: result.latitude, longitude: result.longitude, displayName: [result.name, result.admin1, result.country].filter(Boolean).join(', '), countryCode: result.countryCode, admin1Code: result.admin1Code, timeZone: result.timeZone, units })
+export function normalizeCity(result: CityResult): RegionalLocation {
+  return normalizeRegion({ source: 'city', latitude: result.latitude, longitude: result.longitude, displayName: [result.name, result.admin1, result.country].filter(Boolean).join(', '), countryCode: result.countryCode, admin1Code: result.admin1Code, timeZone: result.timeZone })
 }
 
-export async function normalizeCoordinates(input: { source: 'device' | 'map'; latitude: number; longitude: number; units: RegionalLocation['units'] }): Promise<RegionalLocation> {
+export async function normalizeCoordinates(input: { source: 'device' | 'map'; latitude: number; longitude: number }): Promise<RegionalLocation> {
   const coarse = gridCenter(input.latitude, input.longitude)
   const reverseUrl = new URL(REVERSE_ENDPOINT)
   reverseUrl.searchParams.set('lat', String(coarse.latitude))
@@ -56,7 +56,7 @@ export async function normalizeCoordinates(input: { source: 'device' | 'map'; la
   const countryCode = address.country_code?.toUpperCase()
   if (!countryCode) throw new Error('A country could not be identified. Try a city search instead.')
   const displayName = [address.city ?? address.town ?? address.village ?? address.county, address.state, address.country].filter(Boolean).join(', ')
-  return normalizeRegion({ ...input, ...coarse, displayName: displayName || reverse.display_name || 'Selected region', countryCode, admin1Code: address['ISO3166-2-lvl4'] ?? address.state ?? null, timeZone: time.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone, units: input.units })
+  return normalizeRegion({ ...input, ...coarse, displayName: displayName || reverse.display_name || 'Selected region', countryCode, admin1Code: address['ISO3166-2-lvl4'] ?? address.state ?? null, timeZone: time.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone })
 }
 
 function normalizeRegion(input: Omit<RegionalLocation, 'areaId' | 'precisionKm' | 'produceRegionId'>): RegionalLocation {

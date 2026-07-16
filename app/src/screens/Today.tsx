@@ -6,6 +6,7 @@ import { calculateAssessmentCoverage } from '../quiz/coverage'
 import { selectDailyRecommendation } from '../content/recommendations'
 import { getSeasonalProduce } from '../content/seasonalProduce'
 import { loadLocalConditions, weatherLabel, type LocalConditions } from '../location/conditions'
+import { resolveTemperatureUnit } from '../location/units'
 import {
   BalanceIcon,
   CompleteIcon,
@@ -50,6 +51,7 @@ export function TodayScreen() {
   }).format(new Date())
   const greeting = greetingForTime(new Date(), timeZone)
   const seasonalProduce = getSeasonalProduce(state.profile).slice(0, 4)
+  const temperatureUnit = resolveTemperatureUnit(state.profile.location, state.profile.temperatureUnitPreference)
 
   useEffect(() => {
     if (!currentRecord) dispatch({ type: 'show-recommendation', recommendationId: recommendation.id, date: recommendation.selectionDate })
@@ -58,11 +60,13 @@ export function TodayScreen() {
   useEffect(() => {
     if (!state.profile.location) return
     const controller = new AbortController()
-    loadLocalConditions(state.profile.location, controller.signal).then(setConditions).catch((reason) => {
+    setConditions(null)
+    setConditionsError('')
+    loadLocalConditions(state.profile.location, temperatureUnit, controller.signal).then(setConditions).catch((reason) => {
       if (!controller.signal.aborted) setConditionsError(reason instanceof Error ? reason.message : 'Local conditions are unavailable right now.')
     })
     return () => controller.abort()
-  }, [state.profile.location])
+  }, [state.profile.location, temperatureUnit])
 
   function updateRecommendation(status: 'completed' | 'dismissed') {
     dispatch({ type: 'recommendation-status', recommendationId: recommendation.id, date: recommendation.selectionDate, status })
@@ -103,7 +107,8 @@ export function TodayScreen() {
       </article>
       <section className="local-conditions" aria-labelledby="local-conditions-title">
         <p className="eyebrow">Near you</p><h2 id="local-conditions-title">Local conditions</h2>
-        {conditions ? <div className="conditions-grid"><div><strong>{Math.round(conditions.temperature)}{conditions.temperatureUnit}</strong><span>{weatherLabel(conditions.weatherCode)}</span></div><div><strong>{formatLocalTime(new Date(), conditions.timeZone)}</strong><span>Local time</span></div><div><strong>{formatClock(conditions.sunrise)}</strong><span>Sunrise</span></div><div><strong>{formatClock(conditions.sunset)}</strong><span>Sunset</span></div><div><strong>{conditions.season}</strong><span>General season</span></div></div> : conditionsError ? <p className="supporting">{conditionsError}</p> : <p role="status" className="supporting">Loading local weather and daylight…</p>}
+        <p className="forecast-location">Forecast for <strong>{state.profile.location?.displayName}</strong></p>
+        {conditions ? <><div className="conditions-current"><strong>{formatTemperature(conditions.temperature, conditions.temperatureUnit)}</strong><span>{weatherLabel(conditions.weatherCode)}</span><small>Feels like {formatTemperature(conditions.apparentTemperature, conditions.temperatureUnit)}</small></div><div className="conditions-grid"><div><strong>{formatTemperature(conditions.highTemperature, conditions.temperatureUnit)}</strong><span>High</span></div><div><strong>{formatTemperature(conditions.lowTemperature, conditions.temperatureUnit)}</strong><span>Low</span></div><div><strong>{Math.round(conditions.precipitationProbability)}%</strong><span>Precipitation</span></div><div><strong>{formatClock(conditions.sunrise)}</strong><span>Sunrise</span></div><div><strong>{formatClock(conditions.sunset)}</strong><span>Sunset</span></div><div><strong>{conditions.season}</strong><span>General season</span></div></div></> : conditionsError ? <p className="supporting">{conditionsError}</p> : <p role="status" className="supporting">Loading local weather and daylight…</p>}
       </section>
       <section className="seasonal-card" aria-labelledby="seasonal-title">
         <p className="eyebrow">Regional food guide</p><h2 id="seasonal-title">In season near you</h2>
@@ -153,8 +158,8 @@ function formatClock(value: string) {
   return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date(value))
 }
 
-function formatLocalTime(value: Date, timeZone: string) {
-  return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', timeZone }).format(value)
+function formatTemperature(value: number, unit: string) {
+  return `${Math.round(value)}${unit}`
 }
 
 function latestCheckInLabel(checkIns: Array<{ completedAt: string | null }>) {

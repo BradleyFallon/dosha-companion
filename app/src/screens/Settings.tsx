@@ -16,6 +16,7 @@ import {
 } from '../ui/icons'
 import { birthYearBounds, birthYearError, birthYearInput } from '../profile/birthYear'
 import { getProfileReadiness } from '../profile/readiness'
+import { inferredTemperatureUnit, temperatureUnitSymbol } from '../location/units'
 
 export function SettingsScreen() {
   const { state, dispatch, resetPrototype, seedDemo } = usePrototype()
@@ -31,6 +32,7 @@ export function SettingsScreen() {
   const [yearError, setYearError] = useState('')
   const [dataMessage, setDataMessage] = useState('')
   const { minimum, maximum } = birthYearBounds()
+  const inferredUnit = inferredTemperatureUnit(state.profile.location)
 
   function save(event: FormEvent) {
     event.preventDefault()
@@ -110,9 +112,16 @@ export function SettingsScreen() {
         <button className="button primary icon-label" type="submit"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" />Save profile changes</button>
       </form>
       <section className="settings-location" aria-labelledby="settings-location-title">
-        <h2 className="section-title-with-icon" id="settings-location-title"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Location and units</h2>
-        <p>{state.profile.location?.displayName ?? 'No regional location saved'} · {state.profile.location?.units === 'metric' ? 'Metric' : 'US'} units</p>
+        <h2 className="section-title-with-icon" id="settings-location-title"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Location</h2>
+        <p>{state.profile.location?.displayName ?? 'No regional location saved'}</p>
         <Link className="button secondary icon-label" to="/profile/location?return=settings"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Edit or remove location</Link>
+        <fieldset className="settings-temperature-units">
+          <legend>Temperature units</legend>
+          <p className="field-hint">Automatic uses {temperatureUnitSymbol(inferredUnit)} for your saved location.</p>
+          <label><input type="radio" name="temperature-units" checked={state.profile.temperatureUnitPreference === 'automatic'} onChange={() => dispatch({ type: 'update-profile', values: { temperatureUnitPreference: 'automatic' } })} /> Automatic ({temperatureUnitSymbol(inferredUnit)})</label>
+          <label><input type="radio" name="temperature-units" checked={state.profile.temperatureUnitPreference === 'fahrenheit'} onChange={() => dispatch({ type: 'update-profile', values: { temperatureUnitPreference: 'fahrenheit' } })} /> Fahrenheit (°F)</label>
+          <label><input type="radio" name="temperature-units" checked={state.profile.temperatureUnitPreference === 'celsius'} onChange={() => dispatch({ type: 'update-profile', values: { temperatureUnitPreference: 'celsius' } })} /> Celsius (°C)</label>
+        </fieldset>
       </section>
       <section className="settings-data" aria-labelledby="settings-data-title">
         <h2 className="section-title-with-icon" id="settings-data-title"><StorageIcon aria-hidden="true" className="icon-leading" focusable="false" />Local data</h2>

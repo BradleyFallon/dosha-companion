@@ -14,8 +14,7 @@ Treat device coordinates and map-pin coordinates as transient input. Before brow
   "countryCode": "US",
   "admin1Code": "OR",
   "timeZone": "America/Los_Angeles",
-  "produceRegionId": "us-pacific-northwest",
-  "units": "us"
+  "produceRegionId": "us-pacific-northwest"
 }
 ```
 
@@ -23,7 +22,9 @@ The grid is nominally about 10 km. Its east-west width varies by latitude, so `p
 
 City search uses Open-Meteo's geocoding endpoint. Device and map confirmation use one user-triggered Nominatim reverse lookup at the already coarsened point, then Open-Meteo resolves the time zone. The public Nominatim endpoint must never be used for autocomplete, bulk lookup, or requests above its published limit; the provider URL stays isolated in the adapter so a production deployment can replace it with a contracted or self-hosted service.
 
-This is a useful default because it is precise enough to select a sunset calculation point and a regional weather forecast while avoiding storage of a home-scale location. It is not precise enough for street-level services, and weather can still vary sharply near mountains, coasts, and urban boundaries.
+This is a useful default because it is precise enough to act as the forecast domain for sunset calculations and a regional weather forecast while avoiding storage of a home-scale location. Every weather request uses the saved grid center, never the raw device or dragged-pin coordinates. The Today card names the saved regional display label so users can see which area drives the forecast. The bin is not precise enough for street-level services, and weather can still vary sharply near mountains, coasts, and urban boundaries.
+
+Temperature units are not part of the location bin. The profile defaults automatically from the saved country and stores only an optional Fahrenheit or Celsius override in Settings.
 
 ## Derived location facets
 
@@ -42,7 +43,7 @@ Do not infer produce availability from latitude, weather, or climate alone. “I
 
 ## Content-selection boundary
 
-Location-derived signals may select local-time, daylight, weather, climate, and regional-food content. They do not change baseline dosha scoring. Food content must also pass dietary and allergy exclusions. Any future “supportive for you” claim requires the separate, approved interpretation layer; until then, the app can truthfully present locally seasonal foods and general educational qualities without claiming a calculated dosha match.
+Location-derived signals may display local-time, daylight, weather, climate, and regional-food context. In the current implementation weather is informational and does not select Today guidance or change baseline dosha scoring. Food content must also pass dietary and allergy exclusions. Any future “supportive for you” claim requires the separate, approved interpretation layer; until then, the app can truthfully present locally seasonal foods and general educational qualities without claiming a calculated dosha match.
 
 ## Privacy and lifecycle
 

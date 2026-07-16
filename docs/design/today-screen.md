@@ -28,7 +28,8 @@ Today is the post-assessment home and primary retention surface. It turns the la
 
 - Editorial review status stays in structured content metadata and editor tooling rather than appearing as a repeated badge in the reader experience.
 - Deterministic rules choose the underlying guidance from context, coverage, profile exclusions, and saved-time-zone time of day.
-- Local conditions use the representative regional coordinate for current weather, local time, sunrise, sunset, and a broad hemisphere-aware season.
+- Local conditions use the saved representative regional coordinate for current temperature, feels-like temperature, daily high/low, precipitation chance, sunrise, sunset, and a broad hemisphere-aware season. The card displays the saved regional name and never uses raw selection coordinates.
+- Temperature display defaults from the saved country and can be overridden in Settings. Weather remains informational until separate editorial rules approve its use in guidance selection.
 - “In season near you” uses the editor-owned seasonal produce catalog filtered by region, month, diet, allergies, and exclusions; it does not claim dosha compatibility.
 - “Why this was chosen” exposes the exact matched rule and states that no dosha score was used.
 - The limited MVP does not place automatically generated AI prose on Today.

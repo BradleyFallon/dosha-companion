@@ -8,7 +8,7 @@ describe('profile readiness', () => {
   })
 
   it('distinguishes explicit No from unanswered food safety', () => {
-    const profile = { ...defaultState.profile, preferredName: 'Alex', birthYear: '1990', dietaryPattern: 'Omnivore', hasFoodAllergies: false, hasFoodExclusions: false, location: { source: 'city' as const, latitude: 45.5, longitude: -122.7, areaId: 'grid-v1:45.5:-122.7', precisionKm: 10 as const, displayName: 'Portland, Oregon, United States', countryCode: 'US', admin1Code: 'OR', timeZone: 'America/Los_Angeles', produceRegionId: 'us-pacific-northwest', units: 'us' as const } }
+    const profile = { ...defaultState.profile, preferredName: 'Alex', birthYear: '1990', dietaryPattern: 'Omnivore', hasFoodAllergies: false, hasFoodExclusions: false, location: { source: 'city' as const, latitude: 45.5, longitude: -122.7, areaId: 'grid-v1:45.5:-122.7', precisionKm: 10 as const, displayName: 'Portland, Oregon, United States', countryCode: 'US', admin1Code: 'OR', timeZone: 'America/Los_Angeles', produceRegionId: 'us-pacific-northwest' } }
     expect(getProfileReadiness(profile)).toMatchObject({ ready: true, foodReady: true })
   })
 

@@ -5,7 +5,7 @@ import { getAssessmentQuestions } from '../quiz/assessment'
 import { getProfileReadiness } from '../profile/readiness'
 
 export const STORAGE_KEY = 'dosha-companion-prototype-state'
-export const STORAGE_VERSION = 7
+export const STORAGE_VERSION = 8
 
 export type SaveStatus = 'saved' | 'saving' | 'not-saved'
 
@@ -20,7 +20,6 @@ export interface RegionalLocation {
   admin1Code: string | null
   timeZone: string
   produceRegionId: string | null
-  units: 'us' | 'metric'
 }
 
 export type LocationProfile = RegionalLocation
@@ -29,6 +28,7 @@ export interface ProfileState {
   preferredName: string
   birthYear: string
   location: LocationProfile | null
+  temperatureUnitPreference: 'automatic' | 'fahrenheit' | 'celsius'
   dietaryPattern: string
   hasFoodAllergies: boolean | null
   allergies: string
@@ -102,6 +102,7 @@ export const defaultState: PrototypeState = {
     preferredName: '',
     birthYear: '',
     location: null,
+    temperatureUnitPreference: 'automatic',
     dietaryPattern: '',
     hasFoodAllergies: null,
     allergies: '',
@@ -411,6 +412,9 @@ function sanitizeState(raw: Record<string, unknown>): PrototypeState {
     preferredName: sanitizeString(rawProfile.preferredName, 80),
     birthYear: sanitizeBirthYear(rawProfile.birthYear),
     location: sanitizeLocation(rawProfile.location),
+    temperatureUnitPreference: sanitizeEnum(rawProfile.temperatureUnitPreference, [
+      'automatic', 'fahrenheit', 'celsius',
+    ]),
     dietaryPattern: sanitizeEnum(rawProfile.dietaryPattern, [
       '', 'Omnivore', 'Vegetarian', 'Vegan', 'Pescatarian', 'Other',
     ]),
@@ -554,7 +558,6 @@ function sanitizeLocation(value: unknown): LocationProfile | null {
     admin1Code: sanitizeNullableString(value.admin1Code, 80),
     timeZone: sanitizeString(value.timeZone, 100) || browserTimeZone(),
     produceRegionId: sanitizeNullableString(value.produceRegionId, 80),
-    units: value.units === 'metric' ? 'metric' : 'us',
   }
 }
 
@@ -634,7 +637,8 @@ export function createDemoState(now = new Date()): PrototypeState {
     profile: {
       preferredName: 'Demo Editor',
       birthYear: '1990',
-      location: { source: 'city', latitude: 45.5, longitude: -122.7, areaId: 'grid-v1:45.5:-122.7', precisionKm: 10, displayName: 'Portland, Oregon, United States', countryCode: 'US', admin1Code: 'OR', timeZone: 'America/Los_Angeles', produceRegionId: 'us-pacific-northwest', units: 'us' },
+      location: { source: 'city', latitude: 45.5, longitude: -122.7, areaId: 'grid-v1:45.5:-122.7', precisionKm: 10, displayName: 'Portland, Oregon, United States', countryCode: 'US', admin1Code: 'OR', timeZone: 'America/Los_Angeles', produceRegionId: 'us-pacific-northwest' },
+      temperatureUnitPreference: 'automatic',
       dietaryPattern: 'Vegetarian',
       hasFoodAllergies: false,
       allergies: '',

@@ -16,7 +16,6 @@ interface LocationDraft {
   source: 'device' | 'map'
   latitude: number
   longitude: number
-  units: RegionalLocation['units']
 }
 
 export function LocationProfileScreen() {
@@ -27,7 +26,6 @@ export function LocationProfileScreen() {
   const returnToSettings = new URLSearchParams(routeLocation.search).get('return') === 'settings'
   const returnPath = returnToSettings ? '/settings' : editing ? '/balance' : '/profile/food'
   const [selection, setSelection] = useState<LocationDraft | RegionalLocation | null>(state.profile.location)
-  const [units, setUnits] = useState<RegionalLocation['units']>(state.profile.location?.units ?? inferredUnits())
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
   const [locating, setLocating] = useState(false)
@@ -46,7 +44,7 @@ export function LocationProfileScreen() {
     setLocating(true)
     setStatus('Waiting for location permission…')
     navigator.geolocation.getCurrentPosition((position) => {
-      setSelection({ source: 'device', latitude: position.coords.latitude, longitude: position.coords.longitude, units })
+      setSelection({ source: 'device', latitude: position.coords.latitude, longitude: position.coords.longitude })
       setLocating(false)
       setStatus('Check the general area before continuing.')
     }, () => {
@@ -58,7 +56,7 @@ export function LocationProfileScreen() {
 
   function chooseOnMap() {
     setError('')
-    setSelection({ source: 'map', ...DEFAULT_MAP_LOCATION, units })
+    setSelection({ source: 'map', ...DEFAULT_MAP_LOCATION })
     setStatus('Move the pin to your general area.')
   }
 
@@ -85,8 +83,8 @@ export function LocationProfileScreen() {
     setStatus('Saving your regional location…')
     try {
       const normalized = 'areaId' in selection
-        ? { ...selection, units }
-        : await normalizeCoordinates({ ...selection, units })
+        ? selection
+        : await normalizeCoordinates(selection)
       dispatch({ type: 'update-profile', values: { location: normalized } })
       navigate(returnPath)
     } catch (reason) {
@@ -104,9 +102,8 @@ export function LocationProfileScreen() {
         <>
           <p className="eyebrow">Regional location</p>
           <h1 tabIndex={-1}>{'displayName' in selection ? selection.displayName : selection.source === 'device' ? 'Approximate device area' : 'Selected map area'}</h1>
-          <LocationMap location={selection} onChange={(longitude, latitude) => setSelection({ source: selection.source === 'device' ? 'device' : 'map', longitude, latitude, units })} />
+          <LocationMap location={selection} onChange={(longitude, latitude) => setSelection({ source: selection.source === 'device' ? 'device' : 'map', longitude, latitude })} />
           <p className="map-help">Drag the pin or tap the map to adjust the general area. Exact coordinates are discarded.</p>
-          <fieldset className="inline-options location-units"><legend>Units</legend><label><input type="radio" name="units" checked={units === 'us'} onChange={() => setUnits('us')} /> US</label><label><input type="radio" name="units" checked={units === 'metric'} onChange={() => setUnits('metric')} /> Metric</label></fieldset>
           <button className="button primary icon-label" type="button" disabled={resolving} onClick={confirmLocation}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />{resolving ? 'Saving region…' : 'Use this regional location'}</button>
           <button className="button secondary" type="button" onClick={() => { setSelection(null); setStatus(''); setError('') }}>Choose again</button>
         </>
@@ -117,7 +114,7 @@ export function LocationProfileScreen() {
           <button className="button primary location-primary icon-label" type="button" onClick={useDeviceLocation} disabled={locating}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />{locating ? 'Finding your area…' : 'Use my current location'}</button>
           <button className="button secondary icon-label" type="button" onClick={chooseOnMap}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Choose on map</button>
           <form className="city-search" onSubmit={findCity}><label htmlFor="city-search">Search for your city</label><input id="city-search" type="search" value={cityQuery} onChange={(event) => setCityQuery(event.target.value)} placeholder="City or region" /><button className="button secondary icon-label" type="submit"><SearchIcon aria-hidden="true" className="icon-leading" focusable="false" />Search cities</button></form>
-          {cityResults.length ? <ul className="city-results">{cityResults.map((result) => <li key={result.id}><button type="button" onClick={() => setSelection(normalizeCity(result, units))}><strong>{result.name}</strong><span>{[result.admin1, result.country].filter(Boolean).join(', ')}</span></button></li>)}</ul> : null}
+          {cityResults.length ? <ul className="city-results">{cityResults.map((result) => <li key={result.id}><button type="button" onClick={() => setSelection(normalizeCity(result))}><strong>{result.name}</strong><span>{[result.admin1, result.country].filter(Boolean).join(', ')}</span></button></li>)}</ul> : null}
           <p className="privacy-line"><PrivacyIcon aria-hidden="true" className="icon-leading" focusable="false" />Only a roughly 10 km region is saved. Location lookup uses Open-Meteo and OpenStreetMap data.</p>
         </>
       )}
@@ -146,9 +143,4 @@ function LocationMap({ location, onChange }: { location: Pick<RegionalLocation, 
     return () => { marker.remove(); map.remove(); mapRef.current = null; markerRef.current = null }
   }, [])
   return <div ref={containerRef} className="location-map" role="group" aria-label="Map showing an adjustable regional pin" />
-}
-
-function inferredUnits(): RegionalLocation['units'] {
-  const region = navigator.language.split('-')[1]?.toUpperCase()
-  return region === 'US' || region === 'LR' || region === 'MM' ? 'us' : 'metric'
 }

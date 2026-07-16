@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test'
 async function mockLocationServices(page: Page) {
   await page.route('**/nominatim.openstreetmap.org/reverse**', (route) => route.fulfill({ json: { display_name: 'Portland, Oregon, United States', address: { city: 'Portland', state: 'Oregon', country: 'United States', country_code: 'us', 'ISO3166-2-lvl4': 'OR' } } }))
   await page.route('**/geocoding-api.open-meteo.com/v1/search**', (route) => route.fulfill({ json: { results: [{ id: 1, name: 'Portland', latitude: 45.523, longitude: -122.676, country_code: 'US', country: 'United States', admin1: 'Oregon', admin1_id: 4100, timezone: 'America/Los_Angeles' }] } }))
-  await page.route('**/api.open-meteo.com/v1/forecast**', (route) => route.fulfill({ json: { timezone: 'America/Los_Angeles', current: { temperature_2m: 72, weather_code: 1 }, current_units: { temperature_2m: '°F' }, daily: { sunrise: ['2026-07-16T05:40'], sunset: ['2026-07-16T20:55'] } } }))
+  await page.route('**/api.open-meteo.com/v1/forecast**', (route) => route.fulfill({ json: { timezone: 'America/Los_Angeles', current: { temperature_2m: 72, apparent_temperature: 70, weather_code: 1 }, daily: { temperature_2m_max: [78], temperature_2m_min: [58], precipitation_probability_max: [20], sunrise: ['2026-07-16T05:40'], sunset: ['2026-07-16T20:55'] } } }))
 }
 
 async function reachLocation(page: Page) {
@@ -18,6 +18,7 @@ async function reachLocation(page: Page) {
 async function reachAssessment(page: Page, short = true) {
   await reachLocation(page)
   await page.getByRole('button', { name: 'Choose on map' }).click()
+  await expect(page.getByRole('group', { name: 'Units' })).not.toBeVisible()
   await page.getByRole('button', { name: 'Use this regional location' }).click()
   await page.getByLabel('Dietary pattern').selectOption('Omnivore')
   await page.getByRole('group', { name: 'Do you have food allergies?' }).getByLabel('No').check()
@@ -66,7 +67,12 @@ test('completes the short mobile vertical slice', async ({ page }) => {
   await page.getByRole('button', { name: 'Continue to Today' }).click()
   await expect(page.getByText('For today')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Local conditions' })).toBeVisible()
+  await expect(page.getByText(/Forecast for Portland, Oregon, United States/)).toBeVisible()
   await expect(page.getByText('72°F')).toBeVisible()
+  await expect(page.getByText('Feels like 70°F')).toBeVisible()
+  await expect(page.getByText('78°F')).toBeVisible()
+  await expect(page.getByText('58°F')).toBeVisible()
+  await expect(page.getByText('20%')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'In season near you' })).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Primary navigation' })).toBeVisible()
 })
@@ -146,6 +152,8 @@ test('uses a one-shot device location and persists only a coarse position', asyn
       admin1Code: 'OR',
       produceRegionId: 'us-pacific-northwest',
     })
+  const location = await page.evaluate(() => JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}').state?.profile?.location)
+  expect(location).not.toHaveProperty('units')
 })
 
 test('resolves a city search to a normalized regional location', async ({ page }) => {
@@ -223,6 +231,15 @@ test('uses every post-assessment destination in the mobile demo', async ({ page 
   await page.getByRole('link', { name: 'Questions' }).click()
   await expect(page.getByRole('heading', { name: 'Questions' })).toBeVisible()
   await page.getByRole('link', { name: 'Start current check-in' }).click()
+  await expect(page.getByRole('navigation', { name: 'Primary navigation' })).not.toBeVisible()
+  for (const height of [844, 667]) {
+    await page.setViewportSize({ width: 390, height })
+    const action = page.getByRole('button', { name: 'Continue' })
+    const actionBox = await action.boundingBox()
+    expect(actionBox).not.toBeNull()
+    expect((actionBox?.y ?? 0) + (actionBox?.height ?? 0)).toBeLessThanOrEqual(height)
+    expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1)).toBe(true)
+  }
   for (let index = 0; index < 5; index += 1) {
     await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 1))
     await page.getByRole('radio').first().check()

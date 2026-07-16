@@ -40,7 +40,7 @@ flowchart TD
 | ----- | --------- | -------------- | ----------------- |
 | Welcome | Product category, tagline, brief value, boundary link | Get started | Wellness disclaimer |
 | Profile 1 | Preferred name and adult year of birth | Continue | Back |
-| Profile 2 | Required regional location and units | Use this location | Device, map, or city; back |
+| Profile 2 | Required regional location | Use this location | Device, map, or city; back |
 | Profile 3 | Dietary pattern and explicit allergy/exclusion status | Save and continue | Back |
 | Assessment intro | Time, two sections, saving, skip, educational boundary | Begin assessment | Exit |
 | Baseline question | “Your usual nature,” progress, prompt, answers | Continue after selection | Not sure; skip; back; save and exit |
@@ -60,6 +60,7 @@ flowchart TD
 - Show optional help only when requested; opening help must not reset selection.
 - Use full-width answer buttons with at least 44 px height and sufficient spacing.
 - Keep compact progress chrome and bottom actions fixed to the viewport; only the question-and-answer region scrolls.
+- Hide global bottom navigation during initial questions and repeat check-ins so it cannot cover the fixed actions.
 - Keep “Not sure” in the answer list because it is a stored response.
 - Keep “Skip for now” outside the answer list because it means no answer was submitted.
 

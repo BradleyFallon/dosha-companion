@@ -143,7 +143,6 @@ progress::-moz-progress-bar { background: var(--accent); }
 .location-map { width: 100%; height: min(52vh, 330px); min-height: 240px; margin: 16px 0 12px; overflow: hidden; border: 1px solid var(--line-strong); border-radius: var(--radius); background: linear-gradient(135deg, #e8eee9 25%, #dce5df 25%, #dce5df 50%, #e8eee9 50%, #e8eee9 75%, #dce5df 75%); background-size: 30px 30px; }
 .location-map .maplibregl-canvas:focus-visible { outline: 3px solid var(--focus); outline-offset: -4px; }
 .map-help { color: var(--muted); font-size: .92rem; }
-.location-units { margin-top: 10px; }
 .manual-location-confirmation { display: flex; min-height: 150px; margin: 18px 0 12px; padding: 24px; flex-direction: column; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); border-radius: var(--radius); background: #f2eee6; text-align: center; }
 .manual-location-confirmation span { font-size: 2rem; }
 .manual-location-confirmation p { margin: 0; font-weight: 750; }
@@ -238,6 +237,11 @@ progress::-moz-progress-bar { background: var(--accent); }
 .today-guide-grid a > span { display: flex; min-width: 0; flex-direction: column; }
 .today-guide-grid small { color: var(--muted); }
 .local-conditions, .seasonal-card { margin: 18px 0; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: white; }
+.forecast-location { margin: -2px 0 14px; color: var(--muted); font-size: .9rem; }
+.conditions-current { display: grid; margin-bottom: 12px; padding: 15px; grid-template-columns: auto 1fr; align-items: baseline; gap: 2px 12px; border-radius: 9px; background: var(--accent-soft); }
+.conditions-current strong { grid-row: 1 / span 2; font-size: 2rem; line-height: 1; }
+.conditions-current span { color: var(--ink); font-weight: 750; }
+.conditions-current small { color: var(--muted); }
 .conditions-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .conditions-grid div { display: flex; min-width: 0; padding: 10px; flex-direction: column; border-radius: 8px; background: var(--accent-soft); }
 .conditions-grid strong { font-size: 1.05rem; }
@@ -305,6 +309,10 @@ progress::-moz-progress-bar { background: var(--accent); }
 .storage-summary div { display: flex; padding: 8px 0; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); }
 .storage-summary dd { margin: 0; text-align: right; }
 .danger-button { color: var(--danger); border-color: var(--danger); background: white; }
+.settings-temperature-units { display: grid; margin: 22px 0 0; padding: 18px 0 0; border: 0; border-top: 1px solid var(--line); gap: 4px; }
+.settings-temperature-units .field-hint { margin: 0 0 4px; }
+.settings-temperature-units label { display: flex; min-height: 44px; align-items: center; gap: 9px; font-weight: 500; }
+.settings-temperature-units input { width: 20px; height: 20px; }
 
 @media (min-width: 700px) {
   .screen { padding-top: 48px; padding-right: 70px; padding-left: 70px; }

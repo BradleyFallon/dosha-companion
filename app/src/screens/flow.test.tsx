@@ -1,13 +1,15 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { initialAssessment } from '../generated/initialAssessment'
 import { AppRoutes } from '../App'
 import { PrototypeProvider } from '../prototype/PrototypeContext'
 import { createTestState } from '../prototype/state'
 import { getAssessmentQuestions } from '../quiz/assessment'
 import { getCheckInQuestionSet } from '../content/repository'
+
+afterEach(() => vi.unstubAllGlobals())
 
 function renderAt(path: string, values = {}) {
   const state = createTestState({
@@ -98,6 +100,15 @@ describe('navigation visibility', () => {
     expect(navigation.querySelectorAll('svg')).toHaveLength(4)
   })
 
+  it('hides bottom navigation during an active repeat check-in', () => {
+    renderAt('/questions/check-in/checkin-test', {
+      resultsReached: true,
+      checkIns: [{ id: 'checkin-test', setId: 'quick-current', startedAt: '2026-07-16T10:00:00.000Z', completedAt: null, answers: {} }],
+    })
+    expect(screen.queryByRole('navigation', { name: 'Primary navigation' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+  })
+
   it('renders the temporary dosha mark as three decorative, unfocusable icons', () => {
     const { container } = renderAt('/', { resultsReached: false })
     const mark = container.querySelector('.welcome-mark')
@@ -169,6 +180,14 @@ describe('limited MVP results and settings', () => {
     expect(snapshot.state.submittedAnswers[first.id]).toBe(first.answers[0].id)
   })
 
+  it('offers automatic temperature units with explicit overrides in Settings', async () => {
+    const user = userEvent.setup()
+    renderAt('/settings', { resultsReached: true, profile: completedProfile('Alex') })
+    expect(screen.getByLabelText('Automatic (°F)')).toBeChecked()
+    await user.click(screen.getByLabelText('Celsius (°C)'))
+    await waitFor(() => expect(JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}').state.profile.temperatureUnitPreference).toBe('celsius'))
+  })
+
   it('shows a truthful global failure message when persistence fails', async () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('quota')
@@ -231,13 +250,31 @@ describe('limited MVP results and settings', () => {
   })
 
   it('shows local conditions, seasonal food, and stable guidance modules', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ timezone: 'America/Los_Angeles', current: { temperature_2m: 72, weather_code: 1 }, current_units: { temperature_2m: '°F' }, daily: { sunrise: ['2026-07-16T05:40'], sunset: ['2026-07-16T20:55'] } }) }))
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ timezone: 'America/Los_Angeles', current: { temperature_2m: 72, apparent_temperature: 70, weather_code: 1 }, daily: { temperature_2m_max: [78], temperature_2m_min: [58], precipitation_probability_max: [20], sunrise: ['2026-07-16T05:40'], sunset: ['2026-07-16T20:55'] } }) }))
     renderAt('/today', { resultsReached: true, profile: completedProfile('Alex') })
     expect(screen.getByRole('heading', { name: 'Local conditions' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'In season near you' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Your guide' })).toBeInTheDocument()
+    expect(screen.getByText('Forecast for')).toHaveTextContent('Portland, Oregon, United States')
     expect(await screen.findByText('72°F')).toBeInTheDocument()
-    vi.unstubAllGlobals()
+    expect(screen.getByText('Feels like 70°F')).toBeInTheDocument()
+    expect(screen.getByText('78°F')).toBeInTheDocument()
+    expect(screen.getByText('58°F')).toBeInTheDocument()
+    expect(screen.getByText('20%')).toBeInTheDocument()
+  })
+
+  it('keeps the regional forecast label and Today content during weather loading and failure', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(() => new Promise(() => {})))
+    const loading = renderAt('/today', { resultsReached: true, profile: completedProfile('Alex') })
+    expect(screen.getByText('Forecast for')).toHaveTextContent('Portland, Oregon, United States')
+    expect(screen.getByRole('status')).toHaveTextContent('Loading local weather and daylight')
+    loading.unmount()
+
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }))
+    renderAt('/today', { resultsReached: true, profile: completedProfile('Alex') })
+    expect(await screen.findByText('Local conditions are unavailable right now.')).toBeInTheDocument()
+    expect(screen.getByText('Forecast for')).toHaveTextContent('Portland, Oregon, United States')
+    expect(screen.getByRole('heading', { name: 'Your guide' })).toBeInTheDocument()
   })
 
   it('exports and confirms before clearing local data', async () => {
@@ -276,8 +313,8 @@ function completedProfile(preferredName: string) {
       admin1Code: 'OR',
       timeZone: 'America/Los_Angeles',
       produceRegionId: 'us-pacific-northwest',
-      units: 'us' as const,
     },
+    temperatureUnitPreference: 'automatic' as const,
     dietaryPattern: 'Omnivore',
     hasFoodAllergies: false,
     allergies: '',

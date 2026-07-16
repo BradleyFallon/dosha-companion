@@ -28,7 +28,7 @@ Unapproved article placeholders are non-interactive and labeled unavailable. The
 
 ### Settings
 
-Settings edits profile fields without deleting assessment answers and links to the existing location/units chooser. It displays local save status and browser-only persistence limitations.
+Settings edits profile fields without deleting assessment answers, links to the regional location chooser, and exposes Automatic, Fahrenheit, and Celsius temperature preferences. It displays local save status and browser-only persistence limitations.
 
 ## Deferred specifications
 

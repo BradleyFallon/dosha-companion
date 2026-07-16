@@ -114,6 +114,16 @@ describe('prototype state and persistence', () => {
     expect(restored.notice).toContain('version 4')
   })
 
+  it('migrates location-level units to automatic profile preference', () => {
+    const legacy = persistableState(completedState())
+    delete legacy.profile.temperatureUnitPreference
+    legacy.profile.location.units = 'metric'
+    const restored = restoreState({ getItem: () => JSON.stringify({ version: 7, state: legacy }) })
+    expect(restored.state.profile.temperatureUnitPreference).toBe('automatic')
+    expect(restored.state.profile.location).not.toHaveProperty('units')
+    expect(restored.notice).toContain('version 7')
+  })
+
   it('sanitizes recommendation history and check-in answer references independently', () => {
     const validAnswer = currentQuestion.answers[0].id
     const value = JSON.stringify({
@@ -198,7 +208,7 @@ describe('prototype state and persistence', () => {
         areaId: 'grid-v1:45.5:-122.7', precisionKm: 10,
         displayName: 'Portland, Oregon, United States', countryCode: 'US', admin1Code: 'OR',
         timeZone: 'America/Los_Angeles',
-        produceRegionId: 'us-pacific-northwest', units: 'us',
+        produceRegionId: 'us-pacific-northwest',
       }),
     ).toMatchObject({
       latitude: 45.5,
@@ -221,7 +231,7 @@ function completedState(values: Partial<PrototypeState> = {}): PrototypeState {
         source: 'city', latitude: 45.5, longitude: -122.7,
         areaId: 'grid-v1:45.5:-122.7', precisionKm: 10,
         displayName: 'Portland, Oregon, United States', countryCode: 'US', admin1Code: 'OR',
-        timeZone: 'America/Los_Angeles', produceRegionId: 'us-pacific-northwest', units: 'us',
+        timeZone: 'America/Los_Angeles', produceRegionId: 'us-pacific-northwest',
       },
       dietaryPattern: 'Omnivore',
       hasFoodAllergies: false,
