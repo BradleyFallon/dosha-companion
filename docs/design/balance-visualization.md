@@ -38,7 +38,7 @@ Your current balance
 Vata is currently more prominent
 
 Vata   [===========---]  more prominent
-Pitta  [======--------]  near your recent baseline
+Pitta  [======--------]  present
 Kapha  [===-----------]  less prominent
 ```
 
@@ -78,4 +78,3 @@ Do not label either measure “diagnostic confidence.” A short count such as �
 - Whether “near baseline” compares current loads with baseline proportions
 - Minimum coverage required to render each track
 - How stale current answers change or suppress the visualization
-
