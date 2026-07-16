@@ -524,21 +524,25 @@ This document defines the overall system. More detailed specifications belong in
 
   * Fields stored for questions, answers, and versions
 
-* `data/quiz-questions/initial-questions.csv`
+* `data/quiz/questions.csv`
 
-  * Canonical initial question records
+  * Canonical question wording and behavioral metadata
 
-* `data/quiz-questions/initial-answer-options.csv`
+* `data/quiz/answer-options.csv`
 
-  * Canonical normalized answer-option records and expert-reviewed score weights
+  * Canonical answer wording with stable answer identities
 
-* `data/quiz-questions/refinement-questions.csv`
+* `data/quiz/answer-scores.csv`
 
-  * Early profile-refinement questions
+  * Separately versioned scoring records and expert rationales
 
-* `data/quiz-questions/recurring-check-in-questions.csv`
+* `data/quiz/question-sets.csv` and `data/quiz/question-set-items.csv`
 
-  * Repeatable current-balance questions
+  * Versioned assessment sets and question membership
+
+* `data/quiz/controlled-values.csv`
+
+  * Allowed enum values used across the authoring files
 
 ## Open decisions
 

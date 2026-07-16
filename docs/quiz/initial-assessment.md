@@ -444,16 +444,14 @@ Before launch:
 
 ## Data location
 
-The actual question records should be stored in:
-
-`data/quiz-questions/initial-questions.csv`
+The canonical authoring records are stored in the normalized CSV files under `data/quiz/`, including `questions.csv`, `answer-options.csv`, `answer-scores.csv`, and `question-set-items.csv`.
 
 This document defines the assessment structure but should not duplicate the full question bank.
 
 ## Open decisions
 
-* Is 24 questions the correct launch target?
-* Should the current-balance section contain 5, 6, or 8 questions?
+* Is the current 27-question draft the correct launch composition?
+* Is seven current-balance questions the correct launch target?
 * Which baseline domains are mandatory before results unlock?
 * Should users review all answers before submitting?
 * Should the initial assessment reveal section labels?

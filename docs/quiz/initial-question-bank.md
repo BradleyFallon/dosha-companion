@@ -4,7 +4,7 @@
 
 Draft for Ayurvedic expert review.
 
-This Markdown file supports discussion and review. The normalized files `data/quiz-questions/initial-questions.csv` and `data/quiz-questions/initial-answer-options.csv` are the canonical executable question bank. Application code must not parse this document, and approved structured records should eventually generate the corresponding review documentation.
+This Markdown file supports discussion and review. The six normalized files under `data/quiz/` are the canonical executable source for wording, answer choices, provisional scoring records, controlled values, and question-set membership. Application code must not parse this document, and approved structured records should eventually generate the corresponding review documentation.
 
 These questions are intended to create:
 

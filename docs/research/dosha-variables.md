@@ -210,6 +210,8 @@ These improve relevance without pushing the app toward diagnosis or collecting u
 
 ## Minimal initial question set
 
+> **Noncanonical research sketch:** The 24-item set and example weights below predate the reviewed 27-question draft. Do not import them into the application. Canonical authoring records live under `data/quiz/`, and numerical weights remain unresolved pending Ayurvedic expert approval.
+
 The 24-item starter set below is designed for a first-pass consumer implementation. It is a **product proposal**, not a claim that these exact weights are canonically standardized. The domain choices are grounded in official and reviewed trait families, while the weight matrix is an engineering-friendly starting point for expert review and later calibration.[^ccras-manual][^critical-review][^scoping-review]
 
 **Scoring convention used below**
@@ -258,6 +260,8 @@ The 24-item starter set below is designed for a first-pass consumer implementati
 This 24-item set is intentionally lean. It captures the physical, physiological, and mental-behavioral domains most commonly used in prakriti tools, while avoiding high-friction or culturally fraught items like complexion photographs, precise biometrics, or clinician-only observations.[^ccras-manual][^critical-review][^scoping-review]
 
 ## Deterministic scoring outline
+
+> **Research example only:** The formulas and thresholds in this section are hypotheses for later expert and product evaluation, not the approved scoring model. `docs/quiz/scoring-model.md` remains authoritative for scoring decisions.
 
 A deterministic MVP algorithm should be simple enough for engineering and content teams to reason about, yet explicit enough to version and audit. Given the heterogeneity of published prakriti tools, that is more defensible than hidden model scoring.[^ccras-manual][^critical-review][^scoping-review]
 
@@ -431,4 +435,3 @@ Jurisdiction-specific compliance will still be required before launch. At minimu
 [^hhs-hipaa]: U.S. Department of Health and Human Services, “Covered Entities and Business Associates,” reviewed August 21, 2024. <https://www.hhs.gov/hipaa/for-professionals/covered-entities/index.html>
 
 [^ico-health]: Information Commissioner’s Office, “What is special category data?”, updated April 9, 2024. <https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/special-category-data/what-is-special-category-data/>
-
