@@ -145,11 +145,11 @@ test('edits profile settings, preserves answers, and recalculates Today', async 
   await page.getByLabel(/Dietary pattern/).selectOption('Vegan')
   await page.getByLabel(/Allergies/).fill('Tree nuts')
   await page.getByRole('button', { name: 'Save profile changes' }).click()
-  await expect(page.getByText('Saved on this device')).toBeVisible()
+  await expect(page.getByText('Saved on this device').first()).toBeVisible()
   await page.reload()
   await expect(page.getByLabel('Preferred name')).toHaveValue('Jordan')
   await page.getByRole('link', { name: 'Today' }).first().click()
-  await expect(page.getByRole('heading', { name: 'Good morning, Jordan' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /Good (morning|afternoon|evening), Jordan/ })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Food suggestion withheld' })).toBeVisible()
 
   const submittedCount = await page.evaluate(() => {
@@ -157,4 +157,58 @@ test('edits profile settings, preserves answers, and recalculates Today', async 
     return Object.keys(snapshot.state?.submittedAnswers ?? {}).length
   })
   expect(submittedCount).toBe(5)
+})
+
+test('uses every post-assessment destination in the mobile demo', async ({ page }) => {
+  test.setTimeout(60_000)
+  await reachAssessment(page)
+  for (let index = 0; index < 3; index += 1) {
+    await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 1))
+    await page.getByRole('radio').first().check()
+    await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled()
+    await page.getByRole('button', { name: 'Continue' }).click()
+  }
+  await page.getByRole('button', { name: 'Continue' }).click()
+  for (let index = 0; index < 2; index += 1) {
+    await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 4))
+    await page.getByRole('radio').first().check()
+    await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled()
+    await page.getByRole('button', { name: 'Continue' }).click()
+  }
+  await page.getByRole('link', { name: 'Open the explicit fixture preview' }).click()
+  await page.getByRole('button', { name: 'Preview Today with fixture' }).click()
+
+  await page.getByRole('button', { name: 'Mark complete' }).click()
+  await expect(page.getByText('Marked complete for today.')).toBeVisible()
+  await page.getByRole('button', { name: 'Show another' }).click()
+
+  await page.getByRole('link', { name: 'Questions' }).click()
+  await expect(page.getByRole('heading', { name: 'Questions' })).toBeVisible()
+  await page.getByRole('link', { name: 'Start current check-in' }).click()
+  for (let index = 0; index < 5; index += 1) {
+    await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 1))
+    await page.getByRole('radio').first().check()
+    await page.getByRole('button', { name: index === 4 ? 'Complete check-in' : 'Continue' }).click()
+  }
+  await expect(page.getByRole('heading', { name: 'Your recent answers were saved' })).toBeVisible()
+  await page.getByRole('link', { name: 'View check-in history' }).click()
+  await expect(page.getByText(/Completed · 5 answers/)).toBeVisible()
+
+  await page.getByRole('link', { name: 'My Balance' }).click()
+  await expect(page.getByText('1 completed')).toBeVisible()
+  await page.getByRole('link', { name: 'Learn', exact: true }).click()
+  await page.getByLabel('Search articles').fill('routine')
+  await page.getByRole('link', { name: /Routine and consistency/i }).click()
+  await expect(page.getByRole('heading', { name: 'Routine and consistency' })).toBeVisible()
+  await page.getByRole('link', { name: 'Learn' }).first().click()
+  await page.getByRole('link', { name: 'Search with guided help' }).click()
+  await page.getByRole('button', { name: 'What is Vata?' }).click()
+  await expect(page.getByRole('heading', { name: 'Matching content' })).toBeVisible()
+
+  await page.getByRole('link', { name: 'Today', exact: true }).click()
+  await page.getByRole('link', { name: 'Open profile settings' }).click()
+  await expect(page.getByText('Browser localStorage')).toBeVisible()
+  const downloadPromise = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Export local data as JSON' }).click()
+  expect((await downloadPromise).suggestedFilename()).toMatch(/dosha-companion-local-data/)
 })

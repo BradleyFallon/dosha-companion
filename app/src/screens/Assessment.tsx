@@ -92,8 +92,9 @@ export function QuestionScreen() {
       dispatch({ type: 'skip-question', questionId: question.id, nextIndex })
     }
 
-    if (new URLSearchParams(routeLocation.search).get('return') === 'results') {
-      navigate('/results')
+    const returnTarget = new URLSearchParams(routeLocation.search).get('return')
+    if (returnTarget === 'results' || returnTarget === 'questions') {
+      navigate(returnTarget === 'results' ? '/results' : '/questions')
       return
     }
 

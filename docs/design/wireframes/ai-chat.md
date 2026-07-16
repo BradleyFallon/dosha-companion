@@ -1,5 +1,7 @@
 # AI Chat Wireframe
 
+> Current demo replacement: no AI chat is implemented. The route provides deterministic Guided help that searches published local articles, glossary terms, and recommendation rationales and can repeat the active Today explanation.
+
 ## Subscriber entry
 
 ```text
@@ -87,4 +89,3 @@
 - Source links refer to approved internal content, not invented citations.
 - AI failure never blocks the rest of the product.
 - Conversation history, usage limits, deletion, and detailed escalation behavior require later specification.
-

@@ -12,8 +12,11 @@ import { nextResumePath } from './prototype/resume'
 import { AssessmentIntroScreen, QuestionScreen, TransitionScreen } from './screens/Assessment'
 import { ResultScreen } from './screens/Results'
 import { TodayScreen } from './screens/Today'
-import { AssistantScreen, BalanceScreen, LearnScreen, QuestionsScreen } from './screens/Secondary'
+import { BalanceScreen, QuestionsScreen } from './screens/Secondary'
 import { SettingsScreen } from './screens/Settings'
+import { ArticleScreen, GlossaryScreen, LearnScreen } from './screens/Learn'
+import { AssistantScreen } from './screens/GuidedHelp'
+import { CheckInScreen, NewCheckInScreen } from './screens/CheckIns'
 
 const LocationProfileScreen = lazy(() =>
   import('./screens/LocationProfile').then((module) => ({
@@ -43,8 +46,12 @@ function PrototypeRoutes() {
         <Route path="/results" element={<Guard allowed={state.resultsReached} redirect={resumePath}><ResultScreen /></Guard>} />
         <Route path="/today" element={<Guard allowed={state.resultsReached} redirect={resumePath}><TodayScreen /></Guard>} />
         <Route path="/questions" element={<Guard allowed={state.resultsReached} redirect={resumePath}><QuestionsScreen /></Guard>} />
+        <Route path="/questions/check-in/new" element={<Guard allowed={state.resultsReached} redirect={resumePath}><NewCheckInScreen /></Guard>} />
+        <Route path="/questions/check-in/:id" element={<Guard allowed={state.resultsReached} redirect={resumePath}><CheckInScreen /></Guard>} />
         <Route path="/balance" element={<Guard allowed={state.resultsReached} redirect={resumePath}><BalanceScreen /></Guard>} />
         <Route path="/learn" element={<Guard allowed={state.resultsReached} redirect={resumePath}><LearnScreen /></Guard>} />
+        <Route path="/learn/glossary" element={<Guard allowed={state.resultsReached} redirect={resumePath}><GlossaryScreen /></Guard>} />
+        <Route path="/learn/:articleId" element={<Guard allowed={state.resultsReached} redirect={resumePath}><ArticleScreen /></Guard>} />
         <Route path="/assistant" element={<Guard allowed={state.resultsReached} redirect={resumePath}><AssistantScreen /></Guard>} />
         <Route path="/settings" element={<Guard allowed={state.resultsReached} redirect={resumePath}><SettingsScreen /></Guard>} />
         <Route path="*" element={<Navigate to={state.accountCreated ? resumePath : '/'} replace />} />

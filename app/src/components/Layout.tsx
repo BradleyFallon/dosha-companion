@@ -24,6 +24,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     state.resultsReached && postResultPaths.some((path) => location.pathname.startsWith(path))
 
   function reset() {
+    if (!window.confirm('Reset all browser-local prototype progress?')) return
     resetPrototype()
     navigate('/')
   }

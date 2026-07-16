@@ -1,5 +1,7 @@
 # Questions Wireframe
 
+> Implemented demo update: Questions now combines initial coverage/repair with independent five- and seven-question current check-ins, incomplete-resume behavior, and a short dated history list. Check-ins do not overwrite the initial assessment.
+
 ```text
 +--------------------------------------+
 | ASSESSMENT COVERAGE                  |

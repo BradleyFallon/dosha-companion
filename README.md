@@ -6,7 +6,7 @@
 
 ## Project stage
 
-The project is in product discovery and domain-definition. Requirements, safety boundaries, scoring, and editorial standards must be reviewed before implementation decisions are treated as final.
+The repository now includes a usable browser-local, content-driven demo under `app/`. It supports onboarding, an unscored assessment, deterministic coverage, repeatable current check-ins, interactive provisional Today recommendations, Learn, deterministic content search, and local Settings. Dosha scoring and expert approval remain intentionally unavailable.
 
 ## MVP summary
 
@@ -23,10 +23,20 @@ The proposed MVP includes accounts, profile setup, a ten-minute initial assessme
 - `docs/ai/`: assistant behavior, grounding, context, safety, and evaluation
 - `docs/design/`: interaction and responsive-design decisions
 - `docs/engineering/`: architecture, platform, deployment, and testing decisions
-- `content/`: approved user-facing editorial content
+- `content/`: editor-owned provisional or approved articles, recommendations, glossary terms, check-in sets, and the [editor guide](content/editor-guide.md)
 - `data/`: structured quiz and reference data
 - `decisions/`: architecture and product decision records
 
 ## Using these documents
 
 Treat the documentation as the shared source of truth. Replace every `TODO` only after the appropriate product, Ayurvedic, safety, editorial, or engineering reviewer has confirmed the decision. Keep polished user-facing content separate from specifications, and record major choices in `decisions/`.
+
+## Run the demo
+
+```sh
+cd app
+npm install
+npm run dev
+```
+
+Open the printed Local URL. For the shortest editor review, complete the short development assessment or open Settings from an existing session and choose **Load seeded demo**. Content changes are validated and regenerated automatically before development, tests, and builds.

@@ -10,6 +10,7 @@ import {
 } from 'react'
 import {
   defaultState,
+  createDemoState,
   persistState,
   prototypeReducer,
   removePersistedState,
@@ -24,6 +25,7 @@ interface PrototypeContextValue {
   dispatch: Dispatch<PrototypeAction>
   resetPrototype: () => void
   dismissRestoreNotice: () => void
+  seedDemo: () => void
 }
 
 const PrototypeContext = createContext<PrototypeContextValue | null>(null)
@@ -74,6 +76,7 @@ export function PrototypeProvider({
         })
       },
       dismissRestoreNotice: () => dispatch({ type: 'clear-restore-notice' }),
+      seedDemo: () => dispatch({ type: 'replace-state', state: createDemoState() }),
     }),
     [state],
   )

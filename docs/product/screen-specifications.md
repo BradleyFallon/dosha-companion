@@ -1,5 +1,7 @@
 # Screen Specifications
 
+> Content-driven demo update: Today actions, repeatable Questions check-ins, check-in-aware My Balance, Learn listing/detail/glossary, deterministic Guided help, and Settings export/reset/demo seed are implemented. All editorial content is provisional. No dosha interpretation or LLM is present.
+
 ## Current limited-MVP behavior
 
 ### Sign up and profile setup

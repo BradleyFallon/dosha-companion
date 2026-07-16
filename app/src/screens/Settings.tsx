@@ -1,16 +1,19 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Screen, Status } from '../components/Layout'
 import { usePrototype } from '../prototype/PrototypeContext'
+import { serializeState } from '../prototype/state'
 
 export function SettingsScreen() {
-  const { state, dispatch } = usePrototype()
+  const { state, dispatch, resetPrototype, seedDemo } = usePrototype()
+  const navigate = useNavigate()
   const [preferredName, setPreferredName] = useState(state.profile.preferredName)
   const [ageBand, setAgeBand] = useState(state.profile.ageBand)
   const [dietaryPattern, setDietaryPattern] = useState(state.profile.dietaryPattern)
   const [allergies, setAllergies] = useState(state.profile.allergies)
   const [exclusions, setExclusions] = useState(state.profile.exclusions)
   const [error, setError] = useState('')
+  const [dataMessage, setDataMessage] = useState('')
 
   function save(event: FormEvent) {
     event.preventDefault()
@@ -29,6 +32,28 @@ export function SettingsScreen() {
         exclusions: exclusions.trim(),
       },
     })
+  }
+
+  function exportData() {
+    const anchor = document.createElement('a')
+    anchor.href = `data:application/json;charset=utf-8,${encodeURIComponent(serializeState(state))}`
+    anchor.download = `dosha-companion-local-data-${new Date().toISOString().slice(0, 10)}.json`
+    document.body.append(anchor)
+    anchor.click()
+    anchor.remove()
+    setDataMessage('Local data export prepared.')
+  }
+
+  function clearData() {
+    if (!window.confirm('Clear all browser-local profile, assessment, check-in, and recommendation history?')) return
+    resetPrototype()
+    navigate('/')
+  }
+
+  function loadDemo() {
+    if (!window.confirm('Replace this browser-local session with representative demo data?')) return
+    seedDemo()
+    navigate('/today')
   }
 
   return (
@@ -68,6 +93,14 @@ export function SettingsScreen() {
         <h2 id="settings-location-title">Location and units</h2>
         <p>{state.profile.location?.displayLabel ?? (state.profile.location?.source === 'skipped' ? 'Location skipped' : 'No location saved')} · {state.profile.location?.units === 'metric' ? 'Metric' : 'US'} units</p>
         <Link className="button secondary" to="/profile/location?return=settings">Edit or remove location</Link>
+      </section>
+      <section className="settings-data" aria-labelledby="settings-data-title">
+        <h2 id="settings-data-title">Local data</h2>
+        <dl className="storage-summary"><div><dt>Storage</dt><dd>Browser localStorage</dd></div><div><dt>Status</dt><dd>{state.saveStatus === 'saved' ? 'Saved on this device' : state.saveStatus === 'saving' ? 'Saving…' : 'Not saved; session only'}</dd></div><div><dt>Assessment answers</dt><dd>{Object.keys(state.submittedAnswers).length}</dd></div><div><dt>Check-ins</dt><dd>{state.checkIns.length}</dd></div></dl>
+        <button className="button secondary" type="button" onClick={exportData}>Export local data as JSON</button>
+        <button className="button danger-button" type="button" onClick={clearData}>Clear local data and restart</button>
+        {import.meta.env.DEV ? <div className="dev-control"><strong>Development demo helper</strong><p>Replace this session with a complete profile, assessment coverage, and a completed check-in.</p><button className="button secondary" type="button" onClick={loadDemo}>Load seeded demo</button></div> : null}
+        {dataMessage ? <Status>{dataMessage}</Status> : null}
       </section>
       <p className="boundary-note">This milestone stores the profile only in this browser. It does not synchronize to an account or backend.</p>
     </Screen>

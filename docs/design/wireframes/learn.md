@@ -1,5 +1,7 @@
 # Learn Wireframe
 
+> Implemented demo update: Learn has data-backed article cards, text and category filtering, article details, related reading, glossary search, and links into deterministic Guided help. Published provisional items remain visibly labeled.
+
 ## Library landing
 
 ```text
@@ -40,4 +42,3 @@
 ## Notes
 
 This is a structural placeholder outside the first vertical slice. Filtering, full search behavior, article wireframes, and deep taxonomy navigation remain later design work.
-

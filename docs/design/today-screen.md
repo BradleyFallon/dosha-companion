@@ -1,5 +1,7 @@
 # Today Screen
 
+> Demo update: the primary card is selected from the validated repository catalog. Mark complete, Dismiss, Show another, Why this was chosen, related reading, and linked check-in controls are functional. History is browser-local and used only to avoid immediate repetition.
+
 ## Purpose
 
 Today is the post-assessment home and primary retention surface. It turns the latest approved profile state into one understandable focus and one practical action without requiring the user to interpret scores.
@@ -41,7 +43,7 @@ Today is the post-assessment home and primary retention surface. It turns the la
 | Loading | Preserve card heights with meaningful labels where possible |
 | Content unavailable | Keep balance summary and questions accessible; explain guidance is temporarily unavailable |
 | AI unavailable | Keep the rest of Today intact and disable only the AI entry |
-| Assistant unavailable | Preserve Today guidance and link to the explicit unavailable placeholder |
+| No LLM available | Preserve Today guidance and link to deterministic Guided help content search |
 
 ## Interaction details
 

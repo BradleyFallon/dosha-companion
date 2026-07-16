@@ -1,5 +1,7 @@
-import type { ProfileState } from '../prototype/state'
+import type { ProfileState, RecommendationHistoryRecord } from '../prototype/state'
 import type { AssessmentCoverage } from '../quiz/coverage'
+import type { RecommendationContent } from '../generated/contentCatalog'
+import { getRecommendations } from './repository'
 
 export const PROVISIONAL_CONTENT_LABEL = 'Provisional · not expert-approved'
 
@@ -16,20 +18,9 @@ export interface FoodRecommendation {
   reason: string
 }
 
-export interface DailyRecommendation {
-  id:
-    | 'major-physical-change'
-    | 'travel-anchor'
-    | 'manageable-priority'
-    | 'refresh-current-check-in'
-    | 'morning-pause'
-    | 'evening-transition'
-    | 'general-anchor'
+export interface DailyRecommendation extends RecommendationContent {
   label: typeof PROVISIONAL_CONTENT_LABEL
-  headline: string
-  guidance: string
-  action: string
-  actionHref: string | null
+  selectionDate: string
   why: string[]
   food: FoodRecommendation
 }
@@ -38,141 +29,112 @@ export interface RecommendationInput {
   coverage: AssessmentCoverage
   profile: ProfileState
   submittedAnswers: Record<string, string>
+  recommendationHistory?: RecommendationHistoryRecord[]
+  activeRecommendationId?: string | null
   now?: Date
   fixtureActive?: boolean
 }
 
-export function selectDailyRecommendation({
-  coverage,
-  profile,
-  submittedAnswers,
-  now = new Date(),
-  fixtureActive = false,
-}: RecommendationInput): DailyRecommendation {
-  const contextAnswer = submittedAnswers.q_context_major_change_001
-  const time = localHour(now, profile.location?.timeZone)
-  const why: string[] = []
-  let content: Pick<DailyRecommendation, 'id' | 'headline' | 'guidance' | 'action' | 'actionHref'>
+export function selectDailyRecommendation(input: RecommendationInput): DailyRecommendation {
+  const {
+    coverage,
+    profile,
+    submittedAnswers,
+    recommendationHistory = [],
+    activeRecommendationId = null,
+    now = new Date(),
+    fixtureActive = false,
+  } = input
+  const local = localTime(now, profile.location?.timeZone)
+  const selectionDate = local.date
+  const { context, explanation } = recommendationContext(submittedAnswers, coverage, local.hour)
+  const all = getRecommendations()
+  const primaryCatalog = all.filter((item) => item.category !== 'food')
+  const candidates = eligibleForContext(primaryCatalog, context, local.hour)
+  const active = activeRecommendationId
+    ? candidates.find((item) => item.id === activeRecommendationId && recommendationHistory.some(
+      (record) => record.recommendationId === item.id && record.date === selectionDate,
+    ))
+    : undefined
 
-  if (contextAnswer === CONTEXT_ANSWERS.physicalChange) {
-    content = {
-      id: 'major-physical-change',
-      headline: 'Keep today’s guidance general',
-      guidance: 'You noted a major physical change. This limited MVP will avoid stronger personalization and stay with familiar, low-stakes routines.',
-      action: 'Keep to a familiar routine and consult a qualified professional before changing medical care.',
-      actionHref: null,
-    }
-    why.push('You selected the major physical-change context option, which activates a safety boundary.')
-  } else if (contextAnswer === CONTEXT_ANSWERS.travel) {
-    content = {
-      id: 'travel-anchor',
-      headline: 'Choose one reliable anchor',
-      guidance: 'Travel or a major schedule change can make the day harder to orient around. One familiar point is enough for this provisional suggestion.',
-      action: 'Choose one consistent meal, rest, or wake-time cue for today.',
-      actionHref: null,
-    }
-    why.push('You reported recent travel or a major schedule change.')
-  } else if (contextAnswer === CONTEXT_ANSWERS.lifeEvent) {
-    content = {
-      id: 'manageable-priority',
-      headline: 'Choose one manageable priority',
-      guidance: 'A major life event can make a long list feel less useful. This provisional guidance keeps the focus intentionally small.',
-      action: 'Pick one necessary task and one short pause; let the rest remain optional today.',
-      actionHref: null,
-    }
-    why.push('You reported significant stress or a major life event.')
-  } else if (coverage.current.substantive < 4) {
-    content = {
-      id: 'refresh-current-check-in',
-      headline: 'Refresh your recent check-in',
-      guidance: 'There is not enough substantive recent information to personalize the current-balance area, so the most useful next step is another check-in.',
-      action: 'Answer the next useful recent-balance question.',
-      actionHref: coverage.nextQuestionId
-        ? `/assessment/question/${coverage.nextQuestionId}?return=results`
-        : '/questions',
-    }
-    why.push(`Your current check-in has ${coverage.current.substantive} substantive answers; the provisional coverage policy requires 4.`)
-  } else if (time.hour >= 5 && time.hour < 12) {
-    content = {
-      id: 'morning-pause',
-      headline: 'Begin with a deliberate pause',
-      guidance: 'This small, general wellness prompt is selected for the morning in your saved time zone.',
-      action: 'Before the next task, pause for two unhurried minutes and decide what matters first.',
-      actionHref: null,
-    }
-    why.push(`It is morning in ${time.label}.`)
-  } else if (time.hour >= 18 && time.hour < 24) {
-    content = {
-      id: 'evening-transition',
-      headline: 'Create a quieter transition',
-      guidance: 'This small, general wellness prompt is selected for the evening in your saved time zone.',
-      action: 'Choose one clear stopping point for work or errands before the day ends.',
-      actionHref: null,
-    }
-    why.push(`It is evening in ${time.label}.`)
-  } else {
-    content = {
-      id: 'general-anchor',
-      headline: 'Choose one steady point today',
-      guidance: 'No approved dosha scoring is available, so this provisional suggestion remains general and practical.',
-      action: 'Pick one familiar time for your next meal, pause, or transition.',
-      actionHref: null,
-    }
-    why.push('No higher-priority context or time rule matched, so the general fallback was selected.')
-  }
+  const recentIds = new Set(recommendationHistory.slice(-12).map((record) => record.recommendationId))
+  const fresh = candidates.filter((item) => !recentIds.has(item.id))
+  const pool = fresh.length > 0 ? fresh : candidates
+  const selected = active ?? pool[stableIndex(`${selectionDate}:${context}`, pool.length)] ?? primaryCatalog[0]
+  if (!selected) throw new Error('No published recommendation content is available.')
 
-  if (fixtureActive) {
-    why.push('A development fixture is visible, but it was not used to choose this guidance.')
+  const why = [selected.rationale, explanation]
+  if (!active && fresh.length === 0 && candidates.length > 1) {
+    why.push('All eligible alternatives appeared recently, so the daily rotation reused the stable catalog order.')
+  } else if (!active && recentIds.size > 0) {
+    why.push('Recently shown items were deprioritized when an eligible alternative was available.')
   }
+  if (fixtureActive) why.push('A development fixture is visible, but it was not used to choose this guidance.')
   why.push('No dosha score was calculated or used.')
 
   return {
-    ...content,
+    ...selected,
     label: PROVISIONAL_CONTENT_LABEL,
+    selectionDate,
     why,
-    food: selectFoodRecommendation(profile),
+    food: selectFoodRecommendation(profile, all),
   }
 }
 
-function selectFoodRecommendation(profile: ProfileState): FoodRecommendation {
+function eligibleForContext(catalog: RecommendationContent[], context: string, hour: number) {
+  const exact = catalog.filter((item) => item.contexts.includes(context))
+  if (exact.length > 0) return exact
+  const time = hour >= 5 && hour < 12 ? 'morning' : hour >= 18 ? 'evening' : 'day'
+  const timed = catalog.filter((item) => item.contexts.includes('general') && item.times.includes(time))
+  const anytime = catalog.filter((item) => item.contexts.includes('general') && item.times.includes('any'))
+  return [...timed, ...anytime]
+}
+
+function recommendationContext(submittedAnswers: Record<string, string>, coverage: AssessmentCoverage, hour: number) {
+  const answer = submittedAnswers.q_context_major_change_001
+  if (answer === CONTEXT_ANSWERS.physicalChange) return { context: 'physical-change', explanation: 'The major physical-change answer activates the strongest content safety boundary.' }
+  if (answer === CONTEXT_ANSWERS.travel) return { context: 'travel', explanation: 'The recent travel or schedule-change answer takes priority over time-of-day prompts.' }
+  if (answer === CONTEXT_ANSWERS.lifeEvent) return { context: 'life-event', explanation: 'The significant-life-event answer takes priority over time-of-day prompts.' }
+  if (coverage.current.substantive < 4) return { context: 'insufficient-current', explanation: `The initial assessment has ${coverage.current.substantive} substantive current answers; the provisional coverage policy asks for 4.` }
+  return { context: 'general', explanation: hour >= 5 && hour < 12 ? 'It is morning in the selected time zone.' : hour >= 18 ? 'It is evening in the selected time zone.' : 'No higher-priority context matched, so the general daytime catalog was used.' }
+}
+
+function selectFoodRecommendation(profile: ProfileState, catalog: RecommendationContent[]): FoodRecommendation {
   if (profile.allergies.trim() || profile.exclusions.trim()) {
     return {
       status: 'withheld',
       title: 'Food suggestion withheld',
-      body: 'You listed allergies or exclusions, and this limited MVP does not have reviewed ingredient-level filtering.',
-      reason: 'Safety filtering took precedence over dietary personalization.',
+      body: 'You listed allergies or exclusions, and this demo does not have reviewed ingredient-level filtering.',
+      reason: 'Your allergy or exclusion fields activated the food-content safety filter.',
     }
   }
-
-  const pattern = profile.dietaryPattern.toLowerCase()
-  const title = pattern === 'vegan' || pattern === 'vegetarian'
-    ? 'Choose a familiar plant-based meal you already tolerate'
-    : pattern === 'pescatarian'
-      ? 'Choose a familiar pescatarian meal you already tolerate'
-      : 'Choose a familiar meal you already tolerate'
-
+  const food = catalog.find((item) => item.category === 'food')
+  const pattern = profile.dietaryPattern || 'unspecified'
   return {
     status: 'shown',
-    title,
-    body: 'No recipe or ingredient claim is being made. This provisional prompt reflects only your stated dietary pattern.',
-    reason: profile.dietaryPattern
-      ? `Your dietary pattern is ${profile.dietaryPattern}.`
-      : 'No dietary pattern or food exclusions were supplied.',
+    title: food?.title ?? 'Choose a familiar meal you already tolerate',
+    body: `${food?.guidance ?? 'Choose familiar food you already tolerate.'} Stated dietary pattern: ${pattern}.`,
+    reason: food?.rationale ?? 'No allergy or exclusion was supplied.',
   }
 }
 
-function localHour(now: Date, requestedTimeZone?: string) {
-  const fallback = Intl.DateTimeFormat().resolvedOptions().timeZone || 'your browser time zone'
-  const timeZone = requestedTimeZone || fallback
+function stableIndex(seed: string, length: number) {
+  if (length <= 1) return 0
+  let hash = 0
+  for (const character of seed) hash = ((hash << 5) - hash + character.charCodeAt(0)) | 0
+  return Math.abs(hash) % length
+}
 
+function localTime(now: Date, requestedTimeZone?: string) {
+  const fallback = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+  const timeZone = requestedTimeZone || fallback
   try {
-    const hourPart = new Intl.DateTimeFormat('en-US', {
-      hour: '2-digit',
-      hourCycle: 'h23',
-      timeZone,
-    }).formatToParts(now).find((part) => part.type === 'hour')?.value
-    return { hour: Number(hourPart ?? now.getHours()), label: timeZone }
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23', timeZone,
+    }).formatToParts(now)
+    const value = (type: string) => parts.find((part) => part.type === type)?.value ?? ''
+    return { hour: Number(value('hour')), date: `${value('year')}-${value('month')}-${value('day')}` }
   } catch {
-    return { hour: now.getHours(), label: fallback }
+    return { hour: now.getHours(), date: now.toISOString().slice(0, 10) }
   }
 }

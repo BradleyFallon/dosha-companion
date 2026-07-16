@@ -15,6 +15,7 @@ import {
 
 const firstQuestion = initialAssessment.questions[0]
 const firstAnswer = firstQuestion.answers[0]
+const currentQuestion = initialAssessment.questions.find((question) => question.assessmentType === 'current')!
 
 describe('prototype state and persistence', () => {
   it('records a Not sure answer by stable answer ID', () => {
@@ -91,6 +92,54 @@ describe('prototype state and persistence', () => {
     const restored = restoreState({ getItem: () => value })
     expect(restored.state.profile.location?.source).toBe('skipped')
     expect(restored.notice).toContain('version 2')
+  })
+
+  it('migrates version 3 state with empty recommendation and check-in collections', () => {
+    const legacy = persistableState(completedState())
+    delete legacy.recommendationHistory
+    delete legacy.todayRecommendationId
+    delete legacy.checkIns
+    const restored = restoreState({ getItem: () => JSON.stringify({ version: 3, state: legacy }) })
+    expect(restored.state.recommendationHistory).toEqual([])
+    expect(restored.state.checkIns).toEqual([])
+    expect(restored.notice).toContain('version 3')
+  })
+
+  it('sanitizes recommendation history and check-in answer references independently', () => {
+    const validAnswer = currentQuestion.answers[0].id
+    const value = JSON.stringify({
+      version: STORAGE_VERSION,
+      state: {
+        ...persistableState(completedState()),
+        recommendationHistory: [
+          { recommendationId: 'general-steady-point', date: '2026-07-16', status: 'completed' },
+          { recommendationId: 'unknown', date: 'wrong', status: 'shown' },
+        ],
+        todayRecommendationId: 'general-steady-point',
+        checkIns: [{
+          id: 'valid-checkin',
+          setId: 'quick-current',
+          startedAt: '2026-07-16T10:00:00.000Z',
+          completedAt: null,
+          answers: { [currentQuestion.id]: validAnswer, unknown_question: 'bad' },
+        }],
+      },
+    })
+    const restored = restoreState({ getItem: () => value }).state
+    expect(restored.recommendationHistory).toEqual([{ recommendationId: 'general-steady-point', date: '2026-07-16', status: 'completed' }])
+    expect(restored.todayRecommendationId).toBe('general-steady-point')
+    expect(restored.checkIns[0].answers).toEqual({ [currentQuestion.id]: validAnswer })
+  })
+
+  it('records check-in progress and recommendation status without changing initial answers', () => {
+    const initial = { ...defaultState, submittedAnswers: { [firstQuestion.id]: firstAnswer.id } }
+    const started = prototypeReducer(initial, { type: 'start-check-in', checkIn: { id: 'checkin-1', setId: 'quick-current', startedAt: '2026-07-16T10:00:00.000Z', completedAt: null, answers: {} } })
+    const answered = prototypeReducer(started, { type: 'answer-check-in', checkInId: 'checkin-1', questionId: currentQuestion.id, answerId: currentQuestion.answers[0].id })
+    const shown = prototypeReducer(answered, { type: 'show-recommendation', recommendationId: 'general-steady-point', date: '2026-07-16' })
+    const completed = prototypeReducer(shown, { type: 'recommendation-status', recommendationId: 'general-steady-point', date: '2026-07-16', status: 'completed' })
+    expect(completed.submittedAnswers).toEqual(initial.submittedAnswers)
+    expect(completed.checkIns[0].answers[currentQuestion.id]).toBe(currentQuestion.answers[0].id)
+    expect(completed.recommendationHistory[0].status).toBe('completed')
   })
 
   it('migrates version 1 country fields to a manual coarse location', () => {

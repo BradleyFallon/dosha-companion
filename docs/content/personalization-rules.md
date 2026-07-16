@@ -1,5 +1,7 @@
 # Personalization Rules
 
+> Demo implementation note: Today now selects from `content/recommendations/recommendations.json`. The selector preserves the documented context precedence, filters unpublished and unsafe food content, considers recent local recommendation history, and makes a stable daily choice. Users may complete, dismiss, or replace an item. All current catalog content is provisional, and no dosha score is used.
+
 > Status: Limited-MVP provisional implementation; not expert-approved
 
 The browser-local MVP selects one provisional Today focus through deterministic normal code. It does not use an LLM or dosha score.

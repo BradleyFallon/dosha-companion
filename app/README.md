@@ -2,9 +2,9 @@
 
 This directory contains a low-fidelity mobile-first prototype of the first product loop:
 
-> Welcome → simulated account → profile setup → assessment → deterministic coverage → honest scoring boundary → provisional Today guidance
+> Welcome → simulated account → profile setup → assessment → coverage → interactive Today → check-ins → Learn and guided content search
 
-It is a limited browser-local MVP, not a production application. Coverage and recommendation selection are functional. Authentication, dosha scoring, expert-approved publishing, subscriptions, and AI remain unavailable or simulated.
+It is a content-driven browser-local demo, not a production application. Coverage, repeatable current check-ins, recommendation rotation/history, Learn, deterministic content search, Settings export/reset, and a development demo seed are functional. Authentication, dosha scoring, expert approval, subscriptions, AI, and synchronization remain unavailable or simulated.
 
 ## Stack
 
@@ -43,6 +43,8 @@ Available commands:
 
 ```sh
 npm run generate:quiz
+npm run generate:content
+npm run generate
 npm run dev
 npm run typecheck
 npm run lint
@@ -52,7 +54,7 @@ npm run build
 npm run preview
 ```
 
-`dev`, `test`, `test:e2e`, and `build` automatically run quiz generation first.
+`dev`, `test`, `test:e2e`, and `build` automatically run quiz and content generation first. Editor-owned content lives in `../content/`; see [`../content/editor-guide.md`](../content/editor-guide.md). In a development session, Settings → **Load seeded demo** creates representative coverage and check-in history for fast review. The helper is excluded from production builds.
 
 ## Full and short-demo assessment modes
 
@@ -98,7 +100,7 @@ Coverage readiness is not a dosha result or medical confidence. The application 
 
 ## Today recommendation selector
 
-Today uses a small deterministic rule set, in this order:
+Today selects published content from `../content/recommendations/recommendations.json` with this precedence:
 
 1. Major physical-change safety boundary
 2. Travel or schedule-change routine anchor
@@ -107,13 +109,19 @@ Today uses a small deterministic rule set, in this order:
 5. Local morning or evening using the saved time zone
 6. General fallback
 
-Every focus and food prompt is labeled **Provisional · not expert-approved**. “Why this was chosen” names the matched inputs and states that no dosha score was used. Food prompts are withheld whenever the profile contains allergies or exclusions; this milestone does not attempt ingredient-level filtering.
+Every focus and food prompt is labeled **Provisional · not expert-approved**. Users can mark it complete, dismiss it, show another, open related reading, or start a linked check-in. Browser-local shown/completed/dismissed history avoids immediate repetition when alternatives exist. “Why this was chosen” names the exact catalog rationale and matched inputs. Food prompts are withheld whenever the profile contains allergies or exclusions.
+
+## Learn, Guided help, and check-ins
+
+Learn lists nine editable Markdown articles, category/search filters, article detail routes, related reading, and an eight-term glossary. Guided help searches article titles, summaries, tags, bodies, glossary terms, and recommendation rationales. It is explicitly deterministic content search, not an LLM or chat simulation.
+
+Questions can repair initial coverage or start a five- or seven-question repeatable current check-in. Check-ins reference canonical current questions, have their own start/completion dates and answers, and never overwrite baseline or initial current answers. My Balance summarizes both initial coverage and dated check-in history without dosha interpretation.
 
 ## Settings and local persistence
 
 `/settings` edits preferred name, age band, dietary pattern, allergies, and exclusions without removing assessment answers. Location and units reuse the location chooser and return to Settings.
 
-Persisted state is version 3. Restore logic validates fields and canonical answer references, drops invalid individual values, clamps indexes, migrates version 2, and converts version-1 country/region/city data to a manual coarse-location label. Corrupt or incompatible snapshots start safely with a visible notice. Storage read, write, and removal failures are caught; the UI never reports “Saved” after a failed write.
+Persisted state is version 4. It adds recommendation history, the active daily item, and dated check-ins. Restore logic validates their IDs, statuses, dates, set/question references, and answer relationships while retaining valid neighboring data. Versions 1–3 migrate through sanitization. Corrupt or incompatible snapshots start safely with a visible notice. Settings displays storage status, exports the allow-listed snapshot as JSON, and confirms before clearing all local data.
 
 ## Testing
 
@@ -169,7 +177,7 @@ The plain Vite `Network` URL remains useful for checking layout and non-location
 - Account creation and sign-in are visual simulations. Email and password fields are transient; passwords are never persisted.
 - Profile and assessment progress are stored only in the current browser with a validated, versioned allow-list. They are not secure account records and do not sync across devices.
 - Dosha scoring remains unavailable because numerical weights and thresholds are blank and unapproved. Vata–Pitta labels exist only in the explicit development fixture adapter.
-- Today guidance is deterministically selected provisional copy. It is not expert-approved, generated by AI, or based on a dosha score.
-- The assistant and subscription state are static placeholders. There are no LLM, payment, or entitlement calls.
+- Today guidance is deterministically selected provisional catalog copy. Completion history is a demo interaction, not adherence or outcome evidence.
+- Guided help is literal catalog search, not a conversational assistant. There are no LLM, payment, or entitlement calls.
 - There is no backend, database, CMS, analytics SDK, weather API, reverse-geocoding service, recipe system, notification system, or medical logic.
 - Error, offline, account recovery, and production privacy behavior need dedicated implementation after product validation.

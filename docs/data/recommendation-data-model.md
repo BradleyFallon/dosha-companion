@@ -1,5 +1,7 @@
 # Recommendation Data Model
 
+> Demo implementation note: structured recommendation content is authored in `content/recommendations/recommendations.json` and validated into a typed catalog. Browser-local state v4 stores `{ recommendationId, date, status }` history with `shown`, `completed`, or `dismissed`. This history supports understandable rotation and is not an outcome, adherence score, or health record.
+
 > Status: Limited-MVP provisional interface
 
 The current application uses a typed in-code catalog with:

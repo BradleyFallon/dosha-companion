@@ -3,6 +3,8 @@ import { Screen } from '../components/Layout'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { calculateAssessmentCoverage } from '../quiz/coverage'
 import { CoverageDetail } from './Results'
+import { getCheckInQuestionSet } from '../content/repository'
+import { initialAssessment } from '../generated/initialAssessment'
 
 export function QuestionsScreen() {
   const { state } = usePrototype()
@@ -10,15 +12,15 @@ export function QuestionsScreen() {
     submittedAnswers: state.submittedAnswers,
     skippedQuestionIds: state.skippedQuestionIds,
   })
+  const incomplete = state.checkIns.find((checkIn) => !checkIn.completedAt)
+  const recent = state.checkIns.slice(0, 5)
 
   return (
     <Screen>
-      <p className="eyebrow">Assessment coverage</p>
+      <p className="eyebrow">Assessment and check-ins</p>
       <h1 tabIndex={-1}>Questions</h1>
       <p className="lede">
-        {coverage.ready
-          ? 'The provisional initial-coverage requirements are met.'
-          : 'Another substantive answer would improve the most important missing area.'}
+        Answer missing initial questions or create a separate, dated current-balance check-in.
       </p>
       <div className="queue-list">
         <article><p className="eyebrow">Your usual nature</p><h2>{coverage.baseline.substantive} of {coverage.baseline.total} usable</h2><p>{coverage.baseline.fallback} fallback · {coverage.baseline.skipped} skipped · {coverage.baseline.unanswered} unanswered</p></article>
@@ -26,11 +28,13 @@ export function QuestionsScreen() {
       </div>
       <CoverageDetail coverage={coverage} />
       {coverage.nextQuestionId ? (
-        <Link className="button primary" to={`/assessment/question/${coverage.nextQuestionId}?return=results`}>Answer next useful question</Link>
+        <Link className="button secondary" to={`/assessment/question/${coverage.nextQuestionId}?return=questions`}>Answer next useful initial question</Link>
       ) : (
-        <button className="button primary" type="button" disabled>Initial coverage complete</button>
+        <p className="completion-note">Initial coverage requirements are met.</p>
       )}
-      <button className="button secondary" type="button" disabled>Refinement questions unavailable pending expert review</button>
+      <Link className="button secondary" to={`/assessment/question/${initialAssessment.questions[0].id}?return=questions`}>Review initial assessment answers</Link>
+      <section className="check-in-section" aria-labelledby="current-checkins"><h2 id="current-checkins">Current check-ins</h2><p>Each check-in is a new record about the past seven days. It does not overwrite your baseline.</p>{incomplete ? <Link className="button primary" to={`/questions/check-in/${incomplete.id}`}>Continue incomplete check-in</Link> : <Link className="button primary" to="/questions/check-in/new?set=quick-current">Start current check-in</Link>}<Link className="text-link" to="/questions/check-in/new?set=full-current">Start extended 7-question check-in</Link></section>
+      <section aria-labelledby="recent-checkins"><h2 id="recent-checkins">Recent check-ins</h2>{recent.length > 0 ? <ul className="history-list">{recent.map((checkIn) => { const set = getCheckInQuestionSet(checkIn.setId); return <li key={checkIn.id}><span><strong>{set?.title ?? 'Current check-in'}</strong><small>Started {formatDate(checkIn.startedAt)}</small></span><span>{checkIn.completedAt ? `Completed · ${Object.keys(checkIn.answers).length} answers` : `In progress · ${Object.keys(checkIn.answers).length} answers`}</span>{!checkIn.completedAt ? <Link to={`/questions/check-in/${checkIn.id}`}>Resume</Link> : null}</li> })}</ul> : <p className="empty-state">No repeatable check-ins yet.</p>}</section>
       <p className="boundary-note">There is no daily requirement. Coverage is not diagnostic confidence, and no dosha score has been calculated.</p>
     </Screen>
   )
@@ -42,6 +46,9 @@ export function BalanceScreen() {
     submittedAnswers: state.submittedAnswers,
     skippedQuestionIds: state.skippedQuestionIds,
   })
+  const completed = state.checkIns.filter((checkIn) => checkIn.completedAt)
+  const incomplete = state.checkIns.find((checkIn) => !checkIn.completedAt)
+  const latest = completed[0]
 
   return (
     <Screen>
@@ -50,9 +57,12 @@ export function BalanceScreen() {
       <p className="supporting">This screen reports answer coverage only. Dosha labels and relative measurements are unavailable until expert scoring is approved.</p>
       <CoverageCard title="Your usual nature" timeframe="Usual adult tendencies" substantive={coverage.baseline.substantive} total={coverage.baseline.total} categories={coverage.baseline.categoriesCovered} />
       <CoverageCard title="Your current check-in" timeframe="Past seven days" substantive={coverage.current.substantive} total={coverage.current.total} categories={coverage.current.categoriesCovered} />
+      <article className="result-card"><p className="eyebrow">Repeatable current check-ins</p><h2>{completed.length} completed</h2><p>{latest?.completedAt ? `Latest completed ${formatDate(latest.completedAt)}.` : 'No dated current check-in has been completed yet.'}</p>{incomplete ? <Link to={`/questions/check-in/${incomplete.id}`}>Continue incomplete check-in →</Link> : <Link to="/questions/check-in/new?set=quick-current">Start a current check-in →</Link>}</article>
       <div className="scoring-boundary"><h2>No dosha result calculated</h2><p>The repository contains no approved numerical answer weights or result thresholds.</p></div>
       <CoverageDetail coverage={coverage} />
       {coverage.nextQuestionId ? <Link className="button primary" to={`/assessment/question/${coverage.nextQuestionId}?return=results`}>Improve coverage</Link> : null}
+      <Link className="button secondary" to="/questions">Review answers and check-in history</Link>
+      <Link className="button secondary" to="/learn/nature-and-current-balance">Learn about nature and current balance</Link>
       <Link className="button secondary" to="/settings">Edit profile settings</Link>
       <Link className="button secondary" to="/profile/location">Edit or remove location</Link>
     </Screen>
@@ -69,23 +79,6 @@ function CoverageCard({ title, timeframe, substantive, total, categories }: { ti
   )
 }
 
-export function LearnScreen() {
-  const items = ['Ayurveda basics', 'Vata', 'Pitta', 'Kapha', 'Constitution versus current balance', 'Glossary']
-  return (
-    <Screen>
-      <p className="eyebrow">Learning library</p>
-      <h1 tabIndex={-1}>Learn</h1>
-      <p className="lede">The repository contains article placeholders, but none have completed expert review.</p>
-      <div className="learn-list">
-        {items.map((item) => <div className="unavailable-item" key={item}><strong>{item}</strong><span>Unavailable pending expert review</span></div>)}
-      </div>
-      <p className="boundary-note">Draft or unapproved material is not presented as published educational content.</p>
-    </Screen>
-  )
-}
-
-export function AssistantScreen() {
-  return (
-    <Screen><Link className="back-link" to="/today">← Today</Link><p className="eyebrow">Unavailable feature</p><h1 tabIndex={-1}>AI assistant</h1><div className="assistant-placeholder"><h2>Not connected in this milestone</h2><p>A future assistant may use approved sources and a limited profile summary. This app does not call an AI service, retain chat history, or evaluate symptoms.</p><button className="button primary" type="button" disabled>AI assistant unavailable</button><p>Today, Questions, My Balance, Settings, and Learn remain available without this feature.</p></div><p className="boundary-note">The assistant cannot diagnose, assess emergencies, or recommend medication changes.</p></Screen>
-  )
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value))
 }

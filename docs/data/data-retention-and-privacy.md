@@ -1,5 +1,7 @@
 # Data Retention and Privacy
 
+> Demo implementation note: persistence v4 remains browser-local and includes profile fields, initial answers, skipped IDs, recommendation shown/completed/dismissed history, and dated current check-ins. Settings can export the sanitized allow-listed snapshot and can clear it after confirmation. Exact device coordinates are still coarsened for storage. No data is synchronized or sent to an account service.
+
 > Status: Placeholder requiring privacy and legal review
 
 TODO: Define purpose limitation, consent, retention, deletion, export, access control, audit logging, analytics, LLM data sharing, subprocessors, regional obligations, and incident response for each data category.

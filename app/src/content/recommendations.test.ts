@@ -1,119 +1,47 @@
 import { describe, expect, it } from 'vitest'
-import { initialAssessment } from '../generated/initialAssessment'
-import { defaultState } from '../prototype/state'
+import { createTestState } from '../prototype/state'
 import { calculateAssessmentCoverage } from '../quiz/coverage'
+import { initialAssessment } from '../generated/initialAssessment'
 import { selectDailyRecommendation } from './recommendations'
 
-const allOrdinary = Object.fromEntries(initialAssessment.questions.map((question) => [
-  question.id,
-  question.answers.find((answer) => answer.kind === 'ordinary')?.id ?? '',
-]))
-const readyCoverage = calculateAssessmentCoverage({ submittedAnswers: allOrdinary, skippedQuestionIds: [] })
+const state = createTestState()
+const fullAnswers = Object.fromEntries(initialAssessment.questions.map((question) => [question.id, question.answers.find((answer) => answer.kind === 'ordinary')?.id ?? '']))
 
-describe('daily recommendation selection', () => {
-  it('uses safety context before travel, coverage, or time rules', () => {
-    const recommendation = selectDailyRecommendation({
-      coverage: readyCoverage,
-      profile: profile(),
-      submittedAnswers: {
-        ...allOrdinary,
-        q_context_major_change_001: 'a_context_major_change_001_recent_illness_injury_medication',
-      },
-      now: new Date('2026-07-16T08:00:00Z'),
-    })
-    expect(recommendation.id).toBe('major-physical-change')
-    expect(recommendation.why.at(-1)).toBe('No dosha score was calculated or used.')
+function select(values: Partial<Parameters<typeof selectDailyRecommendation>[0]> = {}) {
+  const submittedAnswers = values.submittedAnswers ?? fullAnswers
+  return selectDailyRecommendation({
+    coverage: values.coverage ?? calculateAssessmentCoverage({ submittedAnswers, skippedQuestionIds: [] }),
+    profile: values.profile ?? state.profile,
+    submittedAnswers,
+    now: values.now ?? new Date('2026-07-16T16:00:00Z'),
+    ...values,
+  })
+}
+
+describe('catalog recommendation selector', () => {
+  it('uses context precedence and explains the no-scoring boundary', () => {
+    const item = select({ submittedAnswers: { ...fullAnswers, q_context_major_change_001: 'a_context_major_change_001_recent_travel_major_schedule' } })
+    expect(item.contexts).toContain('travel')
+    expect(item.why).toContain('No dosha score was calculated or used.')
   })
 
-  it('selects travel and life-event rules deterministically', () => {
-    const travel = selectDailyRecommendation({
-      coverage: readyCoverage,
-      profile: profile(),
-      submittedAnswers: { ...allOrdinary, q_context_major_change_001: 'a_context_major_change_001_recent_travel_major_schedule' },
-    })
-    const lifeEvent = selectDailyRecommendation({
-      coverage: readyCoverage,
-      profile: profile(),
-      submittedAnswers: { ...allOrdinary, q_context_major_change_001: 'a_context_major_change_001_significant_stress_major_life' },
-    })
-    expect(travel.id).toBe('travel-anchor')
-    expect(lifeEvent.id).toBe('manageable-priority')
+  it('uses current coverage before time of day', () => {
+    const answers = Object.fromEntries(initialAssessment.questions.filter((question) => question.assessmentType === 'baseline').map((question) => [question.id, question.answers[0].id]))
+    const item = select({ submittedAnswers: answers, coverage: calculateAssessmentCoverage({ submittedAnswers: answers, skippedQuestionIds: [] }) })
+    expect(item.contexts).toContain('insufficient-current')
+    expect(item.checkInSetId).toBe('quick-current')
   })
 
-  it('prioritizes missing current coverage before local time', () => {
-    const coverage = calculateAssessmentCoverage({ submittedAnswers: {}, skippedQuestionIds: [] })
-    const recommendation = selectDailyRecommendation({
-      coverage,
-      profile: profile(),
-      submittedAnswers: {},
-      now: new Date('2026-07-16T08:00:00Z'),
-    })
-    expect(recommendation.id).toBe('refresh-current-check-in')
-    expect(recommendation.actionHref).toContain('return=results')
+  it('keeps an active shown item and rotates away from history otherwise', () => {
+    const first = select()
+    const history = [{ recommendationId: first.id, date: first.selectionDate, status: 'shown' as const }]
+    expect(select({ recommendationHistory: history, activeRecommendationId: first.id }).id).toBe(first.id)
+    expect(select({ recommendationHistory: history, activeRecommendationId: null }).id).not.toBe(first.id)
   })
 
-  it('uses saved time zone for morning and evening rules', () => {
-    const morning = selectDailyRecommendation({
-      coverage: readyCoverage,
-      profile: profile('UTC'),
-      submittedAnswers: allOrdinary,
-      now: new Date('2026-07-16T08:00:00Z'),
-    })
-    const evening = selectDailyRecommendation({
-      coverage: readyCoverage,
-      profile: profile('UTC'),
-      submittedAnswers: allOrdinary,
-      now: new Date('2026-07-16T20:00:00Z'),
-    })
-    expect(morning.id).toBe('morning-pause')
-    expect(evening.id).toBe('evening-transition')
-  })
-
-  it('falls back safely when a saved time zone is invalid', () => {
-    expect(() => selectDailyRecommendation({
-      coverage: readyCoverage,
-      profile: profile('Not/A_Real_Time_Zone'),
-      submittedAnswers: allOrdinary,
-      now: new Date('2026-07-16T14:00:00Z'),
-    })).not.toThrow()
-  })
-
-  it('withholds food guidance for any allergy or exclusion', () => {
-    const recommendation = selectDailyRecommendation({
-      coverage: readyCoverage,
-      profile: { ...profile(), dietaryPattern: 'Vegan', allergies: 'Tree nuts' },
-      submittedAnswers: allOrdinary,
-    })
-    expect(recommendation.food.status).toBe('withheld')
-    expect(recommendation.food.reason).toContain('Safety filtering')
-  })
-
-  it('uses a dietary variant and keeps fixtures out of selection', () => {
-    const recommendation = selectDailyRecommendation({
-      coverage: readyCoverage,
-      profile: { ...profile('UTC'), dietaryPattern: 'Vegetarian' },
-      submittedAnswers: allOrdinary,
-      now: new Date('2026-07-16T08:00:00Z'),
-      fixtureActive: true,
-    })
-    expect(recommendation.food.title).toContain('plant-based')
-    expect(recommendation.id).toBe('morning-pause')
-    expect(recommendation.why).toContain('A development fixture is visible, but it was not used to choose this guidance.')
+  it('withholds food whenever allergies or exclusions are present', () => {
+    expect(select({ profile: { ...state.profile, dietaryPattern: 'Vegan', allergies: 'Nuts' } }).food.status).toBe('withheld')
+    expect(select({ profile: { ...state.profile, exclusions: 'Soy' } }).food.status).toBe('withheld')
+    expect(select({ profile: { ...state.profile, dietaryPattern: 'Vegetarian' } }).food.status).toBe('shown')
   })
 })
-
-function profile(timeZone = 'America/Los_Angeles') {
-  return {
-    ...defaultState.profile,
-    preferredName: 'Alex',
-    location: {
-      source: 'skipped' as const,
-      latitude: null,
-      longitude: null,
-      accuracyMeters: null,
-      timeZone,
-      units: 'us' as const,
-      displayLabel: null,
-    },
-  }
-}

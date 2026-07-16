@@ -2,6 +2,8 @@
 
 Use controlled tags so editorial discovery, deterministic recommendations, and LLM retrieval share the same vocabulary. Tags require definitions and approval before use.
 
+> Demo implementation note: the small provisional allowed-tag list currently lives in `app/scripts/generate-content.mjs` and validates article and recommendation JSON/metadata at generation time. This is a practical demo allow-list, not the final expert-owned taxonomy.
+
 ## Tag dimensions
 
 | Dimension | Purpose | Initial values |
@@ -27,4 +29,3 @@ Use controlled tags so editorial discovery, deterministic recommendations, and L
 
 - TODO: Add definitions, allowed combinations, ownership, and review status.
 - TODO: Define a process for adding and retiring tags.
-

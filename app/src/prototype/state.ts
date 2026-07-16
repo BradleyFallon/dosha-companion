@@ -1,9 +1,10 @@
 import { initialAssessment } from '../generated/initialAssessment'
+import { checkInQuestionSets, recommendationCatalog } from '../generated/contentCatalog'
 import type { AssessmentMode } from '../quiz/assessment'
 import { getAssessmentQuestions } from '../quiz/assessment'
 
 export const STORAGE_KEY = 'dosha-companion-prototype-state'
-export const STORAGE_VERSION = 3
+export const STORAGE_VERSION = 4
 
 export type SaveStatus = 'saved' | 'saving' | 'not-saved'
 
@@ -26,6 +27,22 @@ export interface ProfileState {
   exclusions: string
 }
 
+export type RecommendationHistoryStatus = 'shown' | 'completed' | 'dismissed'
+
+export interface RecommendationHistoryRecord {
+  recommendationId: string
+  date: string
+  status: RecommendationHistoryStatus
+}
+
+export interface CheckIn {
+  id: string
+  setId: string
+  startedAt: string
+  completedAt: string | null
+  answers: Record<string, string>
+}
+
 export interface PrototypeState {
   accountCreated: boolean
   profile: ProfileState
@@ -40,6 +57,9 @@ export interface PrototypeState {
   transitionSeen: boolean
   resultsReached: boolean
   todayVisited: boolean
+  recommendationHistory: RecommendationHistoryRecord[]
+  todayRecommendationId: string | null
+  checkIns: CheckIn[]
   saveStatus: SaveStatus
   restoreNotice: string | null
 }
@@ -56,6 +76,13 @@ export type PrototypeAction =
   | { type: 'complete-transition' }
   | { type: 'reach-results' }
   | { type: 'visit-today' }
+  | { type: 'show-recommendation'; recommendationId: string; date: string }
+  | { type: 'recommendation-status'; recommendationId: string; date: string; status: RecommendationHistoryStatus }
+  | { type: 'clear-active-recommendation' }
+  | { type: 'start-check-in'; checkIn: CheckIn }
+  | { type: 'answer-check-in'; checkInId: string; questionId: string; answerId: string }
+  | { type: 'complete-check-in'; checkInId: string; completedAt: string }
+  | { type: 'replace-state'; state: PrototypeState }
   | { type: 'set-save-status'; status: SaveStatus }
   | { type: 'clear-restore-notice' }
   | { type: 'reset'; status?: SaveStatus; notice?: string | null }
@@ -81,6 +108,9 @@ export const defaultState: PrototypeState = {
   transitionSeen: false,
   resultsReached: false,
   todayVisited: false,
+  recommendationHistory: [],
+  todayRecommendationId: null,
+  checkIns: [],
   saveStatus: 'saved',
   restoreNotice: null,
 }
@@ -158,6 +188,57 @@ export function prototypeReducer(
       }
     case 'visit-today':
       return { ...state, todayVisited: true, saveStatus: 'saving' }
+    case 'show-recommendation': {
+      const existing = state.recommendationHistory.some(
+        (record) => record.recommendationId === action.recommendationId && record.date === action.date,
+      )
+      return {
+        ...state,
+        todayRecommendationId: action.recommendationId,
+        recommendationHistory: existing
+          ? state.recommendationHistory
+          : [...state.recommendationHistory, { recommendationId: action.recommendationId, date: action.date, status: 'shown' }],
+        saveStatus: 'saving',
+      }
+    }
+    case 'recommendation-status':
+      return {
+        ...state,
+        recommendationHistory: state.recommendationHistory.map((record) =>
+          record.recommendationId === action.recommendationId && record.date === action.date
+            ? { ...record, status: action.status }
+            : record,
+        ),
+        saveStatus: 'saving',
+      }
+    case 'clear-active-recommendation':
+      return { ...state, todayRecommendationId: null, saveStatus: 'saving' }
+    case 'start-check-in':
+      return {
+        ...state,
+        checkIns: state.checkIns.some((checkIn) => checkIn.id === action.checkIn.id)
+          ? state.checkIns
+          : [action.checkIn, ...state.checkIns],
+        saveStatus: 'saving',
+      }
+    case 'answer-check-in':
+      return {
+        ...state,
+        checkIns: state.checkIns.map((checkIn) => checkIn.id === action.checkInId
+          ? { ...checkIn, answers: { ...checkIn.answers, [action.questionId]: action.answerId } }
+          : checkIn),
+        saveStatus: 'saving',
+      }
+    case 'complete-check-in':
+      return {
+        ...state,
+        checkIns: state.checkIns.map((checkIn) => checkIn.id === action.checkInId
+          ? { ...checkIn, completedAt: action.completedAt }
+          : checkIn),
+        saveStatus: 'saving',
+      }
+    case 'replace-state':
+      return { ...action.state, saveStatus: 'saving', restoreNotice: null }
     case 'set-save-status':
       return { ...state, saveStatus: action.status }
     case 'clear-restore-notice':
@@ -205,6 +286,9 @@ export function serializeState(state: PrototypeState): string {
       transitionSeen: state.transitionSeen,
       resultsReached: state.resultsReached,
       todayVisited: state.todayVisited,
+      recommendationHistory: state.recommendationHistory,
+      todayRecommendationId: state.todayRecommendationId,
+      checkIns: state.checkIns,
     },
   }
   return JSON.stringify(persisted)
@@ -385,6 +469,12 @@ function sanitizeState(raw: Record<string, unknown>): PrototypeState {
   const maxIndex = Math.max(getAssessmentQuestions(assessmentMode, true).length - 1, 0)
   const currentIndex = clampInteger(raw.currentIndex, 0, maxIndex)
   const resultsReached = raw.resultsReached === true && assessmentStarted
+  const recommendationIds = new Set(recommendationCatalog.map((item) => item.id))
+  const recommendationHistory = sanitizeRecommendationHistory(raw.recommendationHistory, recommendationIds)
+  const todayRecommendationId = typeof raw.todayRecommendationId === 'string' && recommendationIds.has(raw.todayRecommendationId)
+    ? raw.todayRecommendationId
+    : null
+  const checkIns = sanitizeCheckIns(raw.checkIns)
 
   return {
     accountCreated,
@@ -400,9 +490,60 @@ function sanitizeState(raw: Record<string, unknown>): PrototypeState {
     transitionSeen: raw.transitionSeen === true && assessmentStarted,
     resultsReached,
     todayVisited: raw.todayVisited === true && resultsReached,
+    recommendationHistory,
+    todayRecommendationId,
+    checkIns,
     saveStatus: 'saved',
     restoreNotice: null,
   }
+}
+
+function sanitizeRecommendationHistory(value: unknown, validIds: Set<string>): RecommendationHistoryRecord[] {
+  if (!Array.isArray(value)) return []
+  const records: RecommendationHistoryRecord[] = []
+  const seen = new Set<string>()
+  for (const item of value.slice(-60)) {
+    if (!isRecord(item) || typeof item.recommendationId !== 'string' || !validIds.has(item.recommendationId)) continue
+    if (typeof item.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(item.date)) continue
+    if (item.status !== 'shown' && item.status !== 'completed' && item.status !== 'dismissed') continue
+    const key = `${item.date}:${item.recommendationId}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    records.push({ recommendationId: item.recommendationId, date: item.date, status: item.status })
+  }
+  return records
+}
+
+function sanitizeCheckIns(value: unknown): CheckIn[] {
+  if (!Array.isArray(value)) return []
+  const setById = new Map(checkInQuestionSets.map((set) => [set.id, set]))
+  const questionById = new Map<string, (typeof initialAssessment.questions)[number]>(initialAssessment.questions.map((question) => [question.id, question]))
+  const records: CheckIn[] = []
+  const seen = new Set<string>()
+  for (const item of value.slice(0, 30)) {
+    if (!isRecord(item) || typeof item.id !== 'string' || !/^[a-zA-Z0-9_-]{4,80}$/.test(item.id) || seen.has(item.id)) continue
+    const set = typeof item.setId === 'string' ? setById.get(item.setId) : undefined
+    if (!set || !validIsoDate(item.startedAt)) continue
+    const answers: Record<string, string> = {}
+    if (isRecord(item.answers)) {
+      for (const [questionId, answerId] of Object.entries(item.answers)) {
+        const question = questionById.get(questionId)
+        if (set.questionIds.includes(questionId) && question && typeof answerId === 'string' && question.answers.some((answer) => answer.id === answerId)) {
+          answers[questionId] = answerId
+        }
+      }
+    }
+    const completedAt = validIsoDate(item.completedAt) && Object.keys(answers).length === set.questionIds.length
+      ? item.completedAt
+      : null
+    seen.add(item.id)
+    records.push({ id: item.id, setId: set.id, startedAt: item.startedAt, completedAt, answers })
+  }
+  return records
+}
+
+function validIsoDate(value: unknown): value is string {
+  return typeof value === 'string' && !Number.isNaN(Date.parse(value))
 }
 
 function sanitizeLocation(value: unknown): LocationProfile | null {
@@ -476,5 +617,39 @@ export function createTestState(
     ...defaultState,
     ...values,
     profile: { ...defaultState.profile, ...values.profile },
+  }
+}
+
+export function createDemoState(now = new Date()): PrototypeState {
+  const submittedAnswers = Object.fromEntries(initialAssessment.questions.map((question) => [
+    question.id,
+    question.answers.find((answer) => answer.kind === 'ordinary')?.id ?? question.answers[0]?.id ?? '',
+  ]))
+  const quickSet = checkInQuestionSets.find((set) => set.id === 'quick-current')
+  const answers = Object.fromEntries((quickSet?.questionIds ?? []).map((questionId) => {
+    const question = initialAssessment.questions.find((candidate) => candidate.id === questionId)
+    return [questionId, question?.answers.find((answer) => answer.kind === 'ordinary')?.id ?? '']
+  }))
+  return {
+    ...defaultState,
+    accountCreated: true,
+    profile: {
+      preferredName: 'Demo Editor',
+      ageBand: 'Prefer not to say',
+      location: { source: 'skipped', latitude: null, longitude: null, accuracyMeters: null, timeZone: browserTimeZone(), units: 'us', displayLabel: null },
+      dietaryPattern: 'Vegetarian',
+      allergies: '',
+      exclusions: '',
+    },
+    profileCompleted: true,
+    introSeen: true,
+    assessmentStarted: true,
+    assessmentMode: 'full',
+    currentIndex: initialAssessment.questions.length - 1,
+    submittedAnswers,
+    transitionSeen: true,
+    resultsReached: true,
+    todayVisited: true,
+    checkIns: quickSet ? [{ id: `demo-${now.getTime()}`, setId: quickSet.id, startedAt: now.toISOString(), completedAt: now.toISOString(), answers }] : [],
   }
 }
