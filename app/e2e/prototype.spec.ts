@@ -205,7 +205,7 @@ test('uses every post-assessment destination in the mobile demo', async ({ page 
   await page.getByRole('button', { name: 'What is Vata?' }).click()
   await expect(page.getByRole('heading', { name: 'Matching content' })).toBeVisible()
 
-  await page.getByRole('link', { name: 'Today', exact: true }).click()
+  await page.getByRole('navigation', { name: 'Primary navigation' }).getByRole('link', { name: 'Today', exact: true }).click()
   await page.getByRole('link', { name: 'Open profile settings' }).click()
   await expect(page.getByText('Browser localStorage')).toBeVisible()
   const downloadPromise = page.waitForEvent('download')

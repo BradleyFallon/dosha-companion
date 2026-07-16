@@ -1,8 +1,19 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Screen, Status } from '../components/Layout'
+import { BackLink, Screen, Status } from '../components/Layout'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { serializeState } from '../prototype/state'
+import {
+  ClearDataIcon,
+  CompleteIcon,
+  ExportDataIcon,
+  LocationIcon,
+  PrivacyIcon,
+  ProfileIcon,
+  ResetIcon,
+  StorageIcon,
+  WarningIcon,
+} from '../ui/icons'
 
 export function SettingsScreen() {
   const { state, dispatch, resetPrototype, seedDemo } = usePrototype()
@@ -58,9 +69,9 @@ export function SettingsScreen() {
 
   return (
     <Screen>
-      <Link className="back-link" to="/today">← Today</Link>
+      <BackLink to="/today" label="Today" />
       <div className="settings-heading">
-        <div><p className="eyebrow">Browser-local profile</p><h1 tabIndex={-1}>Settings</h1></div>
+        <div><p className="eyebrow section-title-with-icon"><ProfileIcon aria-hidden="true" className="icon-leading" focusable="false" />Browser-local profile</p><h1 tabIndex={-1}>Settings</h1></div>
         <Status>
           {state.saveStatus === 'saving'
             ? 'Saving…'
@@ -87,22 +98,23 @@ export function SettingsScreen() {
         <input id="settings-allergies" value={allergies} onChange={(event) => setAllergies(event.target.value)} />
         <label htmlFor="settings-exclusions">Other exclusions <span className="optional">Optional</span></label>
         <input id="settings-exclusions" value={exclusions} onChange={(event) => setExclusions(event.target.value)} />
-        <button className="button primary" type="submit">Save profile changes</button>
+        <button className="button primary icon-label" type="submit"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" />Save profile changes</button>
       </form>
       <section className="settings-location" aria-labelledby="settings-location-title">
-        <h2 id="settings-location-title">Location and units</h2>
+        <h2 className="section-title-with-icon" id="settings-location-title"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Location and units</h2>
         <p>{state.profile.location?.displayLabel ?? (state.profile.location?.source === 'skipped' ? 'Location skipped' : 'No location saved')} · {state.profile.location?.units === 'metric' ? 'Metric' : 'US'} units</p>
-        <Link className="button secondary" to="/profile/location?return=settings">Edit or remove location</Link>
+        <Link className="button secondary icon-label" to="/profile/location?return=settings"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Edit or remove location</Link>
       </section>
       <section className="settings-data" aria-labelledby="settings-data-title">
-        <h2 id="settings-data-title">Local data</h2>
+        <h2 className="section-title-with-icon" id="settings-data-title"><StorageIcon aria-hidden="true" className="icon-leading" focusable="false" />Local data</h2>
         <dl className="storage-summary"><div><dt>Storage</dt><dd>Browser localStorage</dd></div><div><dt>Status</dt><dd>{state.saveStatus === 'saved' ? 'Saved on this device' : state.saveStatus === 'saving' ? 'Saving…' : 'Not saved; session only'}</dd></div><div><dt>Assessment answers</dt><dd>{Object.keys(state.submittedAnswers).length}</dd></div><div><dt>Check-ins</dt><dd>{state.checkIns.length}</dd></div></dl>
-        <button className="button secondary" type="button" onClick={exportData}>Export local data as JSON</button>
-        <button className="button danger-button" type="button" onClick={clearData}>Clear local data and restart</button>
-        {import.meta.env.DEV ? <div className="dev-control"><strong>Development demo helper</strong><p>Replace this session with a complete profile, assessment coverage, and a completed check-in.</p><button className="button secondary" type="button" onClick={loadDemo}>Load seeded demo</button></div> : null}
+        {state.saveStatus === 'not-saved' ? <p className="secure-context-note icon-label"><WarningIcon aria-hidden="true" className="icon-leading" focusable="false" />Changes are available only for this session.</p> : null}
+        <button className="button secondary icon-label" type="button" onClick={exportData}><ExportDataIcon aria-hidden="true" className="icon-leading" focusable="false" />Export local data as JSON</button>
+        <button className="button danger-button icon-label" type="button" onClick={clearData}><ClearDataIcon aria-hidden="true" className="icon-leading" focusable="false" />Clear local data and restart</button>
+        {import.meta.env.DEV ? <div className="dev-control"><strong>Development demo helper</strong><p>Replace this session with a complete profile, assessment coverage, and a completed check-in.</p><button className="button secondary icon-label" type="button" onClick={loadDemo}><ResetIcon aria-hidden="true" className="icon-leading" focusable="false" />Load seeded demo</button></div> : null}
         {dataMessage ? <Status>{dataMessage}</Status> : null}
       </section>
-      <p className="boundary-note">This milestone stores the profile only in this browser. It does not synchronize to an account or backend.</p>
+      <p className="boundary-note icon-label"><PrivacyIcon aria-hidden="true" className="icon-leading" focusable="false" />This milestone stores the profile only in this browser. It does not synchronize to an account or backend.</p>
     </Screen>
   )
 }

@@ -4,6 +4,7 @@ import { Screen, Status } from '../components/Layout'
 import { getCheckInQuestionSet } from '../content/repository'
 import { initialAssessment } from '../generated/initialAssessment'
 import { usePrototype } from '../prototype/PrototypeContext'
+import { CompleteIcon, QuestionsIcon } from '../ui/icons'
 
 export function NewCheckInScreen() {
   const { dispatch } = usePrototype()
@@ -46,7 +47,7 @@ export function CheckInScreen() {
   if (checkIn.completedAt || !question) {
     if (!checkIn.completedAt) return <Screen><p role="status">Finishing check-in…</p></Screen>
     return (
-      <Screen><p className="stage-badge">Check-in complete</p><h1 tabIndex={-1}>Your recent answers were saved</h1><p className="lede">This dated record stays separate from your initial assessment. No dosha score was calculated.</p><Link className="button primary" to="/today">Return to Today</Link><Link className="button secondary" to="/questions">View check-in history</Link></Screen>
+      <Screen><p className="stage-badge icon-label"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" weight="fill" />Check-in complete</p><h1 tabIndex={-1}>Your recent answers were saved</h1><p className="lede">This dated record stays separate from your initial assessment. No dosha score was calculated.</p><Link className="button primary" to="/today">Return to Today</Link><Link className="button secondary icon-label" to="/questions"><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />View check-in history</Link></Screen>
     )
   }
 
@@ -63,7 +64,7 @@ export function CheckInScreen() {
       <progress value={index + 1} max={questions.length}>Question {index + 1} of {questions.length}</progress>
       <h1 tabIndex={-1}>{question.text}</h1>
       <fieldset className="answer-list"><legend className="sr-only">Choose one answer</legend>{question.answers.map((answer) => <label className={selected === answer.id ? 'answer-option selected' : 'answer-option'} key={answer.id}><input type="radio" name={question.id} checked={selected === answer.id} onChange={() => setSelected(answer.id)} /><span className="radio-mark" aria-hidden="true">{selected === answer.id ? '✓' : ''}</span><span>{answer.text}</span></label>)}</fieldset>
-      <button className="button primary" type="button" disabled={!selected} onClick={submit}>{index === questions.length - 1 ? 'Complete check-in' : 'Continue'}</button>
+      <button className="button primary icon-label" type="button" disabled={!selected} onClick={submit}>{index === questions.length - 1 ? <CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" /> : <QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />}{index === questions.length - 1 ? 'Complete check-in' : 'Continue'}</button>
       <p className="boundary-note">Check-in answers are saved as a dated record and are not scored.</p>
     </Screen>
   )

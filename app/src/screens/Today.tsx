@@ -5,6 +5,19 @@ import { usePrototype } from '../prototype/PrototypeContext'
 import { calculateAssessmentCoverage } from '../quiz/coverage'
 import { selectDailyRecommendation } from '../content/recommendations'
 import { shortModeAllowed } from '../quiz/assessment'
+import {
+  BalanceIcon,
+  CompleteIcon,
+  DismissIcon,
+  FoodIcon,
+  ForwardIcon,
+  GuidedHelpIcon,
+  LearnIcon,
+  QuestionsIcon,
+  SettingsIcon,
+  ShowAnotherIcon,
+  WhyIcon,
+} from '../ui/icons'
 
 export function TodayScreen() {
   const { state, dispatch } = usePrototype()
@@ -51,14 +64,15 @@ export function TodayScreen() {
       {fixtureActive ? <p className="fixture-banner">Development fixture visible · not calculated from your answers</p> : null}
       <header className="today-header">
         <div><p className="eyebrow">{date}</p><h1 tabIndex={-1}>{greeting}, {name}</h1></div>
-        <Link className="settings-shortcut" to="/settings" aria-label="Open profile settings">Settings</Link>
+        <Link className="settings-shortcut icon-label" to="/settings" aria-label="Open profile settings"><SettingsIcon aria-hidden="true" className="icon-leading" focusable="false" />Settings</Link>
       </header>
       <Link className="balance-summary" to="/balance">
-        <span>
+        <BalanceIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" />
+        <span className="balance-summary-copy">
           <small>Assessment coverage · {coverage.ready ? 'ready' : 'needs information'}</small>
           <strong>{coverage.current.substantive} of {coverage.current.total} recent answers are usable</strong>
         </span>
-        <span aria-hidden="true">→</span>
+        <ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" />
       </Link>
       <article className="daily-focus">
         <p className="provisional-badge">{recommendation.label}</p>
@@ -68,24 +82,24 @@ export function TodayScreen() {
         <div className="practical-action">
           <p className="eyebrow">Try this</p>
           <strong>{recommendation.action}</strong>
-          {recommendation.checkInSetId ? <Link to={`/questions/check-in/new?set=${recommendation.checkInSetId}`}>Start this check-in →</Link> : null}
+          {recommendation.checkInSetId ? <Link className="icon-label" to={`/questions/check-in/new?set=${recommendation.checkInSetId}`}><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />Start this check-in<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></Link> : null}
         </div>
-        {currentRecord?.status === 'completed' ? <p className="completion-note" role="status">Marked complete for today.</p> : null}
+        {currentRecord?.status === 'completed' ? <p className="completion-note icon-label" role="status"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" weight="fill" />Marked complete for today.</p> : null}
         <div className="recommendation-actions">
-          <button className="button primary" type="button" disabled={currentRecord?.status === 'completed'} onClick={() => updateRecommendation('completed')}>Mark complete</button>
-          <button className="button secondary" type="button" onClick={() => updateRecommendation('dismissed')}>Dismiss</button>
-          <button className="text-button" type="button" onClick={() => dispatch({ type: 'clear-active-recommendation' })}>Show another</button>
+          <button className="button primary icon-label" type="button" disabled={currentRecord?.status === 'completed'} onClick={() => updateRecommendation('completed')}><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" />Mark complete</button>
+          <button className="button secondary icon-label" type="button" onClick={() => updateRecommendation('dismissed')}><DismissIcon aria-hidden="true" className="icon-leading" focusable="false" />Dismiss</button>
+          <button className="text-button icon-label" type="button" onClick={() => dispatch({ type: 'clear-active-recommendation' })}><ShowAnotherIcon aria-hidden="true" className="icon-leading" focusable="false" />Show another</button>
         </div>
-        <Link className="text-link" to={`/learn/${recommendation.relatedArticleId}`}>Read related guidance →</Link>
+        <Link className="text-link icon-label" to={`/learn/${recommendation.relatedArticleId}`}><LearnIcon aria-hidden="true" className="icon-leading" focusable="false" />Read related guidance<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></Link>
       </article>
       <section className={recommendation.food.status === 'withheld' ? 'today-secondary withheld' : 'today-secondary'} aria-labelledby="food-title">
         <p className="provisional-badge">{recommendation.label}</p>
         <p className="eyebrow">Optional food prompt</p>
-        <h2 id="food-title">{recommendation.food.title}</h2>
+        <h2 className="section-title-with-icon" id="food-title"><FoodIcon aria-hidden="true" className="icon-leading" focusable="false" weight="duotone" />{recommendation.food.title}</h2>
         <p>{recommendation.food.body}</p>
       </section>
       <button className="disclosure" type="button" aria-expanded={whyOpen} onClick={() => setWhyOpen(!whyOpen)}>
-        Why this was chosen <span aria-hidden="true">{whyOpen ? '−' : '+'}</span>
+        <span className="icon-label"><WhyIcon aria-hidden="true" className="icon-leading" focusable="false" />Why this was chosen</span><span aria-hidden="true">{whyOpen ? '−' : '+'}</span>
       </button>
       {whyOpen ? (
         <div className="disclosure-panel">
@@ -94,10 +108,10 @@ export function TodayScreen() {
         </div>
       ) : null}
       <Link className="question-count" to="/questions">
-        <strong>{coverage.ready ? 'Review assessment coverage' : 'More information is useful'}</strong>
-        <span>{coverage.ready ? 'See answer coverage →' : 'Answer the next useful question →'}</span>
+        <span className="card-link-heading"><QuestionsIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" /><strong>{coverage.ready ? 'Review assessment coverage' : 'More information is useful'}</strong></span>
+        <span className="icon-label">{coverage.ready ? 'See answer coverage' : 'Answer the next useful question'}<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></span>
       </Link>
-      <Link className="assistant-card" to="/assistant"><strong>Search the learning catalog</strong><span>Open deterministic guided help →</span></Link>
+      <Link className="assistant-card" to="/assistant"><span className="card-link-heading"><GuidedHelpIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" /><strong>Search the learning catalog</strong></span><span className="icon-label">Open deterministic guided help<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></span></Link>
     </Screen>
   )
 }

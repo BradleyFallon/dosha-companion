@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { BackLink, Screen } from '../components/Layout'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { nextResumePath } from '../prototype/resume'
+import { DoshaTrioMark } from '../ui/icons'
 
 export function WelcomeScreen() {
   const { state } = usePrototype()
@@ -10,7 +11,7 @@ export function WelcomeScreen() {
 
   return (
     <Screen className="welcome-screen">
-      <div className="welcome-mark" aria-hidden="true">DC</div>
+      <DoshaTrioMark className="welcome-mark" />
       <p className="eyebrow">Dosha Companion</p>
       <h1 tabIndex={-1}>Understand what supports you today.</h1>
       <p className="lede">

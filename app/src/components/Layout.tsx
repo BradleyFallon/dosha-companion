@@ -1,6 +1,13 @@
 import { useEffect, type ReactNode } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { usePrototype } from '../prototype/PrototypeContext'
+import {
+  BackIcon,
+  BalanceIcon,
+  LearnIcon,
+  QuestionsIcon,
+  TodayIcon,
+} from '../ui/icons'
 
 const postResultPaths = ['/today', '/questions', '/balance', '/learn', '/assistant', '/settings']
 
@@ -59,18 +66,27 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 function BottomNavigation() {
   const links = [
-    ['/today', 'Today'],
-    ['/questions', 'Questions'],
-    ['/balance', 'My Balance'],
-    ['/learn', 'Learn'],
+    ['/today', 'Today', TodayIcon],
+    ['/questions', 'Questions', QuestionsIcon],
+    ['/balance', 'My Balance', BalanceIcon],
+    ['/learn', 'Learn', LearnIcon],
   ] as const
 
   return (
     <nav className="bottom-nav" aria-label="Primary navigation">
-      {links.map(([to, label]) => (
+      {links.map(([to, label, Icon]) => (
         <NavLink key={to} to={to} className={({ isActive }) => (isActive ? 'active' : undefined)}>
-          <span aria-hidden="true">{label === 'Today' ? '○' : label === 'Questions' ? '?' : label === 'My Balance' ? '≋' : '□'}</span>
-          {label}
+          {({ isActive }) => (
+            <>
+              <Icon
+                aria-hidden="true"
+                className="nav-icon"
+                focusable="false"
+                weight={isActive ? 'fill' : 'regular'}
+              />
+              <span>{label}</span>
+            </>
+          )}
         </NavLink>
       ))}
     </nav>
@@ -97,7 +113,8 @@ export function Screen({
 export function BackLink({ to, label = 'Back' }: { to: string; label?: string }) {
   return (
     <NavLink className="back-link" to={to}>
-      <span aria-hidden="true">←</span> {label}
+      <BackIcon aria-hidden="true" className="icon-leading" focusable="false" />
+      <span>{label}</span>
     </NavLink>
   )
 }

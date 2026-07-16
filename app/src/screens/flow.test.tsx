@@ -77,6 +77,37 @@ describe('navigation visibility', () => {
     const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
     expect(navigation).toBeInTheDocument()
     expect(navigation.querySelector('a[href="/today"]')).toHaveAttribute('aria-current', 'page')
+    for (const label of ['Today', 'Questions', 'My Balance', 'Learn']) {
+      const link = screen.getByRole('link', { name: label })
+      const icon = link.querySelector('svg')
+      expect(icon).toBeInTheDocument()
+      expect(icon).toHaveAttribute('aria-hidden', 'true')
+      expect(icon).toHaveAttribute('focusable', 'false')
+    }
+    expect(navigation.querySelectorAll('svg')).toHaveLength(4)
+  })
+
+  it('renders the temporary dosha mark as three decorative, unfocusable icons', () => {
+    const { container } = renderAt('/', { resultsReached: false })
+    const mark = container.querySelector('.welcome-mark')
+    expect(mark).toHaveAttribute('aria-hidden', 'true')
+    expect(mark?.querySelectorAll('svg')).toHaveLength(3)
+    mark?.querySelectorAll('svg').forEach((icon) => {
+      expect(icon).toHaveAttribute('focusable', 'false')
+      expect(icon).not.toHaveAttribute('tabindex')
+    })
+  })
+
+  it('preserves accessible names and keeps Today icons out of the tab order', () => {
+    const { container } = renderAt('/today', { resultsReached: true })
+    expect(screen.getByRole('link', { name: 'Open profile settings' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mark complete' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Show another' })).toBeInTheDocument()
+    container.querySelectorAll('svg').forEach((icon) => {
+      expect(icon).toHaveAttribute('focusable', 'false')
+      expect(icon).not.toHaveAttribute('tabindex')
+    })
   })
 })
 

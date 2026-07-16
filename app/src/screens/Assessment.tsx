@@ -8,6 +8,7 @@ import {
   shortModeAllowed,
   type AssessmentMode,
 } from '../quiz/assessment'
+import { ForwardIcon } from '../ui/icons'
 
 export function AssessmentIntroScreen() {
   const { state, dispatch } = usePrototype()
@@ -207,7 +208,7 @@ export function TransitionScreen() {
       <p className="eyebrow">Part 1 complete</p>
       <h1 tabIndex={-1}>Now let’s look at how you’ve been feeling recently.</h1>
       <p className="lede">Think only about the past seven days. These answers help us understand your current balance separately from your usual nature.</p>
-      <div className="time-shift" aria-hidden="true"><span>Usual nature</span><span>→</span><strong>Past 7 days</strong></div>
+      <div className="time-shift" aria-hidden="true"><span>Usual nature</span><ForwardIcon className="icon-trailing" focusable="false" /><strong>Past 7 days</strong></div>
       <button className="button primary" type="button" onClick={continueToCurrent}>Continue</button>
       <button className="button secondary" type="button" onClick={backToBaseline}>Back to last question</button>
       <Link className="text-link centered" to="/">Save and exit</Link>

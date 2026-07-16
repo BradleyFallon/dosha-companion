@@ -5,6 +5,17 @@ import { calculateAssessmentCoverage } from '../quiz/coverage'
 import { CoverageDetail } from './Results'
 import { getCheckInQuestionSet } from '../content/repository'
 import { initialAssessment } from '../generated/initialAssessment'
+import {
+  CompleteIcon,
+  CurrentBalanceIcon,
+  ForwardIcon,
+  LearnIcon,
+  LocationIcon,
+  NatureIcon,
+  QuestionsIcon,
+  SettingsIcon,
+  WarningIcon,
+} from '../ui/icons'
 
 export function QuestionsScreen() {
   const { state } = usePrototype()
@@ -18,7 +29,7 @@ export function QuestionsScreen() {
   return (
     <Screen>
       <p className="eyebrow">Assessment and check-ins</p>
-      <h1 tabIndex={-1}>Questions</h1>
+      <h1 className="section-title-with-icon" tabIndex={-1}><QuestionsIcon aria-hidden="true" className="heading-icon" focusable="false" weight="duotone" />Questions</h1>
       <p className="lede">
         Answer missing initial questions or create a separate, dated current-balance check-in.
       </p>
@@ -28,13 +39,13 @@ export function QuestionsScreen() {
       </div>
       <CoverageDetail coverage={coverage} />
       {coverage.nextQuestionId ? (
-        <Link className="button secondary" to={`/assessment/question/${coverage.nextQuestionId}?return=questions`}>Answer next useful initial question</Link>
+        <Link className="button secondary icon-label" to={`/assessment/question/${coverage.nextQuestionId}?return=questions`}><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />Answer next useful initial question</Link>
       ) : (
-        <p className="completion-note">Initial coverage requirements are met.</p>
+        <p className="completion-note icon-label"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" weight="fill" />Initial coverage requirements are met.</p>
       )}
-      <Link className="button secondary" to={`/assessment/question/${initialAssessment.questions[0].id}?return=questions`}>Review initial assessment answers</Link>
-      <section className="check-in-section" aria-labelledby="current-checkins"><h2 id="current-checkins">Current check-ins</h2><p>Each check-in is a new record about the past seven days. It does not overwrite your baseline.</p>{incomplete ? <Link className="button primary" to={`/questions/check-in/${incomplete.id}`}>Continue incomplete check-in</Link> : <Link className="button primary" to="/questions/check-in/new?set=quick-current">Start current check-in</Link>}<Link className="text-link" to="/questions/check-in/new?set=full-current">Start extended 7-question check-in</Link></section>
-      <section aria-labelledby="recent-checkins"><h2 id="recent-checkins">Recent check-ins</h2>{recent.length > 0 ? <ul className="history-list">{recent.map((checkIn) => { const set = getCheckInQuestionSet(checkIn.setId); return <li key={checkIn.id}><span><strong>{set?.title ?? 'Current check-in'}</strong><small>Started {formatDate(checkIn.startedAt)}</small></span><span>{checkIn.completedAt ? `Completed · ${Object.keys(checkIn.answers).length} answers` : `In progress · ${Object.keys(checkIn.answers).length} answers`}</span>{!checkIn.completedAt ? <Link to={`/questions/check-in/${checkIn.id}`}>Resume</Link> : null}</li> })}</ul> : <p className="empty-state">No repeatable check-ins yet.</p>}</section>
+      <Link className="button secondary icon-label" to={`/assessment/question/${initialAssessment.questions[0].id}?return=questions`}><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />Review initial assessment answers</Link>
+      <section className="check-in-section" aria-labelledby="current-checkins"><h2 className="section-title-with-icon" id="current-checkins"><CurrentBalanceIcon aria-hidden="true" className="icon-leading" focusable="false" weight="duotone" />Current check-ins</h2><p>Each check-in is a new record about the past seven days. It does not overwrite your baseline.</p>{incomplete ? <Link className="button primary icon-label" to={`/questions/check-in/${incomplete.id}`}><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />Continue incomplete check-in</Link> : <Link className="button primary icon-label" to="/questions/check-in/new?set=quick-current"><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />Start current check-in</Link>}<Link className="text-link icon-label" to="/questions/check-in/new?set=full-current"><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />Start extended 7-question check-in</Link></section>
+      <section aria-labelledby="recent-checkins"><h2 className="section-title-with-icon" id="recent-checkins"><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />Recent check-ins</h2>{recent.length > 0 ? <ul className="history-list">{recent.map((checkIn) => { const set = getCheckInQuestionSet(checkIn.setId); const StatusIcon = checkIn.completedAt ? CompleteIcon : CurrentBalanceIcon; return <li key={checkIn.id}><span><strong>{set?.title ?? 'Current check-in'}</strong><small>Started {formatDate(checkIn.startedAt)}</small></span><span className="icon-label"><StatusIcon aria-hidden="true" className="icon-leading" focusable="false" weight={checkIn.completedAt ? 'fill' : 'regular'} />{checkIn.completedAt ? `Completed · ${Object.keys(checkIn.answers).length} answers` : `In progress · ${Object.keys(checkIn.answers).length} answers`}</span>{!checkIn.completedAt ? <Link to={`/questions/check-in/${checkIn.id}`}>Resume</Link> : null}</li> })}</ul> : <p className="empty-state">No repeatable check-ins yet.</p>}</section>
       <p className="boundary-note">There is no daily requirement. Coverage is not diagnostic confidence, and no dosha score has been calculated.</p>
     </Screen>
   )
@@ -55,24 +66,25 @@ export function BalanceScreen() {
       <p className="stage-badge">{coverage.ready ? 'Coverage ready' : 'More information useful'}</p>
       <h1 tabIndex={-1}>My Balance</h1>
       <p className="supporting">This screen reports answer coverage only. Dosha labels and relative measurements are unavailable until expert scoring is approved.</p>
-      <CoverageCard title="Your usual nature" timeframe="Usual adult tendencies" substantive={coverage.baseline.substantive} total={coverage.baseline.total} categories={coverage.baseline.categoriesCovered} />
-      <CoverageCard title="Your current check-in" timeframe="Past seven days" substantive={coverage.current.substantive} total={coverage.current.total} categories={coverage.current.categoriesCovered} />
-      <article className="result-card"><p className="eyebrow">Repeatable current check-ins</p><h2>{completed.length} completed</h2><p>{latest?.completedAt ? `Latest completed ${formatDate(latest.completedAt)}.` : 'No dated current check-in has been completed yet.'}</p>{incomplete ? <Link to={`/questions/check-in/${incomplete.id}`}>Continue incomplete check-in →</Link> : <Link to="/questions/check-in/new?set=quick-current">Start a current check-in →</Link>}</article>
-      <div className="scoring-boundary"><h2>No dosha result calculated</h2><p>The repository contains no approved numerical answer weights or result thresholds.</p></div>
+      <CoverageCard kind="nature" title="Your usual nature" timeframe="Usual adult tendencies" substantive={coverage.baseline.substantive} total={coverage.baseline.total} categories={coverage.baseline.categoriesCovered} />
+      <CoverageCard kind="current" title="Your current check-in" timeframe="Past seven days" substantive={coverage.current.substantive} total={coverage.current.total} categories={coverage.current.categoriesCovered} />
+      <article className="result-card"><p className="eyebrow section-title-with-icon"><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />Repeatable current check-ins</p><h2>{completed.length} completed</h2><p>{latest?.completedAt ? `Latest completed ${formatDate(latest.completedAt)}.` : 'No dated current check-in has been completed yet.'}</p>{incomplete ? <Link className="icon-label" to={`/questions/check-in/${incomplete.id}`}>Continue incomplete check-in<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></Link> : <Link className="icon-label" to="/questions/check-in/new?set=quick-current">Start a current check-in<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></Link>}</article>
+      <div className="scoring-boundary"><h2 className="section-title-with-icon"><WarningIcon aria-hidden="true" className="icon-leading" focusable="false" />No dosha result calculated</h2><p>The repository contains no approved numerical answer weights or result thresholds.</p></div>
       <CoverageDetail coverage={coverage} />
       {coverage.nextQuestionId ? <Link className="button primary" to={`/assessment/question/${coverage.nextQuestionId}?return=results`}>Improve coverage</Link> : null}
-      <Link className="button secondary" to="/questions">Review answers and check-in history</Link>
-      <Link className="button secondary" to="/learn/nature-and-current-balance">Learn about nature and current balance</Link>
-      <Link className="button secondary" to="/settings">Edit profile settings</Link>
-      <Link className="button secondary" to="/profile/location">Edit or remove location</Link>
+      <Link className="button secondary icon-label" to="/questions"><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />Review answers and check-in history</Link>
+      <Link className="button secondary icon-label" to="/learn/nature-and-current-balance"><LearnIcon aria-hidden="true" className="icon-leading" focusable="false" />Learn about nature and current balance</Link>
+      <Link className="button secondary icon-label" to="/settings"><SettingsIcon aria-hidden="true" className="icon-leading" focusable="false" />Edit profile settings</Link>
+      <Link className="button secondary icon-label" to="/profile/location"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Edit or remove location</Link>
     </Screen>
   )
 }
 
-function CoverageCard({ title, timeframe, substantive, total, categories }: { title: string; timeframe: string; substantive: number; total: number; categories: number }) {
+function CoverageCard({ kind, title, timeframe, substantive, total, categories }: { kind: 'nature' | 'current'; title: string; timeframe: string; substantive: number; total: number; categories: number }) {
+  const Icon = kind === 'nature' ? NatureIcon : CurrentBalanceIcon
   return (
     <article className="result-card">
-      <p className="eyebrow">{title}</p><p className="time-context">{timeframe}</p>
+      <p className="eyebrow section-title-with-icon"><Icon aria-hidden="true" className="icon-leading" focusable="false" weight="duotone" />{title}</p><p className="time-context">{timeframe}</p>
       <h2>{substantive} of {total} usable answers</h2>
       <p>{categories} categories have substantive coverage. No dosha interpretation was applied.</p>
     </article>

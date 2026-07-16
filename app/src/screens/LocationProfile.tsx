@@ -6,6 +6,7 @@ import { BackLink, Screen } from '../components/Layout'
 import { usePrototype } from '../prototype/PrototypeContext'
 import type { LocationProfile } from '../prototype/state'
 import { StepHeader } from './Onboarding'
+import { LocationIcon, PrivacyIcon } from '../ui/icons'
 
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright'
 const DEFAULT_MAP_LOCATION = { latitude: 39.5, longitude: -98.35 }
@@ -189,16 +190,16 @@ export function LocationProfileScreen() {
             </p>
           ) : null}
           <button
-            className="button primary location-primary"
+            className="button primary location-primary icon-label"
             type="button"
             onClick={useDeviceLocation}
             disabled={locating || !secureLocationAvailable}
           >
-            {locating ? 'Finding your location…' : 'Use my current location'}
+            <LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />{locating ? 'Finding your location…' : 'Use my current location'}
           </button>
           <div className="choice-divider" aria-hidden="true"><span>or</span></div>
-          <button className="button secondary" type="button" onClick={chooseOnMap}>Choose on map</button>
-          <p className="privacy-line"><span aria-hidden="true">◇</span> We will not make your location public or track it continuously.</p>
+          <button className="button secondary icon-label" type="button" onClick={chooseOnMap}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Choose on map</button>
+          <p className="privacy-line"><PrivacyIcon aria-hidden="true" className="icon-leading" focusable="false" />We will not make your location public or track it continuously.</p>
           <details className="manual-location">
             <summary>Search manually instead</summary>
             <form onSubmit={chooseManual}>
@@ -211,7 +212,7 @@ export function LocationProfileScreen() {
                 onChange={(event) => setManualLabel(event.target.value)}
               />
               <p className="field-hint">Prototype backup: this saves only the label you enter and does not contact a geocoding service.</p>
-              <button className="button secondary" type="submit">Use manual location</button>
+              <button className="button secondary icon-label" type="submit"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Use manual location</button>
             </form>
           </details>
           <button className="text-button centered-action" type="button" onClick={skipLocation}>Skip for now</button>
@@ -247,7 +248,7 @@ function LocationConfirmation({
       {hasCoordinates ? (
         <LocationMap location={location} onChange={onChange} />
       ) : (
-        <div className="manual-location-confirmation"><span aria-hidden="true">⌖</span><p>{location.displayLabel}</p></div>
+        <div className="manual-location-confirmation"><LocationIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" /><p>{location.displayLabel}</p></div>
       )}
       <p className="map-help">
         {hasCoordinates ? 'Drag the pin or tap the map if this is not correct.' : 'Only this general label will be saved.'}
@@ -257,9 +258,9 @@ function LocationConfirmation({
         <label><input type="radio" name="units" value="us" checked={units === 'us'} onChange={() => onUnitsChange('us')} /> US</label>
         <label><input type="radio" name="units" value="metric" checked={units === 'metric'} onChange={() => onUnitsChange('metric')} /> Metric</label>
       </fieldset>
-      <button className="button primary" type="button" onClick={onConfirm}>Use this location</button>
-      <button className="button secondary" type="button" onClick={onChooseAgain}>Choose again</button>
-      <p className="privacy-line">Only a coarse version is saved by this prototype. You can reset it at any time.</p>
+      <button className="button primary icon-label" type="button" onClick={onConfirm}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Use this location</button>
+      <button className="button secondary icon-label" type="button" onClick={onChooseAgain}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Choose again</button>
+      <p className="privacy-line"><PrivacyIcon aria-hidden="true" className="icon-leading" focusable="false" />Only a coarse version is saved by this prototype. You can reset it at any time.</p>
     </>
   )
 }
