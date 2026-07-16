@@ -69,7 +69,6 @@ No single answer should determine a dosha result.
 | Body frame and build      |              1–2 | Captures long-term structural tendency                       |
 | Weight tendency           |                1 | Distinguishes ease of gaining, maintaining, or losing weight |
 | Skin tendency             |                1 | Captures dryness, heat, oiliness, softness, and thickness    |
-| Hair tendency             |                1 | Adds supporting physical information                         |
 | Appetite                  |                1 | Distinguishes variable, strong, or steady appetite           |
 | Digestion                 |              1–2 | Captures irregularity, heat, speed, heaviness, or slowness   |
 | Bowel tendency            |                1 | Adds digestive-pattern specificity                           |
@@ -85,6 +84,10 @@ No single answer should determine a dosha result.
 | Response to delayed meals |                1 | Adds appetite and temperament information                    |
 
 The initial question set does not need every possible Ayurvedic variable. It should prioritize variables that strongly differentiate the doshas and are understandable through self-report.
+
+### Early-refinement domain
+
+Hair tendency is supporting physical evidence, but it is not required in the initial 27-question assessment. Ask it during early refinement after the preliminary result rather than expanding the initial set.
 
 ## Current-balance domain coverage
 
@@ -195,7 +198,7 @@ The assessment should show:
 
 Example:
 
-> Question 8 of 24
+> Question 8 of 27
 
 The app should not display dosha scores while the user is answering questions.
 

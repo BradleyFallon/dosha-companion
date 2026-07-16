@@ -113,6 +113,7 @@ These questions may:
 * Add coverage to missing assessment categories
 * Revisit uncertain answers
 * Clarify whether a trait is lifelong or recent
+* Add supporting physical evidence such as hair tendency
 * Improve food and lifestyle personalization
 
 Early refinement questions should generally be prioritized during the first several days of use.
@@ -166,7 +167,6 @@ High-priority domains include:
 * Body frame
 * Weight tendency
 * Skin tendency
-* Hair tendency
 * Appetite
 * Digestion and bowel tendency
 * Sleep
@@ -462,6 +462,15 @@ Every scored question must have:
 Questions must not be published until approved.
 
 The expert should review the complete initial assessment as a system, not only each question independently.
+
+Use `docs/quiz/expert-review-guide.md` for the review procedure. Give the expert the files in this order:
+
+1. `docs/quiz/initial-question-bank.md`
+2. `data/quiz/questions.csv`
+3. `data/quiz/answer-options.csv`
+4. `data/quiz/answer-scores.csv`
+
+During the first review, update the available expert notes, lifecycle status, reviewer, approval-date, and directional-rationale fields. Leave `vata_weight`, `pitta_weight`, `kapha_weight`, and `reliability_weight` blank until the scoring model is approved.
 
 ## Safety boundaries
 
