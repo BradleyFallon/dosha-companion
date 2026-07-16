@@ -1,12 +1,28 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Screen } from '../components/Layout'
 import { usePrototype } from '../prototype/PrototypeContext'
+import { calculateAssessmentCoverage } from '../quiz/coverage'
+import { selectDailyRecommendation } from '../content/recommendations'
+import { shortModeAllowed } from '../quiz/assessment'
 
 export function TodayScreen() {
   const { state } = usePrototype()
+  const location = useLocation()
   const [whyOpen, setWhyOpen] = useState(false)
   const name = state.profile.preferredName || 'there'
+  const fixtureActive =
+    shortModeAllowed() && new URLSearchParams(location.search).get('fixture') === 'profile'
+  const coverage = calculateAssessmentCoverage({
+    submittedAnswers: state.submittedAnswers,
+    skippedQuestionIds: state.skippedQuestionIds,
+  })
+  const recommendation = selectDailyRecommendation({
+    coverage,
+    profile: state.profile,
+    submittedAnswers: state.submittedAnswers,
+    fixtureActive,
+  })
   const date = new Intl.DateTimeFormat(undefined, {
     weekday: 'long',
     month: 'long',
@@ -15,34 +31,49 @@ export function TodayScreen() {
 
   return (
     <Screen className="today-screen">
+      {fixtureActive ? <p className="fixture-banner">Development fixture visible · not calculated from your answers</p> : null}
       <header className="today-header">
         <div><p className="eyebrow">{date}</p><h1 tabIndex={-1}>Good morning, {name}</h1></div>
-        <Link className="ai-shortcut" to="/assistant" aria-label="Open AI assistant placeholder">AI</Link>
+        <Link className="settings-shortcut" to="/settings" aria-label="Open profile settings">Settings</Link>
       </header>
       <Link className="balance-summary" to="/balance">
-        <span><small>Current balance · updated today</small><strong>Vata is currently more prominent</strong></span>
+        <span>
+          <small>Assessment coverage · {coverage.ready ? 'ready' : 'needs information'}</small>
+          <strong>{coverage.current.substantive} of {coverage.current.total} recent answers are usable</strong>
+        </span>
         <span aria-hidden="true">→</span>
       </Link>
       <article className="daily-focus">
-        <p className="eyebrow">Today’s focus · approved-copy placeholder</p>
-        <h2>Create a steadier start</h2>
-        <p>A regular pause can make a busy day feel easier to navigate. This sample guidance demonstrates placement only; it is not personalized or clinically validated.</p>
+        <p className="provisional-badge">{recommendation.label}</p>
+        <p className="eyebrow">Today’s focus</p>
+        <h2>{recommendation.headline}</h2>
+        <p>{recommendation.guidance}</p>
         <div className="practical-action">
           <p className="eyebrow">Try this</p>
-          <strong>Choose one consistent time for your next meal or short break.</strong>
+          <strong>{recommendation.action}</strong>
+          {recommendation.actionHref ? <Link to={recommendation.actionHref}>Start this check-in →</Link> : null}
         </div>
       </article>
-      <section className="today-secondary" aria-labelledby="food-title">
-        <p className="eyebrow">Optional food idea</p>
-        <h2 id="food-title">Choose a familiar, compatible meal</h2>
-        <p>Placeholder only. Allergies and exclusions would be checked by deterministic rules before a suggestion appears.</p>
+      <section className={recommendation.food.status === 'withheld' ? 'today-secondary withheld' : 'today-secondary'} aria-labelledby="food-title">
+        <p className="provisional-badge">{recommendation.label}</p>
+        <p className="eyebrow">Optional food prompt</p>
+        <h2 id="food-title">{recommendation.food.title}</h2>
+        <p>{recommendation.food.body}</p>
       </section>
       <button className="disclosure" type="button" aria-expanded={whyOpen} onClick={() => setWhyOpen(!whyOpen)}>
         Why this was chosen <span aria-hidden="true">{whyOpen ? '−' : '+'}</span>
       </button>
-      {whyOpen ? <p className="disclosure-panel">Static signals shown for testing: the fixture’s current-balance label and a general routine topic. No raw answers or numeric scores are used.</p> : null}
-      <Link className="question-count" to="/questions"><strong>3 questions available</strong><span>Refinement + current check-in →</span></Link>
-      <Link className="assistant-card" to="/assistant"><strong>Ask about your profile or guidance</strong><span>Open the static premium-feature placeholder →</span></Link>
+      {whyOpen ? (
+        <div className="disclosure-panel">
+          <ul>{recommendation.why.map((reason) => <li key={reason}>{reason}</li>)}</ul>
+          <p>{recommendation.food.reason}</p>
+        </div>
+      ) : null}
+      <Link className="question-count" to="/questions">
+        <strong>{coverage.ready ? 'Review assessment coverage' : 'More information is useful'}</strong>
+        <span>{coverage.ready ? 'See answer coverage →' : 'Answer the next useful question →'}</span>
+      </Link>
+      <Link className="assistant-card" to="/assistant"><strong>Ask about your profile or guidance</strong><span>Open the unavailable assistant placeholder →</span></Link>
     </Screen>
   )
 }

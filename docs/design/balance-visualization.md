@@ -4,9 +4,11 @@
 
 Help users compare baseline constitution and current balance without presenting the result as a medical measurement or implying unjustified numeric precision.
 
-## First-prototype approach
+## Future scored-result approach
 
 Use two separate cards and a simple three-row relative display. Each card includes its own heading, time frame, plain-language label, and accessible text summary.
+
+The current limited MVP does **not** render this visualization because numerical weights and label thresholds remain unapproved. My Balance reports baseline/current answer and category coverage instead. The following pattern remains a future design reference only.
 
 ### Baseline card
 

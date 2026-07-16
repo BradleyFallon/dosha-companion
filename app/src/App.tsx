@@ -13,6 +13,7 @@ import { AssessmentIntroScreen, QuestionScreen, TransitionScreen } from './scree
 import { ResultScreen } from './screens/Results'
 import { TodayScreen } from './screens/Today'
 import { AssistantScreen, BalanceScreen, LearnScreen, QuestionsScreen } from './screens/Secondary'
+import { SettingsScreen } from './screens/Settings'
 
 const LocationProfileScreen = lazy(() =>
   import('./screens/LocationProfile').then((module) => ({
@@ -45,6 +46,7 @@ function PrototypeRoutes() {
         <Route path="/balance" element={<Guard allowed={state.resultsReached} redirect={resumePath}><BalanceScreen /></Guard>} />
         <Route path="/learn" element={<Guard allowed={state.resultsReached} redirect={resumePath}><LearnScreen /></Guard>} />
         <Route path="/assistant" element={<Guard allowed={state.resultsReached} redirect={resumePath}><AssistantScreen /></Guard>} />
+        <Route path="/settings" element={<Guard allowed={state.resultsReached} redirect={resumePath}><SettingsScreen /></Guard>} />
         <Route path="*" element={<Navigate to={state.accountCreated ? resumePath : '/'} replace />} />
       </Routes>
     </AppShell>

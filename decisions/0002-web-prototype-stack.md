@@ -24,7 +24,10 @@ Build the prototype as a static single-page application under `app/` with:
 - a build-time generator that reads the canonical CSV files under `data/quiz/` and emits typed application data;
 - Vitest and React Testing Library for unit and component tests;
 - Playwright for the mobile vertical-slice browser tests;
-- a static result fixture and static Today/assistant content with prominent prototype boundaries.
+- a deterministic, versioned assessment-coverage engine with an unavailable-scoring boundary;
+- a small deterministic Today selector using clearly labeled provisional content;
+- development-only result fixtures isolated behind an explicit adapter; and
+- a static unavailable assistant entry with no API calls.
 
 The application must never read `data/quiz/answer-scores.csv`. Numerical scoring is not approved. Authentication is simulated, passwords are transient, and all local progress is device/browser-local.
 
@@ -62,15 +65,15 @@ Deferred. Real accounts, cross-device persistence, security controls, analytics,
 
 The repository gains a self-contained `app/` workspace and lockfile. Quiz CSV changes must pass generation before the app can start or build. Browser history and refresh can be tested against explicit URLs, and the static output can be hosted on any service that supports SPA fallback routing.
 
-The prototype will contain duplicated fixture copy for result and daily guidance because no approved scoring or recommendation engine exists. That copy must remain clearly labeled and must not become an accidental production source.
+Production-facing result screens report answer coverage and explain that scoring is unavailable. A fixture remains only for explicit development previews and must never be stored as a calculated result. Today guidance is selected by fixed normal-code rules from provisional content and must remain labeled as unapproved until editorial and expert review is complete.
 
-Local persistence is intentionally single-browser and should be treated as disposable. It is not an account record, secure storage, or a migration strategy for production data.
+Local persistence is validated, migrated, and failure-aware, but remains intentionally single-browser and disposable. It is not an account record, secure storage, or a migration strategy for production data.
 
 ## Limitations
 
 - No real authentication, authorization, backend API, or database.
 - No approved dosha scoring, thresholds, or numerical balance visualization.
-- No expert-content publishing workflow or live recommendation selection.
+- No expert-approved daily content or publishing workflow; current deterministic guidance is provisional.
 - No subscription enforcement or payment flow.
 - No LLM call, grounded retrieval, or production AI safety implementation.
 - No cross-device progress, account recovery, server audit trail, or production privacy controls.

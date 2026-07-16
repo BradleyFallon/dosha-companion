@@ -1,48 +1,33 @@
 # Screen Specifications
 
-Each screen specification must eventually cover its purpose, information displayed, user actions, empty states, loading states, errors, accessibility considerations, and subscription restrictions.
+## Current limited-MVP behavior
 
-## Sign up
+### Sign up and profile setup
 
-TODO: Specify the account-creation experience.
+Account entry is simulated and passwords are never persisted. Profile setup collects preferred name, optional age band, optional coarse location/units, dietary pattern, allergies, and exclusions. Settings permits later edits.
 
-## Profile setup
+### Initial questions and Results
 
-TODO: Specify required and optional profile fields, consent, save/resume, and edit behavior.
+The 27 canonical questions support selection, fallback answers, skip, back, immediate local persistence, exit, refresh, and resume. Results use `coverage-policy-0.1-provisional`, distinguish baseline/current/context, expose fallback/skip/unanswered counts, and route to the next useful repair question.
 
-## Initial questions
+Normal Results never display a dosha label because weights and thresholds remain unapproved. Development builds provide an explicit fixture-only preview that is not calculated or persisted.
 
-TODO: Specify progress, answer, skip, resume, and preliminary-result behavior.
+### Today
 
-## Today
+Today shows one deterministically selected provisional focus, one practical action, an optional filtered food prompt, coverage status, and an inspectable rule explanation. Each content item is labeled as not expert-approved. No LLM or dosha score participates.
 
-TODO: Specify daily guidance, freshness, actions, related content, and unavailable-content behavior.
+### Questions and My Balance
 
-## Questions
+Questions reports real baseline/current coverage and links to the next repair question. Unapproved refinement questions are visibly unavailable. My Balance reports coverage only and explains why scoring is unavailable.
 
-TODO: Specify prioritized daily questions, extra questions, profile impact, and completion states.
+### Learn and AI assistant
 
-## My Balance
+Unapproved article placeholders are non-interactive and labeled unavailable. The AI assistant is an explicit unavailable placeholder with safety boundaries.
 
-TODO: Specify baseline constitution, current balance, confidence, freshness, history, and explanatory language.
+### Settings
 
-## Learn
+Settings edits profile fields without deleting assessment answers and links to the existing location/units chooser. It displays local save status and browser-only persistence limitations.
 
-TODO: Specify discovery, taxonomy, search/filtering, and content-access states.
+## Deferred specifications
 
-## Article
-
-TODO: Specify article metadata, reading actions, related content, safety notes, and personalization.
-
-## AI chat
-
-TODO: Specify grounded responses, context controls, citations, limits, refusals, escalation, history, and premium gating.
-
-## Subscription
-
-TODO: Specify plans, entitlements, price presentation, purchase, restore, cancellation, and billing errors.
-
-## Settings
-
-TODO: Specify profile, preferences, privacy, data export/deletion, subscription management, support, and sign out.
-
+Production empty/loading/network behavior, published articles, scoring, confidence, history, subscriptions, data export/deletion, account recovery, grounded AI, and backend synchronization remain TODO after their underlying systems are approved.

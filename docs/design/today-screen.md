@@ -24,10 +24,10 @@ Today is the post-assessment home and primary retention surface. It turns the la
 
 ## Content responsibility
 
-- Expert-authored published content supplies the lesson and action.
-- Deterministic rules choose the underlying guidance.
-- “Why this was chosen” exposes understandable selection signals such as current balance, recent sleep, season, or stated constraints.
-- The first prototype does not place automatically generated AI prose on Today.
+- The limited MVP uses a very small provisional content set; every item is labeled `Provisional · not expert-approved`.
+- Deterministic rules choose the underlying guidance from context, coverage, profile exclusions, and saved-time-zone time of day.
+- “Why this was chosen” exposes the exact matched rule and states that no dosha score was used.
+- The limited MVP does not place automatically generated AI prose on Today.
 - The AI entry opens a separate grounded chat experience.
 
 ## Core states
@@ -36,12 +36,12 @@ Today is the post-assessment home and primary retention surface. It turns the la
 | ----- | -------- |
 | Fresh profile and guidance | Show complete daily hierarchy |
 | Current balance aging | Show guidance with an “Update your balance” question action |
-| Current balance stale | Avoid strong personalization; show general approved guidance and request check-in |
-| No matching guidance | Show a general approved daily item; do not invent a recommendation |
+| Current coverage insufficient | Prefer the next current check-in over stronger personalization |
+| No higher-priority rule | Show the clearly labeled provisional general fallback |
 | Loading | Preserve card heights with meaningful labels where possible |
 | Content unavailable | Keep balance summary and questions accessible; explain guidance is temporarily unavailable |
 | AI unavailable | Keep the rest of Today intact and disable only the AI entry |
-| Free user | Show AI entry with clear subscription label; do not obscure free daily guidance |
+| Assistant unavailable | Preserve Today guidance and link to the explicit unavailable placeholder |
 
 ## Interaction details
 
@@ -67,4 +67,3 @@ Today is the post-assessment home and primary retention surface. It turns the la
 - Does “Why this was chosen” build trust or add cognitive load?
 - Does the AI entry feel optional rather than required for value?
 - Should the daily focus open a full article or remain a self-contained card?
-

@@ -66,6 +66,7 @@ export function QuestionScreen() {
   const { state, dispatch } = usePrototype()
   const { id } = useParams()
   const navigate = useNavigate()
+  const routeLocation = useLocation()
   const questions = getAssessmentQuestions(state.assessmentMode)
   const index = questions.findIndex((question) => question.id === id)
   const question = questions[index]
@@ -89,6 +90,11 @@ export function QuestionScreen() {
       dispatch({ type: 'submit-answer', questionId: question.id, answerId, nextIndex })
     } else {
       dispatch({ type: 'skip-question', questionId: question.id, nextIndex })
+    }
+
+    if (new URLSearchParams(routeLocation.search).get('return') === 'results') {
+      navigate('/results')
+      return
     }
 
     if (nextIndex >= total) {

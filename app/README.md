@@ -2,9 +2,9 @@
 
 This directory contains a low-fidelity mobile-first prototype of the first product loop:
 
-> Welcome → simulated account → profile setup → assessment → preliminary fixture result → Today
+> Welcome → simulated account → profile setup → assessment → deterministic coverage → honest scoring boundary → provisional Today guidance
 
-It is a usability artifact, not a production application. Authentication, scoring, recommendations, subscriptions, and AI are simulated.
+It is a limited browser-local MVP, not a production application. Coverage and recommendation selection are functional. Authentication, dosha scoring, expert-approved publishing, subscriptions, and AI remain unavailable or simulated.
 
 ## Stack
 
@@ -60,7 +60,7 @@ Full mode is the default and uses all 27 canonical initial-assessment questions.
 
 During development only, open `/assessment?demo=short` or use the developer control on the assessment introduction. Short mode uses the first three baseline questions and first two current-balance questions so the vertical slice can be tested quickly. It omits the context question. Production builds ignore the short-mode query and do not render its control.
 
-The “More information needed” result fixture is also development-only at `/results?coverage=missing` after a result has been reached.
+Short mode cannot satisfy the real coverage policy. After its honest “More information needed” state, development builds offer an explicit fixture adapter at `/results?fixture=profile`. Fixture labels are never persisted or presented as calculated output.
 
 Use the always-visible **Reset prototype** control to remove the local prototype snapshot and return to Welcome.
 
@@ -84,15 +84,46 @@ The generator validates unique identifiers, controlled values, references, quest
 
 The generator deliberately never reads `../data/quiz/answer-scores.csv`. No scoring weights are approved or included in the application bundle.
 
+## Coverage and result behavior
+
+The application implements `coverage-policy-0.1-provisional`:
+
+- 22 submitted answers overall; explicit fallback answers count as submitted, while skips do not.
+- 14 substantive usual-nature answers.
+- 4 substantive current-balance answers.
+
+Every canonical question is classified as substantive, fallback, skipped, or unanswered. Baseline, current, context, and category coverage remain separate. When coverage is insufficient, the application chooses the next useful repair question in canonical order, prioritizing baseline and then current requirements.
+
+Coverage readiness is not a dosha result or medical confidence. The application does not read `answer-scores.csv`, calculate Vata/Pitta/Kapha weights, or assign a constitution/current-balance label. The typed outcome retains contributing IDs for audit tests; user-facing Results and My Balance expose the policy, counts, missing information, and the unapproved-scoring reason.
+
+## Today recommendation selector
+
+Today uses a small deterministic rule set, in this order:
+
+1. Major physical-change safety boundary
+2. Travel or schedule-change routine anchor
+3. Significant-life-event manageable priority
+4. Missing current-answer coverage
+5. Local morning or evening using the saved time zone
+6. General fallback
+
+Every focus and food prompt is labeled **Provisional · not expert-approved**. “Why this was chosen” names the matched inputs and states that no dosha score was used. Food prompts are withheld whenever the profile contains allergies or exclusions; this milestone does not attempt ingredient-level filtering.
+
+## Settings and local persistence
+
+`/settings` edits preferred name, age band, dietary pattern, allergies, and exclusions without removing assessment answers. Location and units reuse the location chooser and return to Settings.
+
+Persisted state is version 3. Restore logic validates fields and canonical answer references, drops invalid individual values, clamps indexes, migrates version 2, and converts version-1 country/region/city data to a manual coarse-location label. Corrupt or incompatible snapshots start safely with a visible notice. Storage read, write, and removal failures are caught; the UI never reports “Saved” after a failed write.
+
 ## Testing
 
-Unit and component tests cover generated data, ordering, answer selection/submission, Not sure and Skip behavior, the section transition, persistence boundaries, reload/resume, and navigation visibility.
+Unit and component tests cover generated data, coverage boundaries, result auditing, recommendation precedence and exclusions, answer behavior, settings, persistence validation/migration/failure, reload/resume, and navigation visibility.
 
 ```sh
 npm test
 ```
 
-Playwright covers the short-mode 390 × 844 vertical slice and save/reload/resume:
+Playwright covers the short fixture path, full 27-question coverage-ready path, settings recalculation, location privacy, and save/reload/resume at 390 × 844:
 
 ```sh
 npx playwright install chromium
@@ -136,9 +167,9 @@ The plain Vite `Network` URL remains useful for checking layout and non-location
 ## Prototype limitations
 
 - Account creation and sign-in are visual simulations. Email and password fields are transient; passwords are never persisted.
-- Profile and assessment progress are stored only in the current browser with a versioned allow-list. They are not secure account records and do not sync across devices.
-- The Vata–Pitta result and “Vata is currently more prominent” state are static fixtures. Answers are not scored.
-- Today guidance is safe placeholder copy selected by no recommendation engine and is not attributed to AI.
+- Profile and assessment progress are stored only in the current browser with a validated, versioned allow-list. They are not secure account records and do not sync across devices.
+- Dosha scoring remains unavailable because numerical weights and thresholds are blank and unapproved. Vata–Pitta labels exist only in the explicit development fixture adapter.
+- Today guidance is deterministically selected provisional copy. It is not expert-approved, generated by AI, or based on a dosha score.
 - The assistant and subscription state are static placeholders. There are no LLM, payment, or entitlement calls.
 - There is no backend, database, CMS, analytics SDK, weather API, reverse-geocoding service, recipe system, notification system, or medical logic.
 - Error, offline, account recovery, and production privacy behavior need dedicated implementation after product validation.

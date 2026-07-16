@@ -1,66 +1,37 @@
 # Today Wireframe
 
-## Primary state
-
 ```text
 +--------------------------------------+
-| Good morning, Alex            (AI)   |
-| Wednesday, July 15                   |
+| Thursday, July 16       [ Settings ] |
+| Good morning, Alex                   |
 |                                      |
-| CURRENT BALANCE                      |
-| Vata is currently more prominent     |
-| Updated today                 [ > ]  |
+| ASSESSMENT COVERAGE                  |
+| 7 of 7 recent answers are usable [>] |
 |                                      |
+| PROVISIONAL · NOT EXPERT-APPROVED    |
 | TODAY’S FOCUS                        |
-| +----------------------------------+ |
-| | Create a steadier start           | |
-| |                                  | |
-| | A short expert-authored lesson    | |
-| | explains why regularity may feel  | |
-| | supportive today.                 | |
-| |                                  | |
-| | TRY THIS                          | |
-| | Choose one consistent time for    | |
-| | your next meal or short break.    | |
-| +----------------------------------+ |
+| Choose one reliable anchor           |
 |                                      |
-|             first scroll ↓           |
+| Travel or a schedule change matched  |
+| the highest applicable rule.         |
 |                                      |
-| FOOD SUGGESTION (OPTIONAL)           |
-| [ Compatible approved suggestion  >]|
+| TRY THIS                             |
+| Choose one familiar meal, rest, or   |
+| wake-time cue for today.              |
+|                                      |
+| PROVISIONAL · NOT EXPERT-APPROVED    |
+| OPTIONAL FOOD PROMPT                 |
+| [shown or withheld by exclusions]    |
 |                                      |
 | [ Why this was chosen              ] |
-|                                      |
-| 3 questions available                |
-| Refinement + current check-in  [ > ] |
-|                                      |
-| Ask about your profile or guidance   |
-| [ Open AI assistant                ] |
-| Uses approved educational content    |
+| No dosha score was used.             |
 |                                      |
 | [Today] [Questions] [Balance] [Learn]|
 +--------------------------------------+
 ```
 
-## Stale current-balance state
+## Rule states
 
-```text
-+--------------------------------------+
-| CURRENT BALANCE                      |
-| Update recommended                   |
-| Your recent answers are aging.       |
-|                                      |
-| [ Answer a short check-in           ]|
-|                                      |
-| TODAY’S GENERAL GUIDANCE             |
-| Approved content that does not rely  |
-| on stale personalization...          |
-+--------------------------------------+
-```
+Fixed priority is major physical-change safety boundary, travel/schedule anchor, major-life-event manageable priority, missing current coverage, saved-time-zone morning/evening, then general fallback.
 
-## Notes
-
-- The focus, explanation, and practical action should fit before or near the first scroll.
-- AI is an entry point, not the author of the Today card.
-- Free daily guidance remains visible when AI is subscription-gated or unavailable.
-
+Food prompts are withheld whenever allergies or exclusions are present. Every focus and food item is individually labeled provisional. Development fixtures may be visible but never affect recommendation selection.

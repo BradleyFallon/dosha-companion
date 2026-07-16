@@ -4,14 +4,17 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   type Dispatch,
   type ReactNode,
 } from 'react'
 import {
+  defaultState,
   persistState,
   prototypeReducer,
+  removePersistedState,
   restoreState,
-  STORAGE_KEY,
+  serializeState,
   type PrototypeAction,
   type PrototypeState,
 } from './state'
@@ -20,9 +23,19 @@ interface PrototypeContextValue {
   state: PrototypeState
   dispatch: Dispatch<PrototypeAction>
   resetPrototype: () => void
+  dismissRestoreNotice: () => void
 }
 
 const PrototypeContext = createContext<PrototypeContextValue | null>(null)
+
+function initialPrototypeState(provided?: PrototypeState) {
+  if (provided) return provided
+  const restored = restoreState()
+  return {
+    ...restored.state,
+    restoreNotice: restored.notice,
+  }
+}
 
 export function PrototypeProvider({
   children,
@@ -34,11 +47,17 @@ export function PrototypeProvider({
   const [state, dispatch] = useReducer(
     prototypeReducer,
     initialState,
-    (provided) => provided ?? restoreState(),
+    initialPrototypeState,
   )
+  const lastAttemptedSnapshot = useRef(serializeState(state))
 
   useEffect(() => {
-    persistState(state)
+    const snapshot = serializeState(state)
+    if (snapshot === lastAttemptedSnapshot.current) return
+
+    lastAttemptedSnapshot.current = snapshot
+    const result = persistState(state)
+    dispatch({ type: 'set-save-status', status: result.ok ? 'saved' : 'not-saved' })
   }, [state])
 
   const value = useMemo(
@@ -46,9 +65,15 @@ export function PrototypeProvider({
       state,
       dispatch,
       resetPrototype: () => {
-        window.localStorage.removeItem(STORAGE_KEY)
-        dispatch({ type: 'reset' })
+        const result = removePersistedState()
+        lastAttemptedSnapshot.current = serializeState(defaultState)
+        dispatch({
+          type: 'reset',
+          status: result.ok ? 'saved' : 'not-saved',
+          notice: result.error,
+        })
       },
+      dismissRestoreNotice: () => dispatch({ type: 'clear-restore-notice' }),
     }),
     [state],
   )

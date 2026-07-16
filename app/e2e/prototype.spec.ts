@@ -12,11 +12,11 @@ async function reachLocation(page: Page) {
   await page.getByRole('button', { name: 'Continue' }).click()
 }
 
-async function reachAssessment(page: Page) {
+async function reachAssessment(page: Page, short = true) {
   await reachLocation(page)
   await page.getByRole('button', { name: 'Skip for now' }).click()
   await page.getByRole('button', { name: 'Save and continue' }).click()
-  await page.getByRole('link', { name: 'Switch to short mode' }).click()
+  if (short) await page.getByRole('link', { name: 'Switch to short mode' }).click()
   await page.getByRole('button', { name: 'Begin assessment' }).click()
 }
 
@@ -40,11 +40,40 @@ test('completes the short mobile vertical slice', async ({ page }) => {
     await page.getByRole('button', { name: 'Continue' }).click()
   }
 
-  await expect(page.getByRole('heading', { name: 'Your starting profile' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'A little more information is needed' })).toBeVisible()
+  await page.getByRole('link', { name: 'Open the explicit fixture preview' }).click()
+  await expect(page.getByRole('heading', { name: 'Fixture profile hierarchy' })).toBeVisible()
   await expect(page.getByText('Vata–Pitta')).toBeVisible()
-  await page.getByRole('button', { name: 'Go to Today' }).click()
-  await expect(page.getByText('Choose one consistent time for your next meal or short break.')).toBeVisible()
+  await page.getByRole('button', { name: 'Preview Today with fixture' }).click()
+  await expect(page.getByText('Development fixture visible · not calculated from your answers')).toBeVisible()
+  await expect(page.getByText('Provisional · not expert-approved').first()).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Primary navigation' })).toBeVisible()
+})
+
+test('completes the full assessment with coverage-ready but unavailable scoring', async ({ page }) => {
+  await reachAssessment(page, false)
+
+  for (let index = 0; index < 19; index += 1) {
+    await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 1))
+    await page.getByRole('radio').first().check()
+    await page.getByRole('button', { name: 'Continue' }).click()
+  }
+  await expect(page.getByRole('heading', { name: /how you’ve been feeling recently/i })).toBeVisible()
+  await page.getByRole('button', { name: 'Continue' }).click()
+
+  for (let index = 19; index < 27; index += 1) {
+    await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 1))
+    await page.getByRole('radio').first().check()
+    await page.getByRole('button', { name: 'Continue' }).click()
+  }
+
+  await expect(page.getByRole('heading', { name: 'Your assessment summary' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Dosha scoring is not available yet' })).toBeVisible()
+  await expect(page.getByText('Vata–Pitta')).not.toBeVisible()
+  await page.getByRole('button', { name: 'Go to Today' }).click()
+  await expect(page.getByText('Assessment coverage · ready')).toBeVisible()
+  await page.getByRole('button', { name: 'Why this was chosen' }).click()
+  await expect(page.getByText('No dosha score was calculated or used.')).toBeVisible()
 })
 
 test('reloads and resumes submitted assessment progress', async ({ page }) => {
@@ -91,4 +120,41 @@ test('uses a one-shot device location and persists only a coarse position', asyn
       longitude: -122.68,
       accuracyMeters: 1000,
     })
+})
+
+test('edits profile settings, preserves answers, and recalculates Today', async ({ page }) => {
+  await reachAssessment(page)
+  for (let index = 0; index < 3; index += 1) {
+    await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 1))
+    await page.getByRole('radio').first().check()
+    await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled()
+    await page.getByRole('button', { name: 'Continue' }).click()
+  }
+  await page.getByRole('button', { name: 'Continue' }).click()
+  for (let index = 0; index < 2; index += 1) {
+    await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 4))
+    await page.getByRole('radio').first().check()
+    await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled()
+    await page.getByRole('button', { name: 'Continue' }).click()
+  }
+  await page.getByRole('link', { name: 'Open the explicit fixture preview' }).click()
+  await page.getByRole('button', { name: 'Preview Today with fixture' }).click()
+  await page.getByRole('link', { name: 'Open profile settings' }).click()
+
+  await page.getByLabel('Preferred name').fill('Jordan')
+  await page.getByLabel(/Dietary pattern/).selectOption('Vegan')
+  await page.getByLabel(/Allergies/).fill('Tree nuts')
+  await page.getByRole('button', { name: 'Save profile changes' }).click()
+  await expect(page.getByText('Saved on this device')).toBeVisible()
+  await page.reload()
+  await expect(page.getByLabel('Preferred name')).toHaveValue('Jordan')
+  await page.getByRole('link', { name: 'Today' }).first().click()
+  await expect(page.getByRole('heading', { name: 'Good morning, Jordan' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Food suggestion withheld' })).toBeVisible()
+
+  const submittedCount = await page.evaluate(() => {
+    const snapshot = JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}')
+    return Object.keys(snapshot.state?.submittedAnswers ?? {}).length
+  })
+  expect(submittedCount).toBe(5)
 })

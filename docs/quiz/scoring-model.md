@@ -1,6 +1,19 @@
 # Scoring Model
 
-> Status: Placeholder specification. No scoring logic is approved for production use.
+> Status: Unapproved placeholder. No dosha scoring logic is implemented or approved.
+
+## Limited-MVP implementation boundary
+
+The application deliberately does not read `data/quiz/answer-scores.csv` because all numerical weight and reliability fields remain blank. It does not infer weights from the directional rationale text.
+
+The limited MVP implements `coverage-policy-0.1-provisional` around this future scoring boundary:
+
+- 22 submitted answers overall, where explicit fallback answers count as submitted and skips do not
+- 14 substantive baseline answers
+- 4 substantive current-balance answers
+- Descriptive category coverage, with no category acting as a gate because canonical set items mark none as required
+
+Coverage readiness means enough self-reported information is present for the draft workflow. It is not a dosha result, expert confidence, or clinical certainty. Normal result screens return an explicit unavailable-scoring state until this document, numerical weights, and thresholds are approved.
 
 ## Goals
 
@@ -46,4 +59,3 @@ Every result must reference a scoring algorithm version and the versions of cont
 - Sensitivity analysis for individual answers
 - Plain-language review of result claims
 - Safety and bias review
-

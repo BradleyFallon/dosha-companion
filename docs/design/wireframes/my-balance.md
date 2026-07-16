@@ -1,51 +1,31 @@
 # My Balance Wireframe
 
-## Main view
-
 ```text
 +--------------------------------------+
+| COVERAGE READY                       |
 | My Balance                           |
 |                                      |
-| PROFILE STAGE                        |
-| Preliminary                          |
-| Good initial coverage; a few areas   |
-| can still be refined.                |
+| This screen reports coverage only.   |
 |                                      |
-| +----------------------------------+ |
-| | YOUR NATURE                      | |
-| | Usual adult tendencies           | |
-| | Vata–Pitta                       | |
-| |                                  | |
-| | Vata   [==========----]          | |
-| | Pitta  [========------]          | |
-| | Kapha  [====----------]          | |
-| |                                  | |
-| | [What this means]                | |
-| +----------------------------------+ |
+| YOUR USUAL NATURE                    |
+| 19 of 19 usable answers              |
+| 19 categories covered                |
+| No dosha interpretation applied.     |
 |                                      |
-| +----------------------------------+ |
-| | YOUR CURRENT BALANCE             | |
-| | Past seven days                  | |
-| | Vata is more prominent           | |
-| |                                  | |
-| | Vata   [===========---]          | |
-| | Pitta  [======--------]          | |
-| | Kapha  [===-----------]          | |
-| |                                  | |
-| | Updated today                    | |
-| | [Why it may have changed]        | |
-| +----------------------------------+ |
+| YOUR CURRENT CHECK-IN                |
+| 7 of 7 usable answers                |
+| 7 categories covered                 |
+| No dosha interpretation applied.     |
 |                                      |
-| [ Answer more questions           ] |
+| NO DOSHA RESULT CALCULATED           |
+| Weights and thresholds are unapproved|
+|                                      |
+| [ How coverage was determined      ] |
+| [ Edit profile settings            ] |
+| [ Edit or remove location          ] |
 |                                      |
 | [Today] [Questions] [Balance] [Learn]|
 +--------------------------------------+
 ```
 
-## Notes
-
-- Track lengths are placeholders pending approved scoring.
-- Provide the same information as accessible text or a table.
-- Baseline and current cards retain headings and time frames if visual styling is removed.
-- History and trends are post-MVP and do not appear in the first version.
-
+Score tracks, percentages, and constitution/current-dosha labels are omitted until expert-approved scoring exists.

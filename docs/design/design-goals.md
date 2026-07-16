@@ -15,7 +15,7 @@ Low-fidelity product-design direction for the first mobile prototype. This docum
 
 Validate this complete vertical slice at approximately 390 px wide:
 
-> Welcome → account setup → assessment introduction → baseline questions → section transition → current-balance questions → preliminary result → Today
+> Welcome → account setup → assessment introduction → baseline questions → section transition → current-balance questions → coverage result → Today
 
 The prototype may use representative questions rather than all 27, but it must preserve the real section boundaries, navigation, skip behavior, saving, and result hierarchy.
 
@@ -25,7 +25,7 @@ The prototype may use representative questions rather than all 27, but it must p
 2. Keep account creation and profile setup short enough that the assessment remains the main task.
 3. Make baseline constitution and current balance feel related but unmistakably different.
 4. Make a 27-question assessment feel finite, resumable, and respectful.
-5. Show preliminary results without implying clinical certainty.
+5. Show honest coverage and the unavailable-scoring boundary without implying a calculated dosha result.
 6. Turn the result into an immediately useful Today experience.
 7. Keep approved expert content visibly primary and AI optional.
 8. Work at 320 px and above with touch, keyboard, zoom, and screen readers.
@@ -55,7 +55,7 @@ The prototype may use representative questions rather than all 27, but it must p
 
 | Decision | First-prototype hypothesis | Why it is testable |
 | -------- | -------------------------- | ------------------ |
-| Navigation before completion | Hide primary bottom navigation until preliminary results | Tests whether a focused first-run flow is clearer |
+| Navigation before completion | Hide primary bottom navigation until Results | Tests whether a focused first-run flow is clearer |
 | Question density | One question per screen | Tests comprehension and thumb-friendly interaction |
 | Advancement | Select an answer, then tap Continue | Prevents accidental advancement and permits review |
 | Not sure vs. Skip | “Not sure” is an answer option; “Skip for now” is a separate action | Preserves different data meanings |

@@ -2,7 +2,7 @@ import { useEffect, type ReactNode } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { usePrototype } from '../prototype/PrototypeContext'
 
-const postResultPaths = ['/today', '/questions', '/balance', '/learn', '/assistant']
+const postResultPaths = ['/today', '/questions', '/balance', '/learn', '/assistant', '/settings']
 
 export function RouteFocus() {
   const location = useLocation()
@@ -17,7 +17,7 @@ export function RouteFocus() {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { state, resetPrototype } = usePrototype()
+  const { state, resetPrototype, dismissRestoreNotice } = usePrototype()
   const location = useLocation()
   const navigate = useNavigate()
   const showNavigation =
@@ -34,6 +34,17 @@ export function AppShell({ children }: { children: ReactNode }) {
         Skip to content
       </a>
       <RouteFocus />
+      {state.restoreNotice ? (
+        <div className="global-notice" role="status">
+          <span>{state.restoreNotice}</span>
+          <button type="button" onClick={dismissRestoreNotice}>Dismiss</button>
+        </div>
+      ) : null}
+      {state.saveStatus === 'not-saved' ? (
+        <div className="global-save-error" role="alert">
+          Not saved—changes remain available only for this session.
+        </div>
+      ) : null}
       <main id="main-content" className={showNavigation ? 'app-main with-nav' : 'app-main'}>
         {children}
       </main>

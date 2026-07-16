@@ -1,0 +1,31 @@
+# Settings Wireframe
+
+```text
++--------------------------------------+
+| < Today                 Saved locally|
+| SETTINGS                             |
+| Browser-local profile                |
+|                                      |
+| Preferred name                       |
+| [ Alex                             ] |
+| Age band                             |
+| [ Prefer not to say               v] |
+| Dietary pattern                      |
+| [ Vegetarian                      v] |
+| Allergies                            |
+| [ Tree nuts                        ] |
+| Other exclusions                     |
+| [                                  ] |
+|                                      |
+| [ Save profile changes             ] |
+|                                      |
+| LOCATION AND UNITS                   |
+| Approximate selected area · US       |
+| [ Edit or remove location          ] |
+|                                      |
+| Stored only in this browser.         |
+| [Today] [Questions] [Balance] [Learn]|
++--------------------------------------+
+```
+
+Saving unrelated profile fields preserves assessment answers. Today recommendations are derived from current state and update immediately. A failed browser write shows `Not saved—changes remain available only for this session` and must never display a successful saved state.

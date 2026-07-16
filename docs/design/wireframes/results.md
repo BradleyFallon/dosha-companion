@@ -1,64 +1,28 @@
-# Preliminary Results Wireframes
+# Results Wireframes
 
-## Scope
-
-Low-fidelity result hierarchy after the initial assessment. The visualization is qualitative until scoring and thresholds are approved.
-
-## Preliminary result — top
+## Coverage ready; scoring unavailable
 
 ```text
 +--------------------------------------+
+| COVERAGE READY                       |
+| Your assessment summary              |
 |                                      |
-| PRELIMINARY PROFILE                  |
-| Your profile will become more        |
-| refined as you answer over time.     |
+| Enough usable information is present |
+| for the draft workflow. Dosha scoring|
+| awaits approved weights/thresholds.  |
 |                                      |
-| +----------------------------------+ |
-| | YOUR NATURE                      | |
-| | Usual adult tendencies           | |
-| |                                  | |
-| | Vata–Pitta                       | |
-| |                                  | |
-| | A pattern associated with...     | |
-| | [Read the explanation]           | |
-| +----------------------------------+ |
+| YOUR USUAL NATURE                    |
+| 19 of 19 usable answers              |
+| No constitution label inferred.      |
 |                                      |
-| +----------------------------------+ |
-| | YOUR CURRENT BALANCE             | |
-| | Based on the past seven days     | |
-| |                                  | |
-| | Vata is currently more prominent | |
-| |                                  | |
-| | Updated today                    | |
-| | [Why this may be relevant]       | |
-| +----------------------------------+ |
+| YOUR CURRENT CHECK-IN                |
+| 7 of 7 usable answers                |
+| No current dosha label inferred.     |
 |                                      |
-|             scroll for more ↓        |
-+--------------------------------------+
-```
-
-## Preliminary result — actions
-
-```text
-+--------------------------------------+
-| PROFILE DETAIL                       |
-| Preliminary                          |
-| [===============-------------------] |
-| Good initial coverage. More answers  |
-| can clarify a few areas.             |
-|                                      |
-| Your starting point                  |
-| [ What is a dosha?                 >]|
-|                                      |
-| Today’s first guidance               |
-| A short approved lesson and one      |
-| practical action are ready.          |
+| [ How coverage was determined      ] |
 |                                      |
 | [ Go to Today                      ] |
-| [ Continue refining profile        ] |
-|                                      |
-| Based on self-reported information.  |
-| Educational, not a medical diagnosis.|
+| [ Review coverage                  ] |
 +--------------------------------------+
 ```
 
@@ -66,29 +30,26 @@ Low-fidelity result hierarchy after the initial assessment. The visualization is
 
 ```text
 +--------------------------------------+
-| < Back                               |
-|                                      |
+| ASSESSMENT COVERAGE                  |
 | A little more information is needed  |
 |                                      |
-| You can still skip questions. We     |
-| need better coverage across a few    |
-| areas before preparing a useful      |
-| preliminary profile.                 |
+| • 12 of 14 usual-nature answers      |
+| • 3 of 4 recent answers              |
+| • 20 of 22 submitted overall         |
 |                                      |
-| Next useful area                     |
-| Usual sleep pattern                  |
-|                                      |
-| [ Answer next question             ] |
+| [ Answer next useful question      ] |
 | [ Save and exit                    ] |
 |                                      |
-| We do not need medical details.      |
+| Coverage is not diagnostic confidence|
 +--------------------------------------+
 ```
 
+## Development fixture
+
+Development builds may display the old Vata–Pitta hierarchy only after the user chooses an explicit fixture preview. A persistent banner states that it was not calculated from answers. The fixture is never stored as a result.
+
 ## Notes
 
-- The cards repeat the time-frame distinction; placement or color alone is insufficient.
-- “Preliminary” describes coverage and consistency, not medical certainty.
-- The prototype does not show exact percentages or numerical dosha scores.
-- “Go to Today” is primary because it completes the value loop; refinement remains available but optional.
-
+- Baseline and current coverage remain separate.
+- Normal screens never show percentages, score tracks, or dosha labels.
+- The coverage disclosure names the policy, counts, fallback answers, skips, and unanswered questions.

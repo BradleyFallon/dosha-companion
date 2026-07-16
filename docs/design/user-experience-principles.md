@@ -29,9 +29,9 @@ Persist each answer immediately. Show a quiet “Saved” state without blocking
 
 Use stages such as Preliminary, Developing, and Well established. Describe completeness and freshness, not diagnostic confidence. Avoid unjustifiably precise percentages.
 
-## 7. Put expert-authored guidance before AI
+## 7. Keep content status explicit and AI separate
 
-The application selects approved guidance through deterministic rules. AI may explain approved material in chat, but it must not appear to create the underlying recommendation.
+The limited MVP selects clearly labeled provisional guidance through deterministic rules and keeps AI unavailable. Future reviewed content must replace provisional items before they are described as expert-approved.
 
 ## 8. Keep daily value actionable
 
@@ -48,4 +48,3 @@ Use wellness boundaries where decisions occur, not only in a footer. Sensitive q
 ## 10. Accessibility is interaction quality
 
 Use logical reading order, programmatic labels, keyboard support, visible focus, 44 px minimum targets, non-color cues, concise headings, and content that survives 200% zoom and 320 px reflow.
-

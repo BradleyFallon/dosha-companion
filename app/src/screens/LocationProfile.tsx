@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import maplibregl, { type Map as MapLibreMap, type Marker } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { BackLink, Screen } from '../components/Layout'
 import { usePrototype } from '../prototype/PrototypeContext'
 import type { LocationProfile } from '../prototype/state'
@@ -37,8 +37,14 @@ function blankLocation(
 export function LocationProfileScreen() {
   const { state, dispatch } = usePrototype()
   const navigate = useNavigate()
+  const routeLocation = useLocation()
   const editingExistingProfile = state.profileCompleted
-  const returnPath = editingExistingProfile ? '/balance' : '/profile/food'
+  const returnToSettings = new URLSearchParams(routeLocation.search).get('return') === 'settings'
+  const returnPath = returnToSettings
+    ? '/settings'
+    : editingExistingProfile
+      ? '/balance'
+      : '/profile/food'
   const saved = state.profile.location
   const [selection, setSelection] = useState<LocationProfile | null>(
     saved?.source !== 'skipped' ? saved : null,
@@ -159,8 +165,8 @@ export function LocationProfileScreen() {
   return (
     <Screen className="location-screen">
       <BackLink
-        to={editingExistingProfile ? '/balance' : '/profile/name'}
-        label={editingExistingProfile ? 'My Balance' : 'Back'}
+        to={returnToSettings ? '/settings' : editingExistingProfile ? '/balance' : '/profile/name'}
+        label={returnToSettings ? 'Settings' : editingExistingProfile ? 'My Balance' : 'Back'}
       />
       {editingExistingProfile ? null : <StepHeader step={2} />}
       {selection ? (

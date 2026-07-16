@@ -32,7 +32,7 @@ flowchart TD
 - Welcome, sign-up, profile setup, and assessment are focused flows without bottom navigation.
 - A back action appears where it will not discard required consent or account state.
 - “Save and exit” appears from assessment introduction onward and returns to a resumable home/interstitial state.
-- Primary bottom navigation appears after the preliminary result is available and the user enters Today.
+- Primary bottom navigation appears after the assessment reaches Results and the user enters Today.
 - Deep links into post-assessment screens redirect an incomplete user to the appropriate resume point.
 
 ## Flow states
@@ -48,7 +48,7 @@ flowchart TD
 | Transition | Explicit shift from lifetime to past-seven-days frame | Continue | Save and exit |
 | Current question | “Your current balance,” progress, recent time window | Continue after selection | Not sure; skip; back; save and exit |
 | Missing coverage | More information needed and why | Answer next useful question | Exit |
-| Preliminary result | Separate nature/current cards and stage | Go to Today | Continue refining |
+| Coverage result | Separate baseline/current coverage and scoring boundary | Go to Today | Repair coverage |
 | Today | Daily focus and practical action | View action or guidance | Questions; why chosen; AI entry |
 
 ## Question-screen behavior
@@ -99,14 +99,14 @@ Supporting copy:
 
 Do not show a dosha result or partial score at the transition.
 
-## Preliminary-result gate
+## Coverage-result gate
 
 The prototype must support both outcomes:
 
-- **Requirements met:** show preliminary results.
+- **Requirements met:** show coverage-ready baseline/current counts and explain that dosha scoring is unavailable.
 - **More information needed:** explain that a few important areas lack coverage and present the highest-priority missing question.
 
-The exact gate remains a scoring-model decision. The wireframe must not hardcode a percentage or imply medical certainty.
+The limited MVP versions the documented 22 submitted / 14 substantive baseline / 4 substantive current gate as `coverage-policy-0.1-provisional`. It reports category coverage without making categories blocking because canonical set items mark none as required. The gate is a product-testing rule, not scoring confidence or medical certainty.
 
 ## Prototype test scenarios
 
