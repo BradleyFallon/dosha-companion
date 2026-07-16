@@ -30,6 +30,11 @@ function renderAt(path: string, values = {}) {
 }
 
 describe('assessment interaction', () => {
+  it('allows the assessment without a location when the core profile is complete', () => {
+    renderAt('/assessment', { profile: coreProfileWithoutLocation('Alex'), profileCompleted: true, assessmentStarted: false })
+    expect(screen.getByRole('heading', { name: 'Before the assessment' })).toBeInTheDocument()
+  })
+
   it('selecting an answer does not advance automatically', async () => {
     const user = userEvent.setup()
     const questions = getAssessmentQuestions('short', true)
@@ -188,6 +193,20 @@ describe('limited MVP results and settings', () => {
     await waitFor(() => expect(JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}').state.profile.temperatureUnitPreference).toBe('celsius'))
   })
 
+  it('offers location setup and hides temperature controls when location is not provided yet', () => {
+    renderAt('/settings', { resultsReached: true, profile: coreProfileWithoutLocation('Alex') })
+    expect(screen.getByText(/Add your general area for weather/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Add regional location' })).toHaveAttribute('href', '/profile/location?return=settings')
+    expect(screen.queryByRole('group', { name: 'Temperature units' })).not.toBeInTheDocument()
+  })
+
+  it('shows a saved location, change action, and temperature controls in Settings', () => {
+    renderAt('/settings', { resultsReached: true, profile: completedProfile('Alex') })
+    expect(screen.getByText('Portland, Oregon, United States')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Change regional location' })).toHaveAttribute('href', '/profile/location?return=settings')
+    expect(screen.getByRole('group', { name: 'Temperature units' })).toBeInTheDocument()
+  })
+
   it('shows a truthful global failure message when persistence fails', async () => {
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('quota')
@@ -251,7 +270,7 @@ describe('limited MVP results and settings', () => {
 
   it('shows local conditions, seasonal food, and stable guidance modules', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ timezone: 'America/Los_Angeles', current: { temperature_2m: 72, apparent_temperature: 70, weather_code: 1 }, daily: { temperature_2m_max: [78], temperature_2m_min: [58], precipitation_probability_max: [20], sunrise: ['2026-07-16T05:40'], sunset: ['2026-07-16T20:55'] } }) }))
-    renderAt('/today', { resultsReached: true, profile: completedProfile('Alex') })
+    const { container } = renderAt('/today', { resultsReached: true, profile: completedProfile('Alex') })
     expect(screen.getByRole('heading', { name: 'Local conditions' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'In season near you' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Your guide' })).toBeInTheDocument()
@@ -261,6 +280,33 @@ describe('limited MVP results and settings', () => {
     expect(screen.getByText('78°F')).toBeInTheDocument()
     expect(screen.getByText('58°F')).toBeInTheDocument()
     expect(screen.getByText('20%')).toBeInTheDocument()
+    expect(container.querySelector('.weather-current-icon')).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('.weather-current-icon')).toHaveAttribute('focusable', 'false')
+    expect(container.querySelectorAll('.weather-metric-icon')).toHaveLength(6)
+    container.querySelectorAll('.weather-metric-icon').forEach((icon) => expect(icon).toHaveAttribute('aria-hidden', 'true'))
+  })
+
+  it('shows one contextual location invitation and makes no weather request without location', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const user = userEvent.setup()
+    renderAt('/today', { resultsReached: true, profile: coreProfileWithoutLocation('Alex') })
+    expect(screen.getByRole('button', { name: 'Mark complete' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'See what supports you where you live' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Local conditions' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'In season near you' })).not.toBeInTheDocument()
+    expect(fetchMock).not.toHaveBeenCalled()
+    await user.click(screen.getByRole('link', { name: 'Add my location' }))
+    expect(await screen.findByRole('heading', { name: 'Choose your general area' })).toBeInTheDocument()
+  })
+
+  it('shows a restrained regional-food limitation when the saved area has no catalog region', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ timezone: 'America/Los_Angeles', current: { temperature_2m: 72, apparent_temperature: 70, weather_code: 1 }, daily: { temperature_2m_max: [78], temperature_2m_min: [58], precipitation_probability_max: [20], sunrise: ['2026-07-16T05:40'], sunset: ['2026-07-16T20:55'] } }) }))
+    const saved = completedProfile('Alex')
+    const profile = { ...saved, location: { ...saved.location, produceRegionId: null } }
+    renderAt('/today', { resultsReached: true, profile })
+    expect(await screen.findByText('Regional food guidance is not available for this area yet.')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Add my location' })).not.toBeInTheDocument()
   })
 
   it('keeps the regional forecast label and Today content during weather loading and failure', async () => {
@@ -321,4 +367,8 @@ function completedProfile(preferredName: string) {
     hasFoodExclusions: false,
     exclusions: '',
   }
+}
+
+function coreProfileWithoutLocation(preferredName: string) {
+  return { ...completedProfile(preferredName), location: null }
 }

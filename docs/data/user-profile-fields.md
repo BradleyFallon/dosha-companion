@@ -61,7 +61,7 @@ These fields do not usually need to be asked repeatedly. Most support personaliz
 | Field                   |    Required | Suggested type             | How it is used                                                    | Dosha effect   | LLM access             |
 | ----------------------- | ----------: | -------------------------- | ----------------------------------------------------------------- | -------------- | ---------------------- |
 | `birth_year`            |    Required | Four-digit year            | Derives age for life-stage relevance and safety handling          | None initially | Derived age band only  |
-| `location_profile`      |    Required | Structured coarse location | Seasonal, time-of-day, climate, and measurement defaults           | None           | Generalized value only |
+| `location_profile`      |  Contextual | Structured coarse location | Seasonal, time-of-day, climate, and measurement defaults           | None           | Generalized value only |
 | `dietary_pattern`       |    Required | Enum                       | Filters food suggestions and articles                             | None           | Yes                    |
 | `food_allergies`        | Recommended | Multi-select               | Hard exclusion against unsafe food recommendations                | None           | Yes, as exclusions     |
 | `food_intolerances`     |    Optional | Multi-select               | Filters food and recipe recommendations                           | None           | Yes, as exclusions     |
@@ -102,7 +102,7 @@ Collecting it without a defined use adds sensitivity and privacy risk without im
 
 ### Location fields
 
-Location is required for the regional experience. The onboarding flow should prioritize a single permission-gated device lookup, then map selection and manual locality search as alternatives. It must not require typing country, region, and city fields.
+Location is not required for core onboarding, assessment, or application participation. It remains “not provided yet” until the user chooses a contextual benefit action for regional weather, daylight, season, or food content. The location flow should prioritize a single permission-gated device lookup, then map selection and manual locality search as alternatives. It must not request permission automatically or require typing country, region, and city fields.
 
 The client may use exact coordinates briefly to position an adjustable map pin, but persistent records should retain only the coarse location or locality needed to derive:
 
@@ -123,7 +123,7 @@ Derived weather should use broad categories such as:
 
 Location and weather should influence content selection rather than baseline dosha scoring.
 
-The structured profile should record the selection source (`device`, `map`, or `city`), a versioned coarse-area ID, snapped area-center coordinates, nominal precision, time zone, administrative and produce regions, and a locality label. Temperature units are a separate preference: default to Fahrenheit for US locations and Celsius elsewhere, then let users override that choice in Settings. Do not request continuous location tracking, and do not send coordinates to the LLM. See [Location binning](location-binning.md).
+The structured profile should record the selection source (`device`, `map`, or `city`), a versioned coarse-area ID, snapped area-center coordinates, nominal precision, time zone, administrative and produce regions, and a locality label. Temperature units are a separate preference shown only after location exists: default to Fahrenheit for US locations and Celsius elsewhere, then let users override that choice in Settings. Do not request continuous location tracking, and do not send coordinates to the LLM. See [Location binning](location-binning.md).
 
 ### Dietary fields
 
@@ -364,11 +364,11 @@ Collect immediately after account creation:
 
 1. Preferred name
 2. Year of birth
-3. Regional location through device, map, or city
-4. Preferred measurement units
-5. Dietary pattern
-6. Food allergies
-7. Food intolerances or exclusions
+3. Dietary pattern
+4. Food allergies
+5. Food intolerances or exclusions
+
+Request a regional location contextually when the user reaches localized weather, daylight, seasonal, or food features. Once a location is saved, infer temperature units automatically and expose an optional override in Settings.
 
 Do not collect sex assigned at birth, weight, height, medical conditions, medication use, or detailed symptoms during MVP onboarding.
 

@@ -4,6 +4,25 @@ The interactive prototype uses `@phosphor-icons/react` as its temporary icon sou
 
 Phosphor React 2.1.10 exports the requested designs without an `Icon` suffix (`Sun`, `Spiral`, and so on). The semantic layer deliberately exposes application names such as `TodayIcon`, `QuestionsIcon`, `NatureIcon`, and `CompleteIcon`; no requested design needed a visual substitution.
 
+Weather presentation uses the same semantic boundary and keeps every value visible as text. The mappings are:
+
+- `ClearWeatherIcon` → `Sun`
+- `PartlyCloudyWeatherIcon` → `CloudSun`
+- `CloudyWeatherIcon` → `Cloud`
+- `FogWeatherIcon` → `CloudFog`
+- `RainWeatherIcon` → `CloudRain`
+- `SnowWeatherIcon` → `CloudSnow`
+- `StormWeatherIcon` → `CloudLightning`
+- `TemperatureIcon` → `Thermometer`
+- `HighTemperatureIcon` → `ThermometerHot`
+- `LowTemperatureIcon` → `ThermometerCold`
+- `PrecipitationIcon` → `Drop`
+- `SunriseIcon` → `SunHorizon`
+- `SunsetIcon` → `SunDim` because this installed Phosphor version does not export `Horizon`
+- `SeasonIcon` → `Leaf`
+
+`weatherPresentation()` owns both WMO labels and condition icons so they cannot drift. The main condition icon uses duotone weight; metric icons use regular weight. All are decorative beside visible text.
+
 The temporary concept mappings are:
 
 - Vata: `VataIcon` wrapping Phosphor `Spiral`

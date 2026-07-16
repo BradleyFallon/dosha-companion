@@ -141,7 +141,7 @@ export function prototypeReducer(
         saveStatus: 'saving',
       }
     case 'complete-profile':
-      return { ...state, profileCompleted: getProfileReadiness(state.profile).ready, saveStatus: 'saving' }
+      return { ...state, profileCompleted: getProfileReadiness(state.profile).coreReady, saveStatus: 'saving' }
     case 'start-assessment':
       return {
         ...state,
@@ -427,7 +427,7 @@ function sanitizeState(raw: Record<string, unknown>): PrototypeState {
   const readiness = getProfileReadiness(profile)
   const profileCompleted =
     raw.profileCompleted === true &&
-    readiness.ready
+    readiness.coreReady
   const assessmentStarted = raw.assessmentStarted === true && profileCompleted
   const assessmentMode: AssessmentMode = raw.assessmentMode === 'short' ? 'short' : 'full'
   const validQuestionIds = new Set(initialAssessment.questions.map((question) => question.id))

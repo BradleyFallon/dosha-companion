@@ -9,6 +9,12 @@ import {
   BowlFood,
   CheckCircle,
   CirclesThree,
+  Cloud,
+  CloudFog,
+  CloudLightning,
+  CloudRain,
+  CloudSnow,
+  CloudSun,
   DeviceMobile,
   Drop,
   Export,
@@ -16,6 +22,7 @@ import {
   Fire,
   FlowerLotus,
   ListChecks,
+  Leaf,
   MagnifyingGlass,
   MapPinArea,
   QuestionMark,
@@ -23,7 +30,11 @@ import {
   SlidersHorizontal,
   Spiral,
   Sun,
+  SunDim,
   SunHorizon,
+  Thermometer,
+  ThermometerCold,
+  ThermometerHot,
   Trash,
   UserCircle,
   WarningCircle,
@@ -68,6 +79,22 @@ export const CurrentBalanceIcon = Waves
 export const DailyRoutineIcon = SunHorizon
 export const AyurvedaIcon = FlowerLotus
 export const FoodIcon = BowlFood
+
+// Weather and local context
+export const ClearWeatherIcon = Sun
+export const PartlyCloudyWeatherIcon = CloudSun
+export const CloudyWeatherIcon = Cloud
+export const FogWeatherIcon = CloudFog
+export const RainWeatherIcon = CloudRain
+export const SnowWeatherIcon = CloudSnow
+export const StormWeatherIcon = CloudLightning
+export const TemperatureIcon = Thermometer
+export const HighTemperatureIcon = ThermometerHot
+export const LowTemperatureIcon = ThermometerCold
+export const PrecipitationIcon = Drop
+export const SunriseIcon = SunHorizon
+export const SunsetIcon = SunDim
+export const SeasonIcon = Leaf
 
 // Primary navigation
 export const TodayIcon = Sun

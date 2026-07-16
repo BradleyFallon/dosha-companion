@@ -13,13 +13,20 @@ async function reachLocation(page: Page) {
   await page.getByLabel('Preferred name').fill('Alex')
   await page.getByLabel('Year of birth').fill('1990')
   await page.getByRole('button', { name: 'Continue' }).click()
+  await expect(page.getByRole('heading', { name: 'Food preferences and exclusions' })).toBeVisible()
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}').state?.profile?.preferredName)).toBe('Alex')
+  await page.goto('/profile/location')
 }
 
 async function reachAssessment(page: Page, short = true) {
-  await reachLocation(page)
-  await page.getByRole('button', { name: 'Choose on map' }).click()
-  await expect(page.getByRole('group', { name: 'Units' })).not.toBeVisible()
-  await page.getByRole('button', { name: 'Use this regional location' }).click()
+  await mockLocationServices(page)
+  await page.goto('/')
+  await page.getByRole('link', { name: 'Get started' }).click()
+  await page.getByLabel('Preferred name').fill('Alex')
+  await page.getByLabel('Year of birth').fill('1990')
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await expect(page.getByRole('heading', { name: 'Food preferences and exclusions' })).toBeVisible()
+  await expect(page.getByRole('progressbar')).toHaveAttribute('max', '2')
   await page.getByLabel('Dietary pattern').selectOption('Omnivore')
   await page.getByRole('group', { name: 'Do you have food allergies?' }).getByLabel('No').check()
   await page.getByRole('group', { name: 'Do you avoid any foods for other reasons?' }).getByLabel('No').check()
@@ -29,6 +36,8 @@ async function reachAssessment(page: Page, short = true) {
 }
 
 test('completes the short mobile vertical slice', async ({ page }) => {
+  let weatherRequests = 0
+  page.on('request', (request) => { if (request.url().includes('api.open-meteo.com/v1/forecast')) weatherRequests += 1 })
   await reachAssessment(page)
 
   const continueButton = page.getByRole('button', { name: 'Continue' })
@@ -66,6 +75,15 @@ test('completes the short mobile vertical slice', async ({ page }) => {
   await expect(page.getByText('Vata–Pitta')).toBeVisible()
   await page.getByRole('button', { name: 'Continue to Today' }).click()
   await expect(page.getByText('For today')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'See what supports you where you live' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Local conditions' })).not.toBeVisible()
+  await expect(page.getByRole('heading', { name: 'In season near you' })).not.toBeVisible()
+  expect(weatherRequests).toBe(0)
+  await page.getByRole('link', { name: 'Add my location' }).click()
+  await expect(page.getByRole('heading', { name: 'Choose your general area' })).toBeVisible()
+  await page.getByRole('button', { name: 'Choose on map' }).click()
+  await page.getByRole('button', { name: 'Use this regional location' }).click()
+  await expect(page.getByText('For today')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Local conditions' })).toBeVisible()
   await expect(page.getByText(/Forecast for Portland, Oregon, United States/)).toBeVisible()
   await expect(page.getByText('72°F')).toBeVisible()
@@ -74,6 +92,7 @@ test('completes the short mobile vertical slice', async ({ page }) => {
   await expect(page.getByText('58°F')).toBeVisible()
   await expect(page.getByText('20%')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'In season near you' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'See what supports you where you live' })).not.toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Primary navigation' })).toBeVisible()
 })
 
@@ -192,6 +211,14 @@ test('edits profile settings, preserves answers, and recalculates Today', async 
   await page.getByLabel('Food allergies').fill('Tree nuts')
   await page.getByRole('button', { name: 'Save profile changes' }).click()
   await expect(page.getByText('Saved on this device').first()).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Add regional location' })).toBeVisible()
+  await expect(page.getByRole('group', { name: 'Temperature units' })).not.toBeVisible()
+  await page.getByRole('link', { name: 'Add regional location' }).click()
+  await page.getByRole('button', { name: 'Choose on map' }).click()
+  await page.getByRole('button', { name: 'Use this regional location' }).click()
+  await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Change regional location' })).toBeVisible()
+  await expect(page.getByRole('group', { name: 'Temperature units' })).toBeVisible()
   await page.reload()
   await expect(page.getByLabel('Preferred name')).toHaveValue('Jordan')
   await page.getByRole('link', { name: 'Today' }).first().click()

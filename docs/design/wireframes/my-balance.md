@@ -22,7 +22,7 @@
 |                                      |
 | [ How coverage was determined      ] |
 | [ Edit profile settings            ] |
-| [ Edit or remove location          ] |
+| [ Change regional location         ] |
 |                                      |
 | [Today] [Questions] [Balance] [Learn]|
 +--------------------------------------+

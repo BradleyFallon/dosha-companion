@@ -31,6 +31,8 @@ Today is the post-assessment home and primary retention surface. It turns the la
 - Local conditions use the saved representative regional coordinate for current temperature, feels-like temperature, daily high/low, precipitation chance, sunrise, sunset, and a broad hemisphere-aware season. The card displays the saved regional name and never uses raw selection coordinates.
 - Temperature display defaults from the saved country and can be overridden in Settings. Weather remains informational until separate editorial rules approve its use in guidance selection.
 - “In season near you” uses the editor-owned seasonal produce catalog filtered by region, month, diet, allergies, and exclusions; it does not claim dosha compatibility.
+- Without location, one benefit card explains weather, daylight, season, and nearby-food value and links to `/profile/location?return=today`. Today makes no weather call and renders no empty localized sections in this state.
+- If a valid location has no mapped produce region, keep weather and show that regional food guidance is not available for the area yet.
 - “Why this was chosen” exposes the exact matched rule and states that no dosha score was used.
 - The limited MVP does not place automatically generated AI prose on Today.
 - The AI entry opens a separate grounded chat experience.
@@ -40,6 +42,8 @@ Today is the post-assessment home and primary retention surface. It turns the la
 | State | Behavior |
 | ----- | -------- |
 | Fresh profile and guidance | Show complete daily hierarchy |
+| Location not provided yet | Show one location-benefit card in place of all localized modules |
+| Location provided | Show weather and regional-food modules |
 | Current balance aging | Show guidance with an “Update your balance” question action |
 | Current coverage insufficient | Prefer the next current check-in over stronger personalization |
 | No higher-priority rule | Show the clearly labeled provisional general fallback |

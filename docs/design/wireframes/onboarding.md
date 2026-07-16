@@ -54,19 +54,19 @@ Low-fidelity mobile layouts for welcome, account entry, profile setup, and the h
 +--------------------------------------+
 ```
 
-## Profile setup — 1 of 3
+## Profile setup — 1 of 2
 
 ```text
 +--------------------------------------+
-| < Back                    Step 1 of 3 |
-| [==========------------------------] |
+| < Back                    Step 1 of 2 |
+| [=================-----------------] |
 |                                      |
 | Let’s personalize the experience     |
 |                                      |
 | Preferred name                       |
 | [ Alex                             ] |
 |                                      |
-| Year of birth · optional             |
+| Year of birth                        |
 | [ YYYY                             ] |
 |                                      |
 | We use the year for age-appropriate  |
@@ -76,84 +76,54 @@ Low-fidelity mobile layouts for welcome, account entry, profile setup, and the h
 +--------------------------------------+
 ```
 
-## Profile setup — 2 of 3
+## Profile setup — 2 of 2
 
 ```text
 +--------------------------------------+
-| < Back                    Step 2 of 3 |
-| [====================--------------] |
-|                                      |
-| Use your location                    |
-|                                      |
-| This helps adjust guidance for your  |
-| local season, time, and climate.     |
-|                                      |
-| [ Use my current location          ] |
-|                                      |
-|                  or                  |
-|                                      |
-| [ Choose on map                    ] |
-|                                      |
-| We will not make your location       |
-| public or track it continuously.     |
-|                                      |
-| Search manually instead              |
-| Skip for now                         |
-+--------------------------------------+
-```
-
-## Profile setup — location selected
-
-```text
-+--------------------------------------+
-| < Back                    Step 2 of 3 |
-| [====================--------------] |
-|                                      |
-| LOCATION SELECTED                    |
-| Approximate device location          |
-|                                      |
-| [ map with movable pin             ] |
-|                                      |
-| Drag the pin or tap the map if this  |
-| is not correct.                      |
-|                                      |
-| Units                                |
-| (•) US        ( ) Metric             |
-|                                      |
-| [ Use this location                ] |
-| [ Choose again                     ] |
-+--------------------------------------+
-```
-
-## Profile setup — 3 of 3
-
-```text
-+--------------------------------------+
-| < Back                    Step 3 of 3 |
-| [==============================----] |
+| < Back                    Step 2 of 2 |
+| [==================================] |
 |                                      |
 | Food preferences and exclusions     |
 |                                      |
 | Dietary pattern                     |
 | [ Vegetarian                      v] |
 |                                      |
-| Allergies                           |
-| [ + Add allergy                    ] |
-| [ Tree nuts  x ]                     |
+| Do you have food allergies?         |
+| ( ) No        (•) Yes               |
+| [ Tree nuts                       ] |
 |                                      |
-| Other exclusions (optional)         |
-| [ + Add exclusion                  ] |
-|                                      |
-| Allergies prevent incompatible       |
-| suggestions before AI is involved.  |
+| Do you avoid any other foods?        |
+| (•) No        ( ) Yes               |
 |                                      |
 | [ Save and continue                ] |
++--------------------------------------+
+```
+
+## Contextual location setup
+
+Localized surfaces first explain the benefit and link here with an allowlisted return destination.
+
+```text
++--------------------------------------+
+| < Today                              |
+|                                      |
+| Choose your general area             |
+|                                      |
+| [ Use my current location          ] |
+| [ Choose on map                    ] |
+|                                      |
+| Search for your city                 |
+| [ City or region                  ] |
+|                                      |
+| Only a roughly 10 km region is       |
+| saved.                               |
 +--------------------------------------+
 ```
 
 ## Notes and states
 
 - Profile progress is saved between steps.
+- Core onboarding does not ask for location; localized surfaces explain the benefit before linking to the contextual flow.
 - Validation appears below the relevant field without clearing other values.
 - Device location is requested only after an explicit action and uses a single lookup, not continuous tracking.
 - Exact coordinates may position the live pin, but persistence and downstream context use only a coarse area.

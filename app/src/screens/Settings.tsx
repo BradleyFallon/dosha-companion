@@ -17,6 +17,7 @@ import {
 import { birthYearBounds, birthYearError, birthYearInput } from '../profile/birthYear'
 import { getProfileReadiness } from '../profile/readiness'
 import { inferredTemperatureUnit, temperatureUnitSymbol } from '../location/units'
+import { locationEntryPath } from '../location/returnTargets'
 
 export function SettingsScreen() {
   const { state, dispatch, resetPrototype, seedDemo } = usePrototype()
@@ -46,7 +47,7 @@ export function SettingsScreen() {
       return
     }
     const values = { ...state.profile, preferredName: preferredName.trim(), birthYear, dietaryPattern, hasFoodAllergies, allergies: hasFoodAllergies ? allergies.trim() : '', hasFoodExclusions, exclusions: hasFoodExclusions ? exclusions.trim() : '' }
-    if (!getProfileReadiness(values).ready) {
+    if (!getProfileReadiness(values).coreReady) {
       setError('Complete every required profile and food-safety field.')
       return
     }
@@ -113,15 +114,7 @@ export function SettingsScreen() {
       </form>
       <section className="settings-location" aria-labelledby="settings-location-title">
         <h2 className="section-title-with-icon" id="settings-location-title"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Location</h2>
-        <p>{state.profile.location?.displayName ?? 'No regional location saved'}</p>
-        <Link className="button secondary icon-label" to="/profile/location?return=settings"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Edit or remove location</Link>
-        <fieldset className="settings-temperature-units">
-          <legend>Temperature units</legend>
-          <p className="field-hint">Automatic uses {temperatureUnitSymbol(inferredUnit)} for your saved location.</p>
-          <label><input type="radio" name="temperature-units" checked={state.profile.temperatureUnitPreference === 'automatic'} onChange={() => dispatch({ type: 'update-profile', values: { temperatureUnitPreference: 'automatic' } })} /> Automatic ({temperatureUnitSymbol(inferredUnit)})</label>
-          <label><input type="radio" name="temperature-units" checked={state.profile.temperatureUnitPreference === 'fahrenheit'} onChange={() => dispatch({ type: 'update-profile', values: { temperatureUnitPreference: 'fahrenheit' } })} /> Fahrenheit (°F)</label>
-          <label><input type="radio" name="temperature-units" checked={state.profile.temperatureUnitPreference === 'celsius'} onChange={() => dispatch({ type: 'update-profile', values: { temperatureUnitPreference: 'celsius' } })} /> Celsius (°C)</label>
-        </fieldset>
+        {state.profile.location ? <><p>{state.profile.location.displayName}</p><Link className="button secondary icon-label" to={locationEntryPath('/settings')}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Change regional location</Link><fieldset className="settings-temperature-units"><legend>Temperature units</legend><p className="field-hint">Automatic uses {temperatureUnitSymbol(inferredUnit)} for your saved location.</p><label><input type="radio" name="temperature-units" checked={state.profile.temperatureUnitPreference === 'automatic'} onChange={() => dispatch({ type: 'update-profile', values: { temperatureUnitPreference: 'automatic' } })} /> Automatic ({temperatureUnitSymbol(inferredUnit)})</label><label><input type="radio" name="temperature-units" checked={state.profile.temperatureUnitPreference === 'fahrenheit'} onChange={() => dispatch({ type: 'update-profile', values: { temperatureUnitPreference: 'fahrenheit' } })} /> Fahrenheit (°F)</label><label><input type="radio" name="temperature-units" checked={state.profile.temperatureUnitPreference === 'celsius'} onChange={() => dispatch({ type: 'update-profile', values: { temperatureUnitPreference: 'celsius' } })} /> Celsius (°C)</label></fieldset></> : <><p>Add your general area for weather, daylight, seasonal guidance, and local foods.</p><Link className="button secondary icon-label" to={locationEntryPath('/settings')}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Add regional location</Link></>}
       </section>
       <section className="settings-data" aria-labelledby="settings-data-title">
         <h2 className="section-title-with-icon" id="settings-data-title"><StorageIcon aria-hidden="true" className="icon-leading" focusable="false" />Local data</h2>

@@ -124,6 +124,18 @@ describe('prototype state and persistence', () => {
     expect(restored.notice).toContain('version 7')
   })
 
+  it('preserves assessment and results for a core-complete profile without location', () => {
+    const legacy = persistableState(completedState({ resultsReached: true, todayVisited: true, submittedAnswers: { [firstQuestion.id]: firstAnswer.id } }))
+    legacy.profile.location = null
+    const restored = restoreState({ getItem: () => JSON.stringify({ version: STORAGE_VERSION, state: legacy }) }).state
+    expect(restored.profileCompleted).toBe(true)
+    expect(restored.assessmentStarted).toBe(true)
+    expect(restored.resultsReached).toBe(true)
+    expect(restored.todayVisited).toBe(true)
+    expect(restored.submittedAnswers[firstQuestion.id]).toBe(firstAnswer.id)
+    expect(restored.profile.temperatureUnitPreference).toBe('automatic')
+  })
+
   it('sanitizes recommendation history and check-in answer references independently', () => {
     const validAnswer = currentQuestion.answers[0].id
     const value = JSON.stringify({

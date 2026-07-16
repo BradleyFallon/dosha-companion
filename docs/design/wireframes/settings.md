@@ -21,7 +21,7 @@
 |                                      |
 | LOCATION AND UNITS                   |
 | Approximate selected area · US       |
-| [ Edit or remove location          ] |
+| [ Change regional location         ] |
 |                                      |
 | Stored only in this browser.         |
 | [Today] [Questions] [Balance] [Learn]|

@@ -16,6 +16,7 @@ import {
   SettingsIcon,
   WarningIcon,
 } from '../ui/icons'
+import { locationEntryPath } from '../location/returnTargets'
 
 export function QuestionsScreen() {
   const { state } = usePrototype()
@@ -75,7 +76,7 @@ export function BalanceScreen() {
       <Link className="button secondary icon-label" to="/questions"><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />Review answers and check-in history</Link>
       <Link className="button secondary icon-label" to="/learn/nature-and-current-balance"><LearnIcon aria-hidden="true" className="icon-leading" focusable="false" />Learn about nature and current balance</Link>
       <Link className="button secondary icon-label" to="/settings"><SettingsIcon aria-hidden="true" className="icon-leading" focusable="false" />Edit profile settings</Link>
-      <Link className="button secondary icon-label" to="/profile/location"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Edit or remove location</Link>
+      {state.profile.location ? <Link className="button secondary icon-label" to={locationEntryPath('/balance')}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Change regional location</Link> : null}
     </Screen>
   )
 }

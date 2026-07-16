@@ -40,8 +40,7 @@ flowchart TD
 | ----- | --------- | -------------- | ----------------- |
 | Welcome | Product category, tagline, brief value, boundary link | Get started | Wellness disclaimer |
 | Profile 1 | Preferred name and adult year of birth | Continue | Back |
-| Profile 2 | Required regional location | Use this location | Device, map, or city; back |
-| Profile 3 | Dietary pattern and explicit allergy/exclusion status | Save and continue | Back |
+| Profile 2 | Dietary pattern and explicit allergy/exclusion status | Save and continue | Back |
 | Assessment intro | Time, two sections, saving, skip, educational boundary | Begin assessment | Exit |
 | Baseline question | “Your usual nature,” progress, prompt, answers | Continue after selection | Not sure; skip; back; save and exit |
 | Transition | Explicit shift from lifetime to past-seven-days frame | Continue | Save and exit |
@@ -49,6 +48,8 @@ flowchart TD
 | Missing coverage | More information needed and why | Answer next useful question | Exit |
 | Coverage result | Separate baseline/current coverage and scoring boundary | Go to Today | Repair coverage |
 | Today | Daily focus and practical action | View action or guidance | Questions; why chosen; AI entry |
+
+Location is collected contextually after core onboarding. The location route requires only completed name and birth-year fields and safely returns to Today, Settings, Learn, or My Balance through an allowlisted return key.
 
 ## Question-screen behavior
 

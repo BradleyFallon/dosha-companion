@@ -61,14 +61,3 @@ export function seasonFor(date: Date, latitude: number) {
   if (latitude >= 0) return north
   return { Spring: 'Autumn', Summer: 'Winter', Autumn: 'Spring', Winter: 'Summer' }[north]
 }
-
-export function weatherLabel(code: number) {
-  if (code === 0) return 'Clear'
-  if (code <= 3) return 'Partly cloudy'
-  if (code === 45 || code === 48) return 'Foggy'
-  if (code <= 67) return 'Rain'
-  if (code <= 77) return 'Snow'
-  if (code <= 82) return 'Rain showers'
-  if (code <= 86) return 'Snow showers'
-  return 'Thunderstorms'
-}

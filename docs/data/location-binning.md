@@ -24,7 +24,9 @@ City search uses Open-Meteo's geocoding endpoint. Device and map confirmation us
 
 This is a useful default because it is precise enough to act as the forecast domain for sunset calculations and a regional weather forecast while avoiding storage of a home-scale location. Every weather request uses the saved grid center, never the raw device or dragged-pin coordinates. The Today card names the saved regional display label so users can see which area drives the forecast. The bin is not precise enough for street-level services, and weather can still vary sharply near mountains, coasts, and urban boundaries.
 
-Temperature units are not part of the location bin. The profile defaults automatically from the saved country and stores only an optional Fahrenheit or Celsius override in Settings.
+Temperature units are not part of the location bin. After location is provided, the profile defaults automatically from the saved country and stores only an optional Fahrenheit or Celsius override in Settings.
+
+Core readiness is independent of this record. `location: null` means “not provided yet,” not declined, and gates only localized capabilities. No weather or seasonal-content provider is called until a valid regional record exists.
 
 ## Derived location facets
 
@@ -50,5 +52,5 @@ Location-derived signals may display local-time, daylight, weather, climate, and
 - Never persist the raw permission result or raw dragged-pin coordinates.
 - Never request continuous/background location.
 - Do not send coordinates or `areaId` to language-model context; send only a necessary derived summary such as `cool and damp` or `sunset around 7:45 PM`.
-- Let the user replace, manually broaden, or remove the saved area.
+- Let the user replace or manually broaden the saved area.
 - Version the bin scheme so a future precision change does not silently alter existing area IDs.

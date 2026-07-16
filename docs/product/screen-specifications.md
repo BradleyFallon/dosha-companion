@@ -6,7 +6,9 @@
 
 ### Sign up and profile setup
 
-The demo begins directly with profile setup. Preferred name, adult year of birth, regional location, dietary pattern, explicit allergy status, and explicit other-exclusion status are required. Allergy or exclusion details are required after Yes. Settings uses the same readiness rules for later edits.
+The demo begins directly with a two-step core profile: preferred name and adult year of birth, followed by dietary pattern and explicit allergy/exclusion status. Allergy or exclusion details are required after Yes. Location is not required for core participation; it is requested contextually only when the user chooses localized weather, daylight, season, or food features.
+
+Readiness distinguishes `coreReady` from `localizedContentReady`. Assessment and application routes require the core profile, while a regional location moves localized content from “not provided yet” to available.
 
 ### Initial questions and Results
 
@@ -16,7 +18,7 @@ Normal Results never display a dosha label because weights and thresholds remain
 
 ### Today
 
-Today separates a rotating daily feed from stable links to usual nature, food preferences, and local rhythms. It shows one deterministically selected focus, one practical action, an optional filtered food prompt, coverage status, and an inspectable rule explanation. Editorial approval metadata remains in the content source rather than appearing as repeated user-facing badges. No LLM or dosha score participates.
+Today separates a rotating daily feed from stable links to usual nature, food preferences, and local rhythms. Without location it shows one contextual benefit card and makes no weather request; with location it shows regional weather and seasonal food content. It also shows one deterministically selected focus, one practical action, an optional filtered food prompt, coverage status, and an inspectable rule explanation. Editorial approval metadata remains in the content source rather than appearing as repeated user-facing badges. No LLM or dosha score participates.
 
 ### Questions and My Balance
 
@@ -28,7 +30,7 @@ Unapproved article placeholders are non-interactive and labeled unavailable. The
 
 ### Settings
 
-Settings edits profile fields without deleting assessment answers, links to the regional location chooser, and exposes Automatic, Fahrenheit, and Celsius temperature preferences. It displays local save status and browser-only persistence limitations.
+Settings edits profile fields without deleting assessment answers and links contextually to add or change the regional location. Automatic, Fahrenheit, and Celsius temperature preferences appear only after location is provided. It displays local save status and browser-only persistence limitations.
 
 ## Deferred specifications
 
