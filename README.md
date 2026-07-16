@@ -1,8 +1,8 @@
-# Ayurvedic Wellness Companion
+# Dosha Companion
 
 > Understand your nature. Track your balance. Know what supports you today.
 
-Ayurvedic Wellness Companion is a mobile-first web product that combines expert-authored Ayurvedic education, continuous self-assessment, personalized daily guidance, and a grounded AI assistant. It is a wellness education tool, not a medical service or a substitute for professional care.
+**Dosha Companion** is the temporary project name. The product category is a **personalized Ayurvedic wellness companion**: a mobile-first web product combining expert-authored Ayurvedic education, continuous self-assessment, personalized daily guidance, and a grounded AI assistant. It is a wellness education tool, not a medical service or a substitute for professional care.
 
 ## Project stage
 
@@ -19,7 +19,10 @@ The proposed MVP includes accounts, profile setup, a ten-minute initial assessme
 - `docs/quiz/`: assessment design and scoring rules
 - `docs/data/`: source and derived data definitions
 - `docs/content/`: taxonomy and editorial guidance
+- `docs/research/`: evidence reviews and source material informing product decisions
+- `docs/ai/`: assistant behavior, grounding, context, safety, and evaluation
 - `docs/design/`: interaction and responsive-design decisions
+- `docs/engineering/`: architecture, platform, deployment, and testing decisions
 - `content/`: approved user-facing editorial content
 - `data/`: structured quiz and reference data
 - `decisions/`: architecture and product decision records

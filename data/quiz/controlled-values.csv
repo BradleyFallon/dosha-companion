@@ -1,0 +1,46 @@
+value_group,value,label,description,active
+assessment_type,baseline,Baseline,Long-term constitution question,true
+assessment_type,current,Current balance,Time-bounded current-balance question,true
+assessment_type,context,Context,Recommendation context without dosha scoring,true
+assessment_type,feedback,Feedback,User feedback without dosha scoring,true
+question_category,movement_pace,Movement Pace,Controlled assessment domain,true
+question_category,energy,Energy,Controlled assessment domain,true
+question_category,routine,Routine,Controlled assessment domain,true
+question_category,decision_style,Decision Style,Controlled assessment domain,true
+question_category,learning,Learning,Controlled assessment domain,true
+question_category,memory,Memory,Controlled assessment domain,true
+question_category,endurance,Endurance,Controlled assessment domain,true
+question_category,body_frame,Body Frame,Controlled assessment domain,true
+question_category,weight_tendency,Weight Tendency,Controlled assessment domain,true
+question_category,skin,Skin,Controlled assessment domain,true
+question_category,temperature_tolerance,Temperature Tolerance,Controlled assessment domain,true
+question_category,sweating,Sweating,Controlled assessment domain,true
+question_category,appetite,Appetite,Controlled assessment domain,true
+question_category,delayed_meals,Delayed Meals,Controlled assessment domain,true
+question_category,digestion,Digestion,Controlled assessment domain,true
+question_category,bowel_pattern,Bowel Pattern,Controlled assessment domain,true
+question_category,sleep,Sleep,Controlled assessment domain,true
+question_category,speaking_style,Speaking Style,Controlled assessment domain,true
+question_category,stress_response,Stress Response,Controlled assessment domain,true
+question_category,body_qualities,Body Qualities,Controlled assessment domain,true
+question_category,major_change,Major Change,Controlled assessment domain,true
+response_type,single_select,Single select,Exactly one answer option may be selected,true
+time_window,usual_adult_state,Usual adult state,Most of adult life when generally well,true
+time_window,past_7_days,Past 7 days,Previous seven days,true
+time_window,past_3_days,Past 3 days,Previous three days,true
+time_window,today,Today,Current day,true
+time_window,current_context,Current context,Valid until the user's context changes,true
+time_window,not_applicable,Not applicable,No time window,true
+answer_kind,ordinary,Ordinary,A substantive answer choice,true
+answer_kind,not_sure,Not sure,The user is uncertain,true
+answer_kind,none_fit,None fit,No substantive choice fits,true
+answer_kind,prefer_not,Prefer not to answer,The user declines to answer,true
+answer_kind,skip,Skip,The user skips for another supported reason,true
+editorial_status,draft,Draft,Being written,true
+editorial_status,expert_review,Expert review,Awaiting or undergoing domain review,true
+editorial_status,approved,Approved,Approved for use,true
+editorial_status,published,Published,Available in production,true
+editorial_status,retired,Retired,No longer offered to users,true
+score_target,baseline,Baseline,Contributes only to baseline constitution,true
+score_target,current,Current,Contributes only to current balance,true
+score_target,none,None,Does not contribute to dosha scoring,true

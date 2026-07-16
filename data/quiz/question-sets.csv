@@ -1,0 +1,5 @@
+question_set_id,set_version,slug,label,description,estimated_minutes,minimum_answered,status,created_at,updated_at
+initial_assessment,1,initial-assessment,Initial assessment,First-run baseline and current-balance assessment.,10,22,draft,2026-07-15T00:00:00Z,2026-07-15T00:00:00Z
+early_refinement,1,early-refinement,Early refinement,Questions that improve coverage and resolve ambiguity after the initial result.,,,draft,2026-07-15T00:00:00Z,2026-07-15T00:00:00Z
+recurring_balance,1,recurring-balance,Recurring balance,Repeatable questions that refresh the current-balance profile.,,,draft,2026-07-15T00:00:00Z,2026-07-15T00:00:00Z
+optional_deep_dive,1,optional-deep-dive,Optional deep dive,User-selected questions for deeper exploration.,,,draft,2026-07-15T00:00:00Z,2026-07-15T00:00:00Z

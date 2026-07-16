@@ -2,27 +2,27 @@
 
 ## Executive summary
 
-For a mobile-first consumer web app, the strongest evidence-backed pattern is to keep **account and onboarding data minimal**, and move most **dosha-relevant information into the question stream**. Official Indian Ayurveda bodies and modern reviews consistently describe prakriti assessment as relying on **physical, physiological, psychological, and behavioral traits**; modern tools also use anthropometric or observational items, but reviews note that many published tools remain heterogeneous and only partially validated. That makes a **deterministic, transparent, versioned scoring model** a better fit for an MVP than a black-box classifier or free-form LLM scoring. citeturn12search4turn4view0turn10search4turn10search13
+For a mobile-first consumer web app, the strongest evidence-backed pattern is to keep **account and onboarding data minimal**, and move most **dosha-relevant information into the question stream**. Official Indian Ayurveda bodies and modern reviews consistently describe prakriti assessment as relying on **physical, physiological, psychological, and behavioral traits**; modern tools also use anthropometric or observational items, but reviews note that many published tools remain heterogeneous and only partially validated. That makes a **deterministic, transparent, versioned scoring model** a better fit for an MVP than a black-box classifier or free-form LLM scoring.[^ccras-manual][^critical-review][^scoping-review]
 
-Ayurvedic sources and reviews also support a clean separation between **baseline constitution** and **current balance**. Prakriti is traditionally treated as relatively stable, while vikriti or current imbalance is changeable and shaped by diet, routine, environment, stress, and season. In product terms, that means lifelong or “usually true” items should feed a slowly changing **baseline profile**, while “past week” items and daily context should feed a rapidly decaying **current-balance state**. citeturn12search4turn16search0turn18search12turn18search17
+Ayurvedic sources and reviews also support a clean separation between **baseline constitution** and **current balance**. Prakriti is traditionally treated as relatively stable, while vikriti or current imbalance is changeable and shaped by diet, routine, environment, stress, and season. In product terms, that means lifelong or “usually true” items should feed a slowly changing **baseline profile**, while “past week” items and daily context should feed a rapidly decaying **current-balance state**.[^scoping-review]
 
-For the MVP, the minimum practical design is: collect only account basics plus a few stable personalization fields at sign-up; ask **20–30 high-yield assessment questions** immediately after signup; calculate a preliminary profile after enough answers are present; then continue refining via short question batches. The best Tier 1 variables are body build, skin and hair tendencies, appetite, digestion/bowel tendency, sleep, energy/movement pace, temperature tolerance, sweating, memory/learning pattern, stress response, routine preference, and endurance, plus a small set of “past week” questions for sleep, digestion, appetite, energy, mood, temperature, dryness/heat/heaviness, and routine regularity. Those domains recur across CCRAS/AYUSH materials and modern prakriti tools. citeturn4view0turn11search1turn11search0turn16search8
+For the MVP, the minimum practical design is: collect only account basics plus a few stable personalization fields at sign-up; ask **20–30 high-yield assessment questions** immediately after signup; calculate a preliminary profile after enough answers are present; then continue refining via short question batches. The best Tier 1 variables are body build, skin and hair tendencies, appetite, digestion/bowel tendency, sleep, energy/movement pace, temperature tolerance, sweating, memory/learning pattern, stress response, routine preference, and endurance, plus a small set of “past week” questions for sleep, digestion, appetite, energy, mood, temperature, dryness/heat/heaviness, and routine regularity. Those domains recur across CCRAS/AYUSH materials and modern prakriti tools.[^ccras-manual][^critical-review][^scoping-review]
 
-Privacy-wise, many seemingly simple fields become sensitive once linked to a health-style profile. Health-adjacent app data may trigger data-protection and breach-notification duties depending on jurisdiction; health data is treated as specially protected in UK GDPR-style regimes, and U.S. rules such as the FTC Health Breach Notification Rule can apply to health apps even when HIPAA does not. The safest MVP posture is to avoid exact birth date, exact GPS, complexion/photo analysis, precise weight/BMI, medication data, pregnancy details, and free-text symptom narratives unless there is a clear expert-approved use case. Send only a **minimal structured summary** to the LLM, not raw full-history data by default. citeturn13search18turn13search9turn13search1turn13search5turn13search8
+Privacy-wise, many seemingly simple fields become sensitive once linked to a health-style profile. Health-adjacent app data may trigger data-protection and breach-notification duties depending on jurisdiction; health data is treated as specially protected in UK GDPR-style regimes, and U.S. rules such as the FTC Health Breach Notification Rule can apply to health apps even when HIPAA does not. The safest MVP posture is to avoid exact birth date, exact GPS, complexion/photo analysis, precise weight/BMI, medication data, pregnancy details, and free-text symptom narratives unless there is a clear expert-approved use case. Send only a **minimal structured summary** to the LLM, not raw full-history data by default.[^critical-review][^hhs-hipaa][^ftc-hbnr][^ico-health]
 
 ## Evidence base and design principles
 
-Ayurveda frames health around the relative balance of **Vata, Pitta, and Kapha**. The Ministry of Ayush describes health as equilibrium of the tridoshas, and CCRAS materials describe prakriti as the relative proportions of these doshas that shape an individual’s constitution or temperament. CCRAS’s standardized prakriti work states that its tool was built from classical Ayurvedic texts and expert consultation, and groups predictors into **physical, physiological, psychological, and behavioral** traits. citeturn12search2turn12search4turn4view0
+Ayurveda frames health around the relative balance of **Vata, Pitta, and Kapha**. The Ministry of Ayush describes health as equilibrium of the tridoshas, and CCRAS materials describe prakriti as the relative proportions of these doshas that shape an individual’s constitution or temperament. CCRAS’s standardized prakriti work states that its tool was built from classical Ayurvedic texts and expert consultation, and groups predictors into **physical, physiological, psychological, and behavioral** traits.[^ccras-manual][^critical-review][^scoping-review]
 
-Modern reviews are broadly consistent with that structure. Recent reviews identify common prakriti variables such as **body build, hunger frequency, skin complexion or appearance, sleep patterns, voice characteristics, tolerance to temperature, taste preference, mental characteristics, body movement, endurance, appetite, food quantity, memory, and competitiveness**. At the same time, review literature emphasizes that existing prakriti assessment tools are numerous and methodologically uneven, which argues against overclaiming scientific certainty for any consumer app’s dosha output. citeturn11search1turn11search0turn10search4turn10search13
+Modern reviews are broadly consistent with that structure. Recent reviews identify common prakriti variables such as **body build, hunger frequency, skin complexion or appearance, sleep patterns, voice characteristics, tolerance to temperature, taste preference, mental characteristics, body movement, endurance, appetite, food quantity, memory, and competitiveness**. At the same time, review literature emphasizes that existing prakriti assessment tools are numerous and methodologically uneven, which argues against overclaiming scientific certainty for any consumer app’s dosha output.[^ccras-manual][^critical-review][^scoping-review]
 
-That evidence base supports five practical product principles for Dosha Companion. First, **separate stable constitution from current imbalance**. Second, **prefer structured questions over free text** for scoring. Third, **treat mobile self-report differently from clinician assessment**: CCRAS’s full standardized process includes measurement and observational steps, but a consumer web app should use app-appropriate substitutes. Fourth, **version the scoring model** because the field is still evolving. Fifth, **avoid medical framing** because NCCIH notes that evidence for many Ayurvedic interventions remains limited and some preparations can be unsafe, especially those involving heavy metals. citeturn3view2turn16search8turn10search4turn1search0
+That evidence base supports five practical product principles for Dosha Companion. First, **separate stable constitution from current imbalance**. Second, **prefer structured questions over free text** for scoring. Third, **treat mobile self-report differently from clinician assessment**: CCRAS’s full standardized process includes measurement and observational steps, but a consumer web app should use app-appropriate substitutes. Fourth, **version the scoring model** because the field is still evolving. Fifth, **avoid medical framing** because NCCIH notes that evidence for many Ayurvedic interventions remains limited and some preparations can be unsafe, especially those involving heavy metals.[^nccih][^fda-wellness]
 
-One further design implication matters for engineering: CCRAS’s manual explicitly warns about confounders in anthropometric traits and notes that current weight may be misleading when disease or major change has altered appearance, recommending consideration of earlier healthy-state appearance instead. In an app, that is a strong reason to prefer **self-perceived lifelong body tendency** over exact current weight or BMI in the MVP. citeturn3view2
+One further design implication matters for engineering: CCRAS’s manual explicitly warns about confounders in anthropometric traits and notes that current weight may be misleading when disease or major change has altered appearance, recommending consideration of earlier healthy-state appearance instead. In an app, that is a strong reason to prefer **self-perceived lifelong body tendency** over exact current weight or BMI in the MVP.[^ccras-manual][^critical-review][^scoping-review]
 
 ## Proposed field schema
 
-The schema below translates traditional domains into app-ready fields grouped into **account**, **stable onboarding**, **question-stream**, **context**, and **derived** data. The field choices are a product proposal grounded in official trait categories and modern reviews, not a claim that Ayurveda has one universally accepted digital schema. citeturn12search4turn11search1turn10search4
+The schema below translates traditional domains into app-ready fields grouped into **account**, **stable onboarding**, **question-stream**, **context**, and **derived** data. The field choices are a product proposal grounded in official trait categories and modern reviews, not a claim that Ayurveda has one universally accepted digital schema.[^ccras-manual][^critical-review][^scoping-review]
 
 ### Account and stable onboarding fields
 
@@ -44,11 +44,11 @@ The schema below translates traditional domains into app-ready fields grouped in
 | `major_food_exclusions` | Multi-select | Onboarding | Medium | No dosha score; content filtering | avoid spicy, avoid dairy, no onion/garlic, low-FODMAP, other | Review on change | Yes |
 | `units_preference` | Enum | Onboarding | Low | None | US, metric | No decay | Yes |
 
-\* `sex_assigned_at_birth` is traditionally relevant in some Ayurvedic contexts, but for a consumer wellness MVP it should be **optional, expert-justified, low-weight if used at all, and excluded from default LLM context** because the value is sensitive and often not necessary for initial recommendations. Health and related data can fall into specially protected categories depending on jurisdiction. citeturn13search5turn13search17
+\* `sex_assigned_at_birth` is traditionally relevant in some Ayurvedic contexts, but for a consumer wellness MVP it should be **optional, expert-justified, low-weight if used at all, and excluded from default LLM context** because the value is sensitive and often not necessary for initial recommendations. Health and related data can fall into specially protected categories depending on jurisdiction.[^hhs-hipaa][^ftc-hbnr][^ico-health]
 
 ### Lifelong and usually-true question-stream fields
 
-These are **not** onboarding profile fields. They should live in the assessment stream and be phrased as “through most of adult life” or “when you are at your usual healthy state.” This matches both traditional emphasis on stable constitution and modern tool design. citeturn12search4turn16search0turn16search8
+These are **not** onboarding profile fields. They should live in the assessment stream and be phrased as “through most of adult life” or “when you are at your usual healthy state.” This matches both traditional emphasis on stable constitution and modern tool design.[^scoping-review]
 
 | Field | Type | Collect when | Sensitivity and key concerns | Baseline vs current effect | Suggested values | Expiration or decay | Send to LLM |
 |---|---|---|---|---|---|---|---|
@@ -68,11 +68,11 @@ These are **not** onboarding profile fields. They should live in the assessment 
 | `routine_preference_trait` | Single select | Initial assessment | Low | Moderate baseline | loves variety, likes goals/structure, prefers sameness/stability | No decay; re-ask yearly | Summary only |
 | `endurance_trait` | Single select | Initial assessment | Low | Moderate baseline | short bursts/tire easily, moderate, strong/sustained | No decay; re-ask yearly | Summary only |
 
-These domains are well aligned with official and research tool families that use built, appearance, skin and hair traits, appetite, sleep, sweating, movement, memory, endurance, and psychological/behavioral qualities. citeturn4view0turn11search1turn11search0turn16search8
+These domains are well aligned with official and research tool families that use built, appearance, skin and hair traits, appetite, sleep, sweating, movement, memory, endurance, and psychological/behavioral qualities.[^ccras-manual][^critical-review][^scoping-review]
 
 ### Recurring current-balance and context fields
 
-These should be asked with a short horizon such as **today**, **past 3 days**, or **past week**. They feed current-balance scoring and content relevance, not baseline constitution. citeturn18search17turn18search12
+These should be asked with a short horizon such as **today**, **past 3 days**, or **past week**. They feed current-balance scoring and content relevance, not baseline constitution.[^scoping-review]
 
 | Field | Type | Collect when | Sensitivity and key concerns | Baseline vs current effect | Suggested values | Expiration or decay | Send to LLM |
 |---|---|---|---|---|---|---|---|
@@ -91,7 +91,7 @@ These should be asked with a short horizon such as **today**, **past 3 days**, o
 | `weather_band` | Derived enum | Automatic from location/date | Medium; location-linked | No baseline; moderate current/content | cold-dry, hot, hot-humid, cool-damp, temperate | 24 hours | Yes |
 | `season` | Derived enum | Automatic from date/location | Low | No baseline; moderate current/content | spring, summer, fall, winter, monsoon where relevant | 30 days | Yes |
 
-Ayurveda treats daily and seasonal routine as meaningful, and ritucharya and dinacharya are explicitly emphasized by CCRAS and modern summaries. That makes `season`, `weather_band`, and `routine_regularity` more useful MVP context fields than, for example, detailed biometrics. citeturn6search8turn6search20turn6search6
+Ayurveda treats daily and seasonal routine as meaningful, and ritucharya and dinacharya are explicitly emphasized by CCRAS and modern summaries. That makes `season`, `weather_band`, and `routine_regularity` more useful MVP context fields than, for example, detailed biometrics.[^ccras-ritucharya]
 
 ### Derived fields
 
@@ -128,7 +128,7 @@ A mobile wellness MVP should **defer or avoid** the following unless there is a 
 | Free-text symptom diary | Encourages clinical interpretation and increases moderation burden |
 | Supplements / herbs intent | Avoid until safety review is mature |
 
-Complexion-like variables appear in some modern summaries of prakriti tools, but they are poor MVP choices because they can overlap with race or ethnic origin and are difficult to standardize fairly in a self-report app. citeturn11search1turn13search5turn13search14
+Complexion-like variables appear in some modern summaries of prakriti tools, but they are poor MVP choices because they can overlap with race or ethnic origin and are difficult to standardize fairly in a self-report app.[^critical-review][^hhs-hipaa][^ftc-hbnr][^ico-health]
 
 ## Priority tiers
 
@@ -161,7 +161,7 @@ Tier 1 should produce a useful result with about **20–30 total items**, mostly
 - `activity_pattern_last_7d`
 - `season` or `weather_band` as derived context
 
-This list is intentionally biased toward variables repeatedly seen across official and reviewed prakriti assessments: build, skin/hair, appetite, sleep, sweating, temperature response, digestion, behavior, memory, and endurance. citeturn4view0turn11search1turn11search0turn15search14
+This list is intentionally biased toward variables repeatedly seen across official and reviewed prakriti assessments: build, skin/hair, appetite, sleep, sweating, temperature response, digestion, behavior, memory, and endurance.[^ccras-manual][^critical-review][^scoping-review]
 
 ### Tier 2 fields for early refinement
 
@@ -178,7 +178,7 @@ After the initial result, use early refinement to reduce ambiguity between mixed
 - `time_available_today`
 - `preferred_guidance_mode`
 
-\* Items such as competitiveness, friendship, bravery, ego, or forgiveness appear in some standardized and reviewed tool families, but they are more culturally contingent and should be low priority for an MVP unless your expert strongly wants them. citeturn4view0turn11search0
+\* Items such as competitiveness, friendship, bravery, ego, or forgiveness appear in some standardized and reviewed tool families, but they are more culturally contingent and should be low priority for an MVP unless your expert strongly wants them.[^ccras-manual][^critical-review][^scoping-review]
 
 ### Tier 3 recurring check-ins
 
@@ -193,7 +193,7 @@ These should reappear most often:
 - `routine_regularity_last_7d`
 - `activity_pattern_last_7d`
 
-These are the right candidates for decay-based current-balance logic because vikriti is described as temporary and variable over time. citeturn18search17turn18search12
+These are the right candidates for decay-based current-balance logic because vikriti is described as temporary and variable over time.[^scoping-review]
 
 ### Optional context fields
 
@@ -206,11 +206,11 @@ For personalization without major privacy cost, the best optional context fields
 - `time_available_today`
 - `preferred_guidance_mode`
 
-These improve relevance without pushing the app toward diagnosis or collecting unnecessary sensitive data. Ritucharya and dinacharya are central enough in Ayurveda that season, routine, and daily conditions are legitimate context signals. citeturn6search8turn6search20
+These improve relevance without pushing the app toward diagnosis or collecting unnecessary sensitive data. Ritucharya and dinacharya are central enough in Ayurveda that season, routine, and daily conditions are legitimate context signals.[^ccras-ritucharya]
 
 ## Minimal initial question set
 
-The 24-item starter set below is designed for a first-pass consumer implementation. It is a **product proposal**, not a claim that these exact weights are canonically standardized. The domain choices are grounded in official and reviewed trait families, while the weight matrix is an engineering-friendly starting point for expert review and later calibration. citeturn12search4turn11search1turn11search0turn10search4
+The 24-item starter set below is designed for a first-pass consumer implementation. It is a **product proposal**, not a claim that these exact weights are canonically standardized. The domain choices are grounded in official and reviewed trait families, while the weight matrix is an engineering-friendly starting point for expert review and later calibration.[^ccras-manual][^critical-review][^scoping-review]
 
 **Scoring convention used below**
 
@@ -255,11 +255,11 @@ The 24-item starter set below is designed for a first-pass consumer implementati
 | Q23 | Over the past week, how regular has your routine been? | Past week | A irregular or erratic `[2,0,0]`; B structured but overly intense `[0,2,0]`; C repetitive but inert/sluggish `[0,0,2]` |
 | Q24 | Over the past week, what has your activity pattern been like? | Past week | A rushing/multitasking/overextended `[2,0,0]`; B pushing/competing/overdriving `[0,2,0]`; C sedentary/inactive `[0,0,2]` |
 
-This 24-item set is intentionally lean. It captures the physical, physiological, and mental-behavioral domains most commonly used in prakriti tools, while avoiding high-friction or culturally fraught items like complexion photographs, precise biometrics, or clinician-only observations. citeturn4view0turn11search1turn11search0turn16search8
+This 24-item set is intentionally lean. It captures the physical, physiological, and mental-behavioral domains most commonly used in prakriti tools, while avoiding high-friction or culturally fraught items like complexion photographs, precise biometrics, or clinician-only observations.[^ccras-manual][^critical-review][^scoping-review]
 
 ## Deterministic scoring outline
 
-A deterministic MVP algorithm should be simple enough for engineering and content teams to reason about, yet explicit enough to version and audit. Given the heterogeneity of published prakriti tools, that is more defensible than hidden model scoring. citeturn10search4turn10search13turn16search6
+A deterministic MVP algorithm should be simple enough for engineering and content teams to reason about, yet explicit enough to version and audit. Given the heterogeneity of published prakriti tools, that is more defensible than hidden model scoring.[^ccras-manual][^critical-review][^scoping-review]
 
 ### Baseline calculation
 
@@ -292,7 +292,7 @@ Label logic:
 - Dual-dosha label if top two are within `0.12`
 - “Balanced/mixed” only if all three are within `0.08`
 
-Because official and reviewed tools recognize seven common output types, do not force everyone into only three bins. citeturn12search17turn8search13turn8search4
+Because official and reviewed tools recognize seven common output types, do not force everyone into only three bins.[^ccras-manual][^critical-review][^scoping-review]
 
 ### Current-balance calculation
 
@@ -344,7 +344,7 @@ Conflict examples:
 - User answers “light sleep lifelong” early, then later answers “deep sleep lifelong” with high certainty
 - User says body frame has changed a lot due to illness or major life event
 
-When conflicts appear, the app should either re-ask the question or reduce the confidence score rather than silently overriding data. This is consistent with the literature’s emphasis on validation, inter-rater reliability, and careful reporting. citeturn3view2turn15search1turn10search11
+When conflicts appear, the app should either re-ask the question or reduce the confidence score rather than silently overriding data. This is consistent with the literature’s emphasis on validation, inter-rater reliability, and careful reporting.[^ccras-manual][^critical-review][^scoping-review]
 
 ### Content selection logic
 
@@ -376,13 +376,13 @@ flowchart TD
     O --> P[Today screen and chat]
 ```
 
-This architecture reflects the strongest implementation pattern for your product: **experts define valid content and rule tags; deterministic logic decides what is relevant; the LLM explains and personalizes**. That reduces hallucination risk and keeps intent closer to general wellness rather than diagnosis. citeturn19search0turn19search10turn1search0
+This architecture reflects the strongest implementation pattern for your product: **experts define valid content and rule tags; deterministic logic decides what is relevant; the LLM explains and personalizes**. That reduces hallucination risk and keeps intent closer to general wellness rather than diagnosis.[^nccih][^fda-wellness]
 
 ## Privacy, safety, and regulatory considerations
 
-The overall privacy rule for Dosha Companion should be **collect less, infer less, retain less, share less**. Even if the app markets itself as wellness rather than medical care, profile data tied to appetite, digestion, sleep, mood, allergies, location, and current state can still function as identifiable health-style data. In the United States, HIPAA applies only to covered entities and business associates, so many consumer wellness apps are outside HIPAA; however, the FTC’s Health Breach Notification Rule can still apply to health apps and similar technologies. In UK GDPR-style regimes, health data is special category data requiring additional protection, and some automated profiling uses are restricted. citeturn13search1turn13search4turn13search18turn13search9turn13search5turn13search8
+The overall privacy rule for Dosha Companion should be **collect less, infer less, retain less, share less**. Even if the app markets itself as wellness rather than medical care, profile data tied to appetite, digestion, sleep, mood, allergies, location, and current state can still function as identifiable health-style data. In the United States, HIPAA applies only to covered entities and business associates, so many consumer wellness apps are outside HIPAA; however, the FTC’s Health Breach Notification Rule can still apply to health apps and similar technologies. In UK GDPR-style regimes, health data is special category data requiring additional protection, and some automated profiling uses are restricted.[^hhs-hipaa][^ftc-hbnr][^ico-health]
 
-The MVP should therefore adopt the following defaults. Use **age band instead of exact birth date**. Use **city or region instead of exact GPS**. Use **body tendency instead of exact weight/BMI**, at least initially. Keep `sex_assigned_at_birth` optional and excluded from default LLM context. Store allergies because they are safety-critical for food suggestions, but treat them as sensitive. Keep all mental-state items at the level of **non-diagnostic wellness descriptors** such as “anxious/overwhelmed” or “irritable/impatient,” not clinical screening language. citeturn13search5turn13search17turn3view2
+The MVP should therefore adopt the following defaults. Use **age band instead of exact birth date**. Use **city or region instead of exact GPS**. Use **body tendency instead of exact weight/BMI**, at least initially. Keep `sex_assigned_at_birth` optional and excluded from default LLM context. Store allergies because they are safety-critical for food suggestions, but treat them as sensitive. Keep all mental-state items at the level of **non-diagnostic wellness descriptors** such as “anxious/overwhelmed” or “irritable/impatient,” not clinical screening language.[^hhs-hipaa][^ftc-hbnr][^ico-health]
 
 Do not let the LLM receive raw questionnaires, timestamps, all message history, exact location, or fields with no immediate relevance to the user’s request. A safe MVP payload is a compact summary such as:
 
@@ -402,21 +402,33 @@ Do not let the LLM receive raw questionnaires, timestamps, all message history, 
 
 That is enough for personalization without excessive data exposure.
 
-From a safety and product-claims perspective, keep the app clearly inside a **general wellness** frame. The FDA’s digital-health materials focus heavily on intended use; software that merely encourages healthy lifestyle practices is treated differently from software that diagnoses or treats disease. Because NCCIH also notes limited evidence for many Ayurvedic health claims and specific safety concerns around some preparations, the app should avoid disease claims, medication suggestions, and personalized herbal prescribing in the MVP. citeturn19search12turn19search0turn19search10turn1search0
+From a safety and product-claims perspective, keep the app clearly inside a **general wellness** frame. The FDA’s digital-health materials focus heavily on intended use; software that merely encourages healthy lifestyle practices is treated differently from software that diagnoses or treats disease. Because NCCIH also notes limited evidence for many Ayurvedic health claims and specific safety concerns around some preparations, the app should avoid disease claims, medication suggestions, and personalized herbal prescribing in the MVP.[^nccih][^fda-wellness]
 
-Jurisdiction-specific compliance will still be required before launch. At minimum, you should assume potential obligations around privacy notice, lawful basis/consent, data minimization, deletion rights, retention limits, vendor contracts, access logging, and breach notification. citeturn13search10turn13search18turn13search5
+Jurisdiction-specific compliance will still be required before launch. At minimum, you should assume potential obligations around privacy notice, lawful basis/consent, data minimization, deletion rights, retention limits, vendor contracts, access logging, and breach notification.[^hhs-hipaa][^ftc-hbnr][^ico-health]
 
-## Key sources to consult
+## Key sources
 
-The strongest source stack for schema design and expert review is:
+- The Central Council for Research in Ayurvedic Sciences (CCRAS) manual provides the official standardized predictor framework and the physical, physiological, psychological, and behavioral domains used in this report.[^ccras-manual]
+- Two recent reviews summarize modern Prakriti assessment tools, their measured traits, and their still-limited psychometric validation.[^critical-review][^scoping-review]
+- CCRAS's *Ritu Charya* publication is the official source used here for seasonal-context claims.[^ccras-ritucharya]
+- NCCIH and FDA guidance support the product's conservative evidence, safety, and general-wellness boundaries.[^nccih][^fda-wellness]
+- FTC, HHS, and ICO guidance supports the discussion of consumer health apps, HIPAA scope, breach notification, inferred health data, and special-category data.[^ftc-hbnr][^hhs-hipaa][^ico-health]
 
-- **CCRAS Manual of Standard Operative Procedures for Prakriti Assessment** for the closest thing to an official standardized predictor framework, including physical, physiological, psychological, and behavioral domains. citeturn12search4turn3view2
-- **Ayusoft / Ministry of Ayush Prakriti resources** for official framing of tridosha equilibrium and prakriti. citeturn12search2turn18search0
-- **AYU 2022 and related CCRAS standardization work** for questionnaire development, construct validity, and reliability emphasis. citeturn15search1turn15search5
-- **Recent critical and scoping reviews of prakriti assessment tools** for understanding what is commonly measured and where validation remains weak. citeturn10search4turn10search13turn10search7
-- **Prototype and self-report prakriti tool papers** for examples of structured item design and the need to manage inter-rater or self-report variability. citeturn16search6turn16search8turn18search17
-- **NCCIH Ayurveda overview** for consumer-facing safety and evidence boundaries. citeturn1search0
-- **CCRAS and other official materials on dinacharya and ritucharya** for daily/seasonal context logic. citeturn6search6turn6search8turn6search20
-- **FTC, HHS, ICO, and FDA guidance** for privacy, breach, special-category handling, and general-wellness positioning. citeturn13search18turn13search9turn13search1turn13search5turn19search0turn19search12
+[^ccras-manual]: Central Council for Research in Ayurvedic Sciences, *Manual of Standard Operative Procedures for Prakriti Assessment*, 2023. <https://ccras.nic.in/wp-content/uploads/2024/07/15032023_AYUR-PRAKRITI-WEB-PORTAL-Manual.pdf>
 
-If you want the next artifact after this report, the most implementation-ready follow-up would be a concrete `docs/data/user-profile-fields.md` schema with JSON field definitions and a matching `data/quiz-questions/initial-questions.csv` starter file derived from the Tier 1 table above.
+[^critical-review]: Archana Venkatesh et al., “Prakriti (constitutional typology) in Ayurveda: a critical review of Prakriti assessment tools and their scientific validity,” *Frontiers in Medicine* 12 (2025): 1656249. <https://doi.org/10.3389/fmed.2025.1656249>
+
+[^scoping-review]: Ankit Gupta et al., “Towards standardization of Prakriti Evaluation: A scoping review of modern assessment tools and their psychometric properties in Ayurvedic medicine,” *Journal of Ayurveda and Integrative Medicine* 16, no. 4 (2025): 101157. <https://doi.org/10.1016/j.jaim.2025.101157>
+
+[^ccras-ritucharya]: Central Council for Research in Ayurvedic Sciences, *Ritu Charya*, 2023. <https://ccras.nic.in/wp-content/uploads/2024/06/RITU-CHARYA-Title-Changed.pdf>
+
+[^nccih]: National Center for Complementary and Integrative Health, “Ayurvedic Medicine: In Depth,” accessed July 15, 2026. <https://www.nccih.nih.gov/health/ayurvedic-medicine-in-depth>
+
+[^fda-wellness]: U.S. Food and Drug Administration, “Step 3: Is the Software Function Intended For Maintaining or Encouraging a Healthy Lifestyle?”, accessed July 15, 2026. <https://www.fda.gov/medical-devices/digital-health-center-excellence/step-3-software-function-intended-maintaining-or-encouraging-healthy-lifestyle>
+
+[^ftc-hbnr]: Federal Trade Commission, “Complying with FTC’s Health Breach Notification Rule,” updated July 2024. <https://www.ftc.gov/business-guidance/resources/complying-ftcs-health-breach-notification-rule-0>
+
+[^hhs-hipaa]: U.S. Department of Health and Human Services, “Covered Entities and Business Associates,” reviewed August 21, 2024. <https://www.hhs.gov/hipaa/for-professionals/covered-entities/index.html>
+
+[^ico-health]: Information Commissioner’s Office, “What is special category data?”, updated April 9, 2024. <https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/lawful-basis/special-category-data/what-is-special-category-data/>
+

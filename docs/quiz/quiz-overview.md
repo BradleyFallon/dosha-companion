@@ -526,7 +526,11 @@ This document defines the overall system. More detailed specifications belong in
 
 * `data/quiz-questions/initial-questions.csv`
 
-  * Actual initial question records
+  * Canonical initial question records
+
+* `data/quiz-questions/initial-answer-options.csv`
+
+  * Canonical normalized answer-option records and expert-reviewed score weights
 
 * `data/quiz-questions/refinement-questions.csv`
 
