@@ -88,7 +88,7 @@ The generator deliberately never reads `../data/quiz/answer-scores.csv`. No scor
 
 ## Coverage and result behavior
 
-The application implements `coverage-policy-0.1-provisional`:
+The application implements `coverage-policy-0.1`:
 
 - 22 submitted answers overall; explicit fallback answers count as submitted, while skips do not.
 - 14 substantive usual-nature answers.

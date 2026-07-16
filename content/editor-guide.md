@@ -2,7 +2,7 @@
 
 This directory is the editable source for the mobile demo. Editors change content here; they do not need to edit React components.
 
-All current entries are conservative placeholders with `status: "provisional"`. Published provisional content is visible in the app with the label **Provisional · not expert-approved**. Do not change an item to `approved` until the product's expert review and approval process is complete.
+All current entries keep an internal `status: "provisional"` until the product's review process is complete. That editorial status is available in the source and editor tooling but is not repeated as a badge in the reader experience. Do not change an item to `approved` until the review and approval process is complete.
 
 ## Where content lives
 

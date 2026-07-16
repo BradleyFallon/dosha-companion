@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { usePrototype } from '../prototype/PrototypeContext'
 import {
   BackIcon,
@@ -24,17 +24,10 @@ export function RouteFocus() {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { state, resetPrototype, dismissRestoreNotice } = usePrototype()
+  const { state, dismissRestoreNotice } = usePrototype()
   const location = useLocation()
-  const navigate = useNavigate()
   const showNavigation =
     state.resultsReached && postResultPaths.some((path) => location.pathname.startsWith(path))
-
-  function reset() {
-    if (!window.confirm('Reset all browser-local prototype progress?')) return
-    resetPrototype()
-    navigate('/')
-  }
 
   return (
     <div className="app-frame">
@@ -57,9 +50,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         {children}
       </main>
       {showNavigation ? <BottomNavigation /> : null}
-      <button className="prototype-reset" type="button" onClick={reset}>
-        Reset prototype
-      </button>
     </div>
   )
 }

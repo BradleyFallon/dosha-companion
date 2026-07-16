@@ -6,7 +6,7 @@ Self-assessment can help you notice patterns, but it has limits. Answers may cha
 
 ## Coverage is not certainty
 
-This demo reports whether enough substantive answers were submitted for the provisional product gate. “Not sure” is a valid submitted response, while a skipped question remains open. Coverage does not mean the app is clinically confident.
+The app reports whether enough substantive answers were submitted for the coverage gate. “Not sure” is a valid submitted response, while a skipped question remains open. Coverage does not mean the app is clinically confident.
 
 ## Check-ins are separate records
 

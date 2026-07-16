@@ -6,17 +6,17 @@
 
 ### Sign up and profile setup
 
-Account entry is simulated and passwords are never persisted. Profile setup collects preferred name, optional age band, optional coarse location/units, dietary pattern, allergies, and exclusions. Settings permits later edits.
+Account entry keeps passwords out of persistence. Profile setup collects preferred name, optional year of birth, optional coarse location/units, dietary pattern, allergies, and exclusions. Settings permits later edits.
 
 ### Initial questions and Results
 
-The 27 canonical questions support selection, fallback answers, skip, back, immediate local persistence, exit, refresh, and resume. Results use `coverage-policy-0.1-provisional`, distinguish baseline/current/context, expose fallback/skip/unanswered counts, and route to the next useful repair question.
+The 27 canonical questions support selection, fallback answers, skip, back, immediate local persistence, exit, refresh, and resume. Results use `coverage-policy-0.1`, distinguish baseline/current/context, expose fallback/skip/unanswered counts, and route to the next useful repair question.
 
 Normal Results never display a dosha label because weights and thresholds remain unapproved. Development builds provide an explicit fixture-only preview that is not calculated or persisted.
 
 ### Today
 
-Today shows one deterministically selected provisional focus, one practical action, an optional filtered food prompt, coverage status, and an inspectable rule explanation. Each content item is labeled as not expert-approved. No LLM or dosha score participates.
+Today separates a rotating daily feed from stable links to usual nature, food preferences, and local rhythms. It shows one deterministically selected focus, one practical action, an optional filtered food prompt, coverage status, and an inspectable rule explanation. Editorial approval metadata remains in the content source rather than appearing as repeated user-facing badges. No LLM or dosha score participates.
 
 ### Questions and My Balance
 

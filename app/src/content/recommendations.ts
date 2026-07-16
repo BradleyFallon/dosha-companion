@@ -3,8 +3,6 @@ import type { AssessmentCoverage } from '../quiz/coverage'
 import type { RecommendationContent } from '../generated/contentCatalog'
 import { getRecommendations } from './repository'
 
-export const PROVISIONAL_CONTENT_LABEL = 'Provisional · not expert-approved'
-
 const CONTEXT_ANSWERS = {
   physicalChange: 'a_context_major_change_001_recent_illness_injury_medication',
   travel: 'a_context_major_change_001_recent_travel_major_schedule',
@@ -19,7 +17,6 @@ export interface FoodRecommendation {
 }
 
 export interface DailyRecommendation extends RecommendationContent {
-  label: typeof PROVISIONAL_CONTENT_LABEL
   selectionDate: string
   why: string[]
   food: FoodRecommendation
@@ -32,7 +29,6 @@ export interface RecommendationInput {
   recommendationHistory?: RecommendationHistoryRecord[]
   activeRecommendationId?: string | null
   now?: Date
-  fixtureActive?: boolean
 }
 
 export function selectDailyRecommendation(input: RecommendationInput): DailyRecommendation {
@@ -43,7 +39,6 @@ export function selectDailyRecommendation(input: RecommendationInput): DailyReco
     recommendationHistory = [],
     activeRecommendationId = null,
     now = new Date(),
-    fixtureActive = false,
   } = input
   const local = localTime(now, profile.location?.timeZone)
   const selectionDate = local.date
@@ -69,12 +64,10 @@ export function selectDailyRecommendation(input: RecommendationInput): DailyReco
   } else if (!active && recentIds.size > 0) {
     why.push('Recently shown items were deprioritized when an eligible alternative was available.')
   }
-  if (fixtureActive) why.push('A development fixture is visible, but it was not used to choose this guidance.')
   why.push('No dosha score was calculated or used.')
 
   return {
     ...selected,
-    label: PROVISIONAL_CONTENT_LABEL,
     selectionDate,
     why,
     food: selectFoodRecommendation(profile, all),
@@ -95,7 +88,7 @@ function recommendationContext(submittedAnswers: Record<string, string>, coverag
   if (answer === CONTEXT_ANSWERS.physicalChange) return { context: 'physical-change', explanation: 'The major physical-change answer activates the strongest content safety boundary.' }
   if (answer === CONTEXT_ANSWERS.travel) return { context: 'travel', explanation: 'The recent travel or schedule-change answer takes priority over time-of-day prompts.' }
   if (answer === CONTEXT_ANSWERS.lifeEvent) return { context: 'life-event', explanation: 'The significant-life-event answer takes priority over time-of-day prompts.' }
-  if (coverage.current.substantive < 4) return { context: 'insufficient-current', explanation: `The initial assessment has ${coverage.current.substantive} substantive current answers; the provisional coverage policy asks for 4.` }
+  if (coverage.current.substantive < 4) return { context: 'insufficient-current', explanation: `The initial assessment has ${coverage.current.substantive} substantive current answers; the coverage policy asks for 4.` }
   return { context: 'general', explanation: hour >= 5 && hour < 12 ? 'It is morning in the selected time zone.' : hour >= 18 ? 'It is evening in the selected time zone.' : 'No higher-priority context matched, so the general daytime catalog was used.' }
 }
 
@@ -104,7 +97,7 @@ function selectFoodRecommendation(profile: ProfileState, catalog: Recommendation
     return {
       status: 'withheld',
       title: 'Food suggestion withheld',
-      body: 'You listed allergies or exclusions, and this demo does not have reviewed ingredient-level filtering.',
+      body: 'You listed allergies or exclusions, and ingredient-level filtering is not available.',
       reason: 'Your allergy or exclusion fields activated the food-content safety filter.',
     }
   }

@@ -9,6 +9,7 @@ import {
   type AssessmentMode,
 } from '../quiz/assessment'
 import { ForwardIcon } from '../ui/icons'
+import { useQuestionKeyboard } from '../quiz/useQuestionKeyboard'
 
 export function AssessmentIntroScreen() {
   const { state, dispatch } = usePrototype()
@@ -34,7 +35,7 @@ export function AssessmentIntroScreen() {
       <BackLink to="/profile/food" />
       <p className="eyebrow">Your wellness profile</p>
       <h1 tabIndex={-1}>Before the assessment</h1>
-      <p className="lede">Allow about ten minutes for the full 27-question draft.</p>
+      <p className="lede">Allow about ten minutes for the full 27-question assessment.</p>
       <div className="info-card">
         <h2>Two kinds of questions</h2>
         <p><strong>Your usual nature</strong><br />Tendencies across adult life when you are generally well.</p>
@@ -48,7 +49,7 @@ export function AssessmentIntroScreen() {
       <p className="boundary-note">Results are educational and based on self-report. They are not a medical diagnosis.</p>
       {shortModeAllowed() ? (
         <div className="dev-control">
-          <strong>Developer preview</strong>
+          <strong>Question set</strong>
           <p>{selectedMode === 'short' ? 'Short mode: 3 baseline + 2 current questions.' : 'Full mode: all 27 questions.'}</p>
           <Link to={selectedMode === 'short' ? '/assessment?demo=full' : '/assessment?demo=short'}>
             Switch to {selectedMode === 'short' ? 'full' : 'short'} mode
@@ -80,12 +81,13 @@ export function QuestionScreen() {
     }
   }, [dispatch, index, question, state.currentIndex, state.selectedAnswerId, state.submittedAnswers])
 
-  if (!question) return <Navigate to="/assessment" replace />
-
-  const selected = state.selectedAnswerId ?? state.submittedAnswers[question.id] ?? null
+  const selected = question
+    ? state.selectedAnswerId ?? state.submittedAnswers[question.id] ?? null
+    : null
   const total = questions.length
 
   function advance(answerId?: string) {
+    if (!question) return
     const nextIndex = index + 1
     if (answerId) {
       dispatch({ type: 'submit-answer', questionId: question.id, answerId, nextIndex })
@@ -114,6 +116,7 @@ export function QuestionScreen() {
   }
 
   function goBack() {
+    if (!question) return
     if (index === 0) {
       navigate('/assessment')
       return
@@ -131,50 +134,68 @@ export function QuestionScreen() {
     navigate(`/assessment/question/${previous.id}`)
   }
 
+  useQuestionKeyboard({
+    answerIds: question?.answers.map((answer) => answer.id) ?? [],
+    selectedId: selected,
+    onSelect: (answerId) => dispatch({ type: 'select-answer', answerId }),
+    onConfirm: () => selected && advance(selected),
+  })
+
+  if (!question) return <Navigate to="/assessment" replace />
+
   return (
     <Screen className="question-screen">
-      <div className="assessment-topline">
-        <Link to="/">Save and exit</Link>
-        <Status>{state.saveStatus === 'saved' ? 'Saved on this device' : state.saveStatus}</Status>
+      <div className="question-fixed-header">
+        <div className="assessment-topline">
+          <Link to="/">Save and exit</Link>
+          <Status>{state.saveStatus === 'saved' ? 'Saved on this device' : state.saveStatus}</Status>
+        </div>
+        <div className="question-progress-row">
+          <p className="eyebrow">{sectionLabel(question.assessmentType)}</p>
+          <div className="progress-copy">
+            <span>Question {index + 1} of {total}</span>
+            {question.assessmentType === 'current' ? <span>Past seven days</span> : null}
+          </div>
+        </div>
+        <progress value={index + 1} max={total}>Question {index + 1} of {total}</progress>
       </div>
-      <p className="eyebrow">{sectionLabel(question.assessmentType)}</p>
-      <div className="progress-copy">
-        <span>Question {index + 1} of {total}</span>
-        {question.assessmentType === 'current' ? <span>Past seven days</span> : null}
+      <div className="question-scroll-region">
+        <h1 tabIndex={-1}>{question.text}</h1>
+        {question.helpText ? <p className="field-hint">{question.helpText}</p> : null}
+        {question.assessmentType === 'baseline' ? (
+          <details className="question-help">
+            <summary>What does “usual nature” mean?</summary>
+            <p>Think about most of your adult life when generally well—not only how you feel this week.</p>
+          </details>
+        ) : null}
+        <fieldset className="answer-list">
+          <legend className="sr-only">Choose one answer</legend>
+          {question.answers.map((answer) => (
+            <label className={selected === answer.id ? 'answer-option selected' : 'answer-option'} key={answer.id}>
+              <input
+                type="radio"
+                name={question.id}
+                value={answer.id}
+                checked={selected === answer.id}
+                onChange={() => dispatch({ type: 'select-answer', answerId: answer.id })}
+              />
+              <span className="radio-mark" aria-hidden="true">{selected === answer.id ? '✓' : ''}</span>
+              <span>{answer.text}</span>
+            </label>
+          ))}
+        </fieldset>
+        {question.skippable ? (
+          <button className="text-button skip-action" type="button" onClick={() => advance()}>
+            Skip for now
+          </button>
+        ) : null}
       </div>
-      <progress value={index + 1} max={total}>Question {index + 1} of {total}</progress>
-      <h1 tabIndex={-1}>{question.text}</h1>
-      {question.helpText ? <p className="field-hint">{question.helpText}</p> : null}
-      {question.assessmentType === 'baseline' ? (
-        <details className="question-help">
-          <summary>What does “usual nature” mean?</summary>
-          <p>Think about most of your adult life when generally well—not only how you feel this week.</p>
-        </details>
-      ) : null}
-      <fieldset className="answer-list">
-        <legend className="sr-only">Choose one answer</legend>
-        {question.answers.map((answer) => (
-          <label className={selected === answer.id ? 'answer-option selected' : 'answer-option'} key={answer.id}>
-            <input
-              type="radio"
-              name={question.id}
-              value={answer.id}
-              checked={selected === answer.id}
-              onChange={() => dispatch({ type: 'select-answer', answerId: answer.id })}
-            />
-            <span className="radio-mark" aria-hidden="true">{selected === answer.id ? '✓' : ''}</span>
-            <span>{answer.text}</span>
-          </label>
-        ))}
-      </fieldset>
-      {question.skippable ? (
-        <button className="text-button skip-action" type="button" onClick={() => advance()}>
-          Skip for now
-        </button>
-      ) : null}
-      <div className="assessment-actions">
-        <button className="button secondary" type="button" onClick={goBack}>Back</button>
-        <button className="button primary" type="button" disabled={!selected} onClick={() => selected && advance(selected)}>Continue</button>
+      <div className="question-action-shell">
+        <p className="keyboard-hint">Arrow keys to choose · Enter to continue</p>
+        <div className="assessment-actions">
+          <button className="button secondary" type="button" onClick={goBack}>Back</button>
+          <button className="button primary" type="button" disabled={!selected} onClick={() => selected && advance(selected)}>Continue</button>
+        </div>
       </div>
     </Screen>
   )

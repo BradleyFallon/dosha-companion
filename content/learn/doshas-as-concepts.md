@@ -6,7 +6,7 @@ Ayurvedic traditions use Vata, Pitta, and Kapha as organizing concepts. They are
 
 ## Educational, not diagnostic
 
-In this demo, dosha language is educational. No label is inferred from your answers because the numerical scoring model has not been approved. A single answer should never be treated as proof of a constitution or imbalance.
+In this app, dosha language is educational. No label is inferred from your answers. A single answer should never be treated as proof of a constitution or imbalance.
 
 ## Patterns need context
 

@@ -45,6 +45,16 @@ describe('assessment interaction', () => {
     expect(screen.getByRole('heading', { name: questions[1].text })).toBeInTheDocument()
   })
 
+  it('supports arrow-key selection and Enter confirmation', async () => {
+    const user = userEvent.setup()
+    const questions = getAssessmentQuestions('short', true)
+    renderAt(`/assessment/question/${questions[0].id}`)
+    await user.keyboard('{ArrowDown}')
+    expect(screen.getAllByRole('radio')[0]).toBeChecked()
+    await user.keyboard('{Enter}')
+    expect(screen.getByRole('heading', { name: questions[1].text })).toBeInTheDocument()
+  })
+
   it('Skip for now records no answer and advances', async () => {
     const user = userEvent.setup()
     const questions = getAssessmentQuestions('short', true)
@@ -169,11 +179,11 @@ describe('limited MVP results and settings', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Not saved—changes remain available only for this session.')
   })
 
-  it('loads and filters real provisional Learn articles', async () => {
+  it('loads and filters published Learn articles without editorial status labels', async () => {
     const user = userEvent.setup()
     renderAt('/learn', { resultsReached: true })
     expect(screen.getByText('Ayurveda basics')).toBeInTheDocument()
-    expect(screen.getAllByText('Provisional · not expert-approved')).toHaveLength(9)
+    expect(screen.queryByText('Provisional · not expert-approved')).not.toBeInTheDocument()
     await user.type(screen.getByLabelText('Search articles'), 'Vata')
     expect(screen.getByText('2 articles')).toBeInTheDocument()
     await user.click(screen.getByRole('link', { name: /An educational overview of qualities commonly associated with Vata/i }))
@@ -243,12 +253,14 @@ function allOrdinaryAnswers() {
 function completedProfile(preferredName: string) {
   return {
     preferredName,
-    ageBand: '',
+    birthYear: '',
     location: {
       source: 'skipped' as const,
       latitude: null,
       longitude: null,
       accuracyMeters: null,
+      areaId: null,
+      precisionKm: null,
       timeZone: 'UTC',
       units: 'us' as const,
       displayLabel: null,

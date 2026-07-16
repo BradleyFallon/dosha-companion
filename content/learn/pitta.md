@@ -6,4 +6,4 @@ Pitta is commonly described through qualities such as warmth, sharpness, intensi
 
 These associations are broad educational ideas, not medical findings. Context matters, and a recent experience should not be used alone to assign a lasting label.
 
-This demo will not calculate a Pitta result until experts approve both answer mappings and the scoring model.
+The app does not calculate a Pitta result from your answers.

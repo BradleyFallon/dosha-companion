@@ -1,8 +1,8 @@
 ---
-{"id":"provisional-guidance","title":"Understanding provisional guidance","summary":"How Today recommendations are selected and what their status label means.","category":"using-the-app","tags":["recommendations","provisional","safety","routine"],"status":"provisional","publicationStatus":"published","relatedArticleIds":["routine-and-consistency","self-assessment"]}
+{"id":"provisional-guidance","title":"How Today chooses guidance","summary":"How Today recommendations are selected and why they remain understandable.","category":"using-the-app","tags":["recommendations","safety","routine"],"status":"provisional","publicationStatus":"published","relatedArticleIds":["routine-and-consistency","self-assessment"]}
 ---
 
-Every Today recommendation currently carries the label “Provisional · not expert-approved.” This means an editor can review the experience, but the material has not completed the product’s expert approval process.
+Today presents one clear focus selected from the published content catalog.
 
 ## How selection works
 

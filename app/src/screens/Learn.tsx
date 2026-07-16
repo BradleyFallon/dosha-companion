@@ -25,9 +25,9 @@ export function LearnScreen() {
 
   return (
     <Screen>
-      <p className="eyebrow">Editable learning library</p>
+      <p className="eyebrow">Learning library</p>
       <h1 tabIndex={-1}>Learn</h1>
-      <p className="lede">Browse conservative draft education. Every published item is visibly provisional until expert approval.</p>
+      <p className="lede">Browse practical education about Ayurvedic concepts, routines, and using your check-ins.</p>
       <div className="content-filters">
         <label className="icon-label" htmlFor="learn-search"><SearchIcon aria-hidden="true" className="icon-leading" focusable="false" />Search articles</label>
         <input id="learn-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Try routine or Vata" />
@@ -45,7 +45,6 @@ export function LearnScreen() {
             <Link className="content-card" key={article.id} to={`/learn/${article.id}`}>
               <span className="content-card-header">
                 <Icon aria-hidden="true" className={`card-icon article-icon article-icon-${tone}`} focusable="false" weight="duotone" />
-                <span className="provisional-badge">{article.status === 'approved' ? 'Approved' : 'Provisional · not expert-approved'}</span>
               </span>
               <strong>{article.title}</strong>
               <span>{article.summary}</span>
@@ -71,7 +70,6 @@ export function ArticleScreen() {
   return (
     <Screen>
       <BackLink to="/learn" label="Learn" />
-      <p className="provisional-badge">{article.status === 'approved' ? 'Approved' : 'Provisional · not expert-approved'}</p>
       <p className="eyebrow">{formatCategory(article.category)}</p>
       <h1 tabIndex={-1}>{article.title}</h1>
       <p className="lede">{article.summary}</p>

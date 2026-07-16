@@ -5,6 +5,7 @@ import { getCheckInQuestionSet } from '../content/repository'
 import { initialAssessment } from '../generated/initialAssessment'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { CompleteIcon, QuestionsIcon } from '../ui/icons'
+import { useQuestionKeyboard } from '../quiz/useQuestionKeyboard'
 
 export function NewCheckInScreen() {
   const { dispatch } = usePrototype()
@@ -41,8 +42,21 @@ export function CheckInScreen() {
       dispatch({ type: 'complete-check-in', checkInId: checkIn.id, completedAt: new Date().toISOString() })
     }
   }, [checkIn, dispatch, index, questions.length])
+
+  function submit() {
+    if (!selected || !question || !checkIn) return
+    dispatch({ type: 'answer-check-in', checkInId: checkIn.id, questionId: question.id, answerId: selected })
+    if (index === questions.length - 1) dispatch({ type: 'complete-check-in', checkInId: checkIn.id, completedAt: new Date().toISOString() })
+  }
+
+  useQuestionKeyboard({
+    answerIds: question?.answers.map((answer) => answer.id) ?? [],
+    selectedId: selected,
+    onSelect: setSelected,
+    onConfirm: submit,
+  })
+
   if (!checkIn || !set) return <Navigate to="/questions" replace />
-  const activeCheckIn = checkIn
 
   if (checkIn.completedAt || !question) {
     if (!checkIn.completedAt) return <Screen><p role="status">Finishing check-in…</p></Screen>
@@ -51,21 +65,22 @@ export function CheckInScreen() {
     )
   }
 
-  function submit() {
-    if (!selected || !question) return
-    dispatch({ type: 'answer-check-in', checkInId: activeCheckIn.id, questionId: question.id, answerId: selected })
-    if (index === questions.length - 1) dispatch({ type: 'complete-check-in', checkInId: activeCheckIn.id, completedAt: new Date().toISOString() })
-  }
-
   return (
     <Screen className="question-screen">
-      <div className="assessment-topline"><Link to="/questions">Finish later</Link><Status>{state.saveStatus === 'saved' ? 'Saved on this device' : state.saveStatus}</Status></div>
-      <p className="eyebrow">{set.title}</p><div className="progress-copy"><span>Question {index + 1} of {questions.length}</span><span>Past seven days</span></div>
-      <progress value={index + 1} max={questions.length}>Question {index + 1} of {questions.length}</progress>
-      <h1 tabIndex={-1}>{question.text}</h1>
-      <fieldset className="answer-list"><legend className="sr-only">Choose one answer</legend>{question.answers.map((answer) => <label className={selected === answer.id ? 'answer-option selected' : 'answer-option'} key={answer.id}><input type="radio" name={question.id} checked={selected === answer.id} onChange={() => setSelected(answer.id)} /><span className="radio-mark" aria-hidden="true">{selected === answer.id ? '✓' : ''}</span><span>{answer.text}</span></label>)}</fieldset>
-      <button className="button primary icon-label" type="button" disabled={!selected} onClick={submit}>{index === questions.length - 1 ? <CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" /> : <QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />}{index === questions.length - 1 ? 'Complete check-in' : 'Continue'}</button>
-      <p className="boundary-note">Check-in answers are saved as a dated record and are not scored.</p>
+      <div className="question-fixed-header">
+        <div className="assessment-topline"><Link to="/questions">Finish later</Link><Status>{state.saveStatus === 'saved' ? 'Saved on this device' : state.saveStatus}</Status></div>
+        <div className="question-progress-row"><p className="eyebrow">{set.title}</p><div className="progress-copy"><span>Question {index + 1} of {questions.length}</span><span>Past seven days</span></div></div>
+        <progress value={index + 1} max={questions.length}>Question {index + 1} of {questions.length}</progress>
+      </div>
+      <div className="question-scroll-region">
+        <h1 tabIndex={-1}>{question.text}</h1>
+        <fieldset className="answer-list"><legend className="sr-only">Choose one answer</legend>{question.answers.map((answer) => <label className={selected === answer.id ? 'answer-option selected' : 'answer-option'} key={answer.id}><input type="radio" name={question.id} checked={selected === answer.id} onChange={() => setSelected(answer.id)} /><span className="radio-mark" aria-hidden="true">{selected === answer.id ? '✓' : ''}</span><span>{answer.text}</span></label>)}</fieldset>
+        <p className="boundary-note">Check-in answers are saved as a dated record and are not scored.</p>
+      </div>
+      <div className="question-action-shell">
+        <p className="keyboard-hint">Arrow keys to choose · Enter to continue</p>
+        <button className="button primary icon-label" type="button" disabled={!selected} onClick={submit}>{index === questions.length - 1 ? <CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" /> : <QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />}{index === questions.length - 1 ? 'Complete check-in' : 'Continue'}</button>
+      </div>
     </Screen>
   )
 }

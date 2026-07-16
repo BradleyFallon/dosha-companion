@@ -12,7 +12,7 @@ export const learningArticles: LearningArticle[] = [
   {
     "id": "ayurveda-basics",
     "title": "Ayurveda basics",
-    "summary": "A brief introduction to the tradition and how this demo uses its ideas.",
+    "summary": "A brief introduction to the tradition and how this app uses its ideas.",
     "category": "foundations",
     "tags": [
       "ayurveda",
@@ -25,7 +25,7 @@ export const learningArticles: LearningArticle[] = [
       "doshas-as-concepts",
       "nature-and-current-balance"
     ],
-    "body": "Ayurveda is a traditional system of knowledge that developed in South Asia. It includes many ways of thinking about daily routine, food, environment, and individual patterns.\n\nThis demo uses a narrow educational subset of those ideas. It helps you notice self-reported patterns and offers conservative wellness prompts. It does not reproduce the full tradition or provide clinical Ayurvedic care.\n\n## What this demo can do\n\n- Explain basic terms in plain language.\n- Keep your usual tendencies separate from recent experience.\n- Offer small, general actions from an editable content catalog.\n- Show why a recommendation was selected.\n\n## What it cannot do\n\nThe demo does not diagnose a condition, calculate an expert-approved dosha result, recommend treatment, or replace medical care. All currently published app content is marked provisional until expert review is complete."
+    "body": "Ayurveda is a traditional system of knowledge that developed in South Asia. It includes many ways of thinking about daily routine, food, environment, and individual patterns.\n\nThis app uses a narrow educational subset of those ideas. It helps you notice self-reported patterns and offers conservative wellness prompts. It does not reproduce the full tradition or provide clinical Ayurvedic care.\n\n## What this app can do\n\n- Explain basic terms in plain language.\n- Keep your usual tendencies separate from recent experience.\n- Offer small, general actions from an editable content catalog.\n- Show why a recommendation was selected.\n\n## What it cannot do\n\nThe app does not diagnose a condition, calculate a dosha result, recommend treatment, or replace medical care."
   },
   {
     "id": "doshas-as-concepts",
@@ -46,7 +46,7 @@ export const learningArticles: LearningArticle[] = [
       "pitta",
       "kapha"
     ],
-    "body": "Ayurvedic traditions use Vata, Pitta, and Kapha as organizing concepts. They are often used to describe clusters of qualities, tendencies, and patterns rather than isolated facts.\n\n## Educational, not diagnostic\n\nIn this demo, dosha language is educational. No label is inferred from your answers because the numerical scoring model has not been approved. A single answer should never be treated as proof of a constitution or imbalance.\n\n## Patterns need context\n\nAge, climate, culture, routine, illness, medication, and recent life changes can all affect self-report. That is why the assessment keeps usual nature separate from recent experience and preserves an honest “not sure” option."
+    "body": "Ayurvedic traditions use Vata, Pitta, and Kapha as organizing concepts. They are often used to describe clusters of qualities, tendencies, and patterns rather than isolated facts.\n\n## Educational, not diagnostic\n\nIn this app, dosha language is educational. No label is inferred from your answers. A single answer should never be treated as proof of a constitution or imbalance.\n\n## Patterns need context\n\nAge, climate, culture, routine, illness, medication, and recent life changes can all affect self-report. That is why the assessment keeps usual nature separate from recent experience and preserves an honest “not sure” option."
   },
   {
     "id": "kapha",
@@ -64,7 +64,7 @@ export const learningArticles: LearningArticle[] = [
       "doshas-as-concepts",
       "nature-and-current-balance"
     ],
-    "body": "Kapha is commonly described through qualities such as steadiness, heaviness, coolness, smoothness, and stability. Traditional descriptions may connect these qualities with endurance, structure, and other patterns.\n\nThese associations are broad educational ideas, not medical findings. Different qualities can appear together, and no single observation establishes a dosha profile.\n\nThis demo will not calculate a Kapha result until experts approve both answer mappings and the scoring model."
+    "body": "Kapha is commonly described through qualities such as steadiness, heaviness, coolness, smoothness, and stability. Traditional descriptions may connect these qualities with endurance, structure, and other patterns.\n\nThese associations are broad educational ideas, not medical findings. Different qualities can appear together, and no single observation establishes a dosha profile.\n\nThe app does not calculate a Kapha result from your answers."
   },
   {
     "id": "nature-and-current-balance",
@@ -83,7 +83,7 @@ export const learningArticles: LearningArticle[] = [
       "self-assessment",
       "doshas-as-concepts"
     ],
-    "body": "The assessment separates two timeframes so a temporary experience is not mistaken for a long-term tendency.\n\n## Your usual nature\n\nThese questions ask about patterns across your adult life when you are generally well. They are intended to provide baseline information for a future expert-approved interpretation.\n\n## Your current balance\n\nThese questions ask about the past seven days. They can be repeated as check-ins because sleep, energy, appetite, routine, and other experiences can change.\n\nThe current demo reports answer coverage only. It does not turn either set of answers into a dosha label."
+    "body": "The assessment separates two timeframes so a temporary experience is not mistaken for a long-term tendency.\n\n## Your usual nature\n\nThese questions ask about patterns across your adult life when you are generally well. They provide baseline information that remains separate from recent check-ins.\n\n## Your current balance\n\nThese questions ask about the past seven days. They can be repeated as check-ins because sleep, energy, appetite, routine, and other experiences can change.\n\nThe app currently reports answer coverage only. It does not turn either set of answers into a dosha label."
   },
   {
     "id": "pitta",
@@ -101,16 +101,15 @@ export const learningArticles: LearningArticle[] = [
       "doshas-as-concepts",
       "nature-and-current-balance"
     ],
-    "body": "Pitta is commonly described through qualities such as warmth, sharpness, intensity, and transformation. Traditional descriptions may connect these qualities with appetite, focus, and other patterns.\n\nThese associations are broad educational ideas, not medical findings. Context matters, and a recent experience should not be used alone to assign a lasting label.\n\nThis demo will not calculate a Pitta result until experts approve both answer mappings and the scoring model."
+    "body": "Pitta is commonly described through qualities such as warmth, sharpness, intensity, and transformation. Traditional descriptions may connect these qualities with appetite, focus, and other patterns.\n\nThese associations are broad educational ideas, not medical findings. Context matters, and a recent experience should not be used alone to assign a lasting label.\n\nThe app does not calculate a Pitta result from your answers."
   },
   {
     "id": "provisional-guidance",
-    "title": "Understanding provisional guidance",
-    "summary": "How Today recommendations are selected and what their status label means.",
+    "title": "How Today chooses guidance",
+    "summary": "How Today recommendations are selected and why they remain understandable.",
     "category": "using-the-app",
     "tags": [
       "recommendations",
-      "provisional",
       "safety",
       "routine"
     ],
@@ -120,7 +119,7 @@ export const learningArticles: LearningArticle[] = [
       "routine-and-consistency",
       "self-assessment"
     ],
-    "body": "Every Today recommendation currently carries the label “Provisional · not expert-approved.” This means an editor can review the experience, but the material has not completed the product’s expert approval process.\n\n## How selection works\n\nThe app filters the local catalog for published, eligible content. It considers a small set of explicit inputs such as a major-change answer, current check-in coverage, local time, and recent recommendation history. The same inputs produce an understandable result.\n\nNo dosha score, diagnosis, symptom analysis, or AI model is used. You can complete, dismiss, or replace a recommendation, and the browser stores that small history locally."
+    "body": "Today presents one clear focus selected from the published content catalog.\n\n## How selection works\n\nThe app filters the local catalog for published, eligible content. It considers a small set of explicit inputs such as a major-change answer, current check-in coverage, local time, and recent recommendation history. The same inputs produce an understandable result.\n\nNo dosha score, diagnosis, symptom analysis, or AI model is used. You can complete, dismiss, or replace a recommendation, and the browser stores that small history locally."
   },
   {
     "id": "routine-and-consistency",
@@ -139,7 +138,7 @@ export const learningArticles: LearningArticle[] = [
       "provisional-guidance",
       "nature-and-current-balance"
     ],
-    "body": "When a day feels changeable or crowded, one familiar point can be easier to use than a complete routine overhaul. A routine anchor might be a regular wake time, a familiar meal window, a short pause, or a clear stopping point.\n\nThe goal of the prompts in this demo is modest: choose one action that is understandable and realistic. Completing a prompt is not a health outcome, and dismissing it does not count against you.\n\nIf your needs relate to illness, injury, medication, or significant distress, general routine content is not a substitute for qualified care."
+    "body": "When a day feels changeable or crowded, one familiar point can be easier to use than a complete routine overhaul. A routine anchor might be a regular wake time, a familiar meal window, a short pause, or a clear stopping point.\n\nThe goal of these prompts is modest: choose one action that is understandable and realistic. Completing a prompt is not a health outcome, and dismissing it does not count against you.\n\nIf your needs relate to illness, injury, medication, or significant distress, general routine content is not a substitute for qualified care."
   },
   {
     "id": "self-assessment",
@@ -158,7 +157,7 @@ export const learningArticles: LearningArticle[] = [
       "nature-and-current-balance",
       "provisional-guidance"
     ],
-    "body": "Self-assessment can help you notice patterns, but it has limits. Answers may change with memory, interpretation, environment, illness, or a recent event.\n\n## Coverage is not certainty\n\nThis demo reports whether enough substantive answers were submitted for the provisional product gate. “Not sure” is a valid submitted response, while a skipped question remains open. Coverage does not mean the app is clinically confident.\n\n## Check-ins are separate records\n\nRepeatable current check-ins are saved with their own date and answers. They do not overwrite your long-term baseline answers. No dosha interpretation is applied to check-ins in this milestone."
+    "body": "Self-assessment can help you notice patterns, but it has limits. Answers may change with memory, interpretation, environment, illness, or a recent event.\n\n## Coverage is not certainty\n\nThe app reports whether enough substantive answers were submitted for the coverage gate. “Not sure” is a valid submitted response, while a skipped question remains open. Coverage does not mean the app is clinically confident.\n\n## Check-ins are separate records\n\nRepeatable current check-ins are saved with their own date and answers. They do not overwrite your long-term baseline answers. No dosha interpretation is applied to check-ins in this milestone."
   },
   {
     "id": "vata",
@@ -176,7 +175,7 @@ export const learningArticles: LearningArticle[] = [
       "doshas-as-concepts",
       "nature-and-current-balance"
     ],
-    "body": "Vata is commonly described through qualities such as movement, lightness, dryness, coolness, and variability. Traditional descriptions may connect these qualities with changing routines, movement, and other patterns.\n\nThese associations are broad educational ideas, not medical findings. People can recognize different qualities at different times, and one observation does not establish a dosha profile.\n\nThis demo will not calculate a Vata result until experts approve both answer mappings and the scoring model."
+    "body": "Vata is commonly described through qualities such as movement, lightness, dryness, coolness, and variability. Traditional descriptions may connect these qualities with changing routines, movement, and other patterns.\n\nThese associations are broad educational ideas, not medical findings. People can recognize different qualities at different times, and one observation does not establish a dosha profile.\n\nThe app does not calculate a Vata result from your answers."
   }
 ]
 
@@ -185,7 +184,7 @@ export const recommendationCatalog: RecommendationContent[] = [
     "id": "physical-change-boundary",
     "title": "Keep today’s guidance general",
     "summary": "A safety boundary for a reported major physical change.",
-    "guidance": "A major physical change can make stronger personalization inappropriate in this demo. Stay with familiar, low-stakes routines and seek qualified advice for care decisions.",
+    "guidance": "A major physical change can make stronger personalization inappropriate. Stay with familiar, low-stakes routines and seek qualified advice for care decisions.",
     "action": "Keep your routine familiar and do not use this app to change medical care.",
     "category": "safety",
     "contexts": [
@@ -212,7 +211,7 @@ export const recommendationCatalog: RecommendationContent[] = [
     "id": "travel-one-anchor",
     "title": "Choose one reliable anchor",
     "summary": "A small routine anchor for travel or a disrupted schedule.",
-    "guidance": "Travel or a major schedule change can make the day harder to orient around. One familiar point is enough for this provisional suggestion.",
+    "guidance": "Travel or a major schedule change can make the day harder to orient around. One familiar point is enough for today.",
     "action": "Choose one consistent meal, rest, or wake-time cue for today.",
     "category": "routine",
     "contexts": [
@@ -341,7 +340,7 @@ export const recommendationCatalog: RecommendationContent[] = [
       "all"
     ],
     "exclusionPolicy": "general-only",
-    "rationale": "Selected because current substantive coverage is below the provisional product gate."
+    "rationale": "Selected because current substantive coverage is below the coverage gate."
   },
   {
     "id": "review-recent-patterns",
@@ -601,7 +600,7 @@ export const glossaryEntries: GlossaryEntry[] = [
   {
     "id": "ayurveda",
     "term": "Ayurveda",
-    "definition": "A traditional system of knowledge developed in South Asia; this demo uses only a narrow educational subset.",
+    "definition": "A traditional system of knowledge developed in South Asia; this app uses a narrow educational subset.",
     "aliases": [],
     "relatedArticleId": "ayurveda-basics",
     "status": "provisional",
@@ -672,7 +671,7 @@ export const glossaryEntries: GlossaryEntry[] = [
   {
     "id": "coverage",
     "term": "Coverage",
-    "definition": "A provisional product measure of submitted and substantive answers; it is not diagnostic or clinical confidence.",
+    "definition": "A product measure of submitted and substantive answers; it is not diagnostic or clinical confidence.",
     "aliases": [
       "assessment coverage"
     ],

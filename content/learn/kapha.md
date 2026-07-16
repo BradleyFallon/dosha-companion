@@ -6,4 +6,4 @@ Kapha is commonly described through qualities such as steadiness, heaviness, coo
 
 These associations are broad educational ideas, not medical findings. Different qualities can appear together, and no single observation establishes a dosha profile.
 
-This demo will not calculate a Kapha result until experts approve both answer mappings and the scoring model.
+The app does not calculate a Kapha result from your answers.

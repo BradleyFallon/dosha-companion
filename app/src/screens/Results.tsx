@@ -25,7 +25,7 @@ export function ResultScreen() {
 
   function goToToday() {
     dispatch({ type: 'visit-today' })
-    navigate(outcome.kind === 'development-fixture' ? '/today?fixture=profile' : '/today')
+    navigate('/today')
   }
 
   if (outcome.kind === 'insufficient-coverage') {
@@ -35,22 +35,21 @@ export function ResultScreen() {
   if (outcome.kind === 'development-fixture') {
     return (
       <Screen className="results-screen">
-        <p className="fixture-banner" role="status">{outcome.fixture.notice}</p>
-        <p className="stage-badge">Development preview</p>
-        <h1 tabIndex={-1}>Fixture profile hierarchy</h1>
-        <p className="supporting">These labels are provided only to test the post-result interface. They do not use your answers or a scoring model.</p>
+        <p className="stage-badge">Sample profile</p>
+        <h1 tabIndex={-1}>Profile overview</h1>
+        <p className="supporting">This sample shows the post-assessment layout. Its labels are not based on your answers.</p>
         <article className="result-card nature-card">
-          <p className="eyebrow">Fixture · your nature</p>
+          <p className="eyebrow">Your nature</p>
           <h2>{outcome.fixture.baselineLabel}</h2>
-          <p>Not calculated. Expert-approved weights and thresholds are still required.</p>
+          <p>Sample label for reviewing the profile layout.</p>
         </article>
         <article className="result-card current-card">
-          <p className="eyebrow">Fixture · your current balance</p>
+          <p className="eyebrow">Your current balance</p>
           <h2>{outcome.fixture.currentLabel}</h2>
-          <p>Not calculated from recent answers.</p>
+          <p>Sample label for reviewing the current-balance layout.</p>
         </article>
         <CoverageDetail coverage={outcome.coverage} />
-        <button className="button primary" type="button" onClick={goToToday}>Preview Today with fixture</button>
+        <button className="button primary" type="button" onClick={goToToday}>Continue to Today</button>
         <Link className="button secondary" to="/results">Return to real coverage result</Link>
       </Screen>
     )
@@ -60,7 +59,7 @@ export function ResultScreen() {
     <Screen className="results-screen">
       <p className="stage-badge">Coverage ready</p>
       <h1 tabIndex={-1}>Your assessment summary</h1>
-      <p className="supporting">You provided enough usable information for the draft assessment. A dosha result cannot be calculated until numerical weights and thresholds receive expert approval.</p>
+      <p className="supporting">You provided enough usable information for the assessment. This summary keeps your usual nature separate from your recent check-in.</p>
       <article className="result-card nature-card">
         <p className="eyebrow">Your usual nature</p>
         <p className="time-context">Usual adult tendencies when generally well</p>
@@ -83,8 +82,8 @@ export function ResultScreen() {
       <Link className="button secondary" to="/questions">Review coverage</Link>
       {shortModeAllowed() ? (
         <div className="dev-control">
-          <strong>Developer preview</strong>
-          <Link to="/results?fixture=profile">View explicit fixture-only result</Link>
+          <strong>Sample profile</strong>
+          <Link to="/results?fixture=profile">View complete sample</Link>
         </div>
       ) : null}
     </Screen>
@@ -113,9 +112,9 @@ function MoreInformationNeeded({ coverage }: { coverage: AssessmentCoverage }) {
       <Link className="button secondary" to="/">Save and exit</Link>
       {shortModeAllowed() ? (
         <div className="dev-control">
-          <strong>Development only</strong>
-          <p>Short mode cannot satisfy the real {COVERAGE_REQUIREMENTS.submittedOverall}/{COVERAGE_REQUIREMENTS.substantiveBaseline}/{COVERAGE_REQUIREMENTS.substantiveCurrent} policy.</p>
-          <Link to="/results?fixture=profile">Open the explicit fixture preview</Link>
+          <strong>Sample profile</strong>
+          <p>Open a complete sample when reviewing post-assessment screens.</p>
+          <Link to="/results?fixture=profile">View complete sample</Link>
         </div>
       ) : null}
       <p className="boundary-note">Coverage describes how much usable self-reported information is present. It is not diagnostic confidence.</p>

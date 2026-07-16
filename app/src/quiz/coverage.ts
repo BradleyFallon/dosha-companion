@@ -1,6 +1,6 @@
 import { initialAssessment } from '../generated/initialAssessment'
 
-export const COVERAGE_POLICY_VERSION = 'coverage-policy-0.1-provisional'
+export const COVERAGE_POLICY_VERSION = 'coverage-policy-0.1'
 
 export const COVERAGE_REQUIREMENTS = {
   submittedOverall: 22,

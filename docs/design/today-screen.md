@@ -20,13 +20,13 @@ Today is the post-assessment home and primary retention surface. It turns the la
 
 6. Optional compatible food suggestion
 7. “Why this was chosen” disclosure
-8. Related approved learning content
-9. Available-question indicator
-10. AI assistant entry point
+8. Stable “Your guide” links for usual nature, food preferences, and local rhythms
+9. Related learning content
+10. Available-question indicator and Guided help entry point
 
 ## Content responsibility
 
-- The limited MVP uses a very small provisional content set; every item is labeled `Provisional · not expert-approved`.
+- Editorial review status stays in structured content metadata and editor tooling rather than appearing as a repeated badge in the reader experience.
 - Deterministic rules choose the underlying guidance from context, coverage, profile exclusions, and saved-time-zone time of day.
 - “Why this was chosen” exposes the exact matched rule and states that no dosha score was used.
 - The limited MVP does not place automatically generated AI prose on Today.

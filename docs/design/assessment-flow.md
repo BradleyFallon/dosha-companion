@@ -40,7 +40,7 @@ flowchart TD
 | State | User sees | Primary action | Alternate actions |
 | ----- | --------- | -------------- | ----------------- |
 | Welcome | Product category, tagline, brief value, boundary link | Create account | Sign in; wellness disclaimer |
-| Profile 1 | Preferred name and age band | Continue | Back |
+| Profile 1 | Preferred name and optional year of birth | Continue | Back |
 | Profile 2 | Optional device location, adjustable map pin, and units | Use this location | Choose on map; manual search; skip; back |
 | Profile 3 | Dietary pattern, allergies, exclusions | Save and continue | Back; skip optional fields |
 | Assessment intro | Time, two sections, saving, skip, educational boundary | Begin assessment | Exit |
@@ -60,6 +60,7 @@ flowchart TD
 - Repeat or clearly imply the relevant time window in the prompt.
 - Show optional help only when requested; opening help must not reset selection.
 - Use full-width answer buttons with at least 44 px height and sufficient spacing.
+- Keep compact progress chrome and bottom actions fixed to the viewport; only the question-and-answer region scrolls.
 - Keep “Not sure” in the answer list because it is a stored response.
 - Keep “Skip for now” outside the answer list because it means no answer was submitted.
 
@@ -71,6 +72,8 @@ flowchart TD
 4. Continue saves the selected answer and advances when persistence succeeds.
 5. Back returns to the previous question with its selected answer preserved.
 6. Editing an already saved answer creates the appropriate superseding record in production behavior.
+
+On keyboard-capable browsers, Left/Up and Right/Down move through answers with wrapping. Enter confirms the selected answer. Keyboard shortcuts do not take over while a link, button, text field, or disclosure has focus.
 
 ### Saving and connectivity
 
@@ -106,7 +109,7 @@ The prototype must support both outcomes:
 - **Requirements met:** show coverage-ready baseline/current counts and explain that dosha scoring is unavailable.
 - **More information needed:** explain that a few important areas lack coverage and present the highest-priority missing question.
 
-The limited MVP versions the documented 22 submitted / 14 substantive baseline / 4 substantive current gate as `coverage-policy-0.1-provisional`. It reports category coverage without making categories blocking because canonical set items mark none as required. The gate is a product-testing rule, not scoring confidence or medical certainty.
+The limited MVP versions the documented 22 submitted / 14 substantive baseline / 4 substantive current gate as `coverage-policy-0.1`. It reports category coverage without making categories blocking because canonical set items mark none as required. The gate is a product-testing rule, not scoring confidence or medical certainty.
 
 ## Prototype test scenarios
 

@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Screen } from '../components/Layout'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { calculateAssessmentCoverage } from '../quiz/coverage'
 import { selectDailyRecommendation } from '../content/recommendations'
-import { shortModeAllowed } from '../quiz/assessment'
 import {
   BalanceIcon,
   CompleteIcon,
@@ -13,6 +12,8 @@ import {
   ForwardIcon,
   GuidedHelpIcon,
   LearnIcon,
+  LocationIcon,
+  NatureIcon,
   QuestionsIcon,
   SettingsIcon,
   ShowAnotherIcon,
@@ -21,11 +22,8 @@ import {
 
 export function TodayScreen() {
   const { state, dispatch } = usePrototype()
-  const location = useLocation()
   const [whyOpen, setWhyOpen] = useState(false)
   const name = state.profile.preferredName || 'there'
-  const fixtureActive =
-    shortModeAllowed() && new URLSearchParams(location.search).get('fixture') === 'profile'
   const coverage = calculateAssessmentCoverage({
     submittedAnswers: state.submittedAnswers,
     skippedQuestionIds: state.skippedQuestionIds,
@@ -36,7 +34,6 @@ export function TodayScreen() {
     submittedAnswers: state.submittedAnswers,
     recommendationHistory: state.recommendationHistory,
     activeRecommendationId: state.todayRecommendationId,
-    fixtureActive,
   })
   const currentRecord = state.recommendationHistory.find((record) =>
     record.recommendationId === recommendation.id && record.date === recommendation.selectionDate,
@@ -61,7 +58,6 @@ export function TodayScreen() {
 
   return (
     <Screen className="today-screen">
-      {fixtureActive ? <p className="fixture-banner">Development fixture visible · not calculated from your answers</p> : null}
       <header className="today-header">
         <div><p className="eyebrow">{date}</p><h1 tabIndex={-1}>{greeting}, {name}</h1></div>
         <Link className="settings-shortcut icon-label" to="/settings" aria-label="Open profile settings"><SettingsIcon aria-hidden="true" className="icon-leading" focusable="false" />Settings</Link>
@@ -74,8 +70,8 @@ export function TodayScreen() {
         </span>
         <ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" />
       </Link>
+      <p className="eyebrow today-feed-label">For today</p>
       <article className="daily-focus">
-        <p className="provisional-badge">{recommendation.label}</p>
         <p className="eyebrow">Today’s focus</p>
         <h2>{recommendation.title}</h2>
         <p>{recommendation.guidance}</p>
@@ -93,7 +89,6 @@ export function TodayScreen() {
         <Link className="text-link icon-label" to={`/learn/${recommendation.relatedArticleId}`}><LearnIcon aria-hidden="true" className="icon-leading" focusable="false" />Read related guidance<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></Link>
       </article>
       <section className={recommendation.food.status === 'withheld' ? 'today-secondary withheld' : 'today-secondary'} aria-labelledby="food-title">
-        <p className="provisional-badge">{recommendation.label}</p>
         <p className="eyebrow">Optional food prompt</p>
         <h2 className="section-title-with-icon" id="food-title"><FoodIcon aria-hidden="true" className="icon-leading" focusable="false" weight="duotone" />{recommendation.food.title}</h2>
         <p>{recommendation.food.body}</p>
@@ -107,6 +102,27 @@ export function TodayScreen() {
           <p>{recommendation.food.reason}</p>
         </div>
       ) : null}
+      <section className="today-guide" aria-labelledby="today-guide-title">
+        <p className="eyebrow">Keep close</p>
+        <h2 id="today-guide-title">Your guide</h2>
+        <div className="today-guide-grid">
+          <Link to="/balance">
+            <NatureIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" />
+            <span><strong>Your usual nature</strong><small>Assessment and check-in history</small></span>
+            <ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" />
+          </Link>
+          <Link to="/settings">
+            <FoodIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" />
+            <span><strong>Food preferences</strong><small>{state.profile.dietaryPattern || 'No dietary pattern saved'}</small></span>
+            <ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" />
+          </Link>
+          <Link to="/profile/location">
+            <LocationIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" />
+            <span><strong>Local rhythms</strong><small>{state.profile.location?.displayLabel || (state.profile.location?.areaId ? 'General area saved' : 'Add a general area')}</small></span>
+            <ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" />
+          </Link>
+        </div>
+      </section>
       <Link className="question-count" to="/questions">
         <span className="card-link-heading"><QuestionsIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" /><strong>{coverage.ready ? 'Review assessment coverage' : 'More information is useful'}</strong></span>
         <span className="icon-label">{coverage.ready ? 'See answer coverage' : 'Answer the next useful question'}<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></span>

@@ -6,7 +6,7 @@
 
 The application deliberately does not read `data/quiz/answer-scores.csv` because all numerical weight and reliability fields remain blank. It does not infer weights from the directional rationale text.
 
-The limited MVP implements `coverage-policy-0.1-provisional` around this future scoring boundary:
+The limited MVP implements `coverage-policy-0.1` around this future scoring boundary:
 
 - 22 submitted answers overall, where explicit fallback answers count as submitted and skips do not
 - 14 substantive baseline answers

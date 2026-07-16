@@ -6,4 +6,4 @@ Vata is commonly described through qualities such as movement, lightness, drynes
 
 These associations are broad educational ideas, not medical findings. People can recognize different qualities at different times, and one observation does not establish a dosha profile.
 
-This demo will not calculate a Vata result until experts approve both answer mappings and the scoring model.
+The app does not calculate a Vata result from your answers.
