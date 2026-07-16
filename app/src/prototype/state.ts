@@ -4,7 +4,7 @@ import type { AssessmentMode } from '../quiz/assessment'
 import { getAssessmentQuestions } from '../quiz/assessment'
 
 export const STORAGE_KEY = 'dosha-companion-prototype-state'
-export const STORAGE_VERSION = 4
+export const STORAGE_VERSION = 5
 
 export type SaveStatus = 'saved' | 'saving' | 'not-saved'
 
@@ -13,6 +13,8 @@ export interface LocationProfile {
   latitude: number | null
   longitude: number | null
   accuracyMeters: number | null
+  areaId: string | null
+  precisionKm: number | null
   timeZone: string
   units: 'us' | 'metric'
   displayLabel: string | null
@@ -20,7 +22,7 @@ export interface LocationProfile {
 
 export interface ProfileState {
   preferredName: string
-  ageBand: string
+  birthYear: string
   location: LocationProfile | null
   dietaryPattern: string
   allergies: string
@@ -91,7 +93,7 @@ export const defaultState: PrototypeState = {
   accountCreated: false,
   profile: {
     preferredName: '',
-    ageBand: '',
+    birthYear: '',
     location: null,
     dietaryPattern: '',
     allergies: '',
@@ -252,7 +254,7 @@ export function prototypeReducer(
   }
 }
 
-interface PersistedStateV3 {
+interface PersistedState {
   version: typeof STORAGE_VERSION
   state: Omit<PrototypeState, 'selectedAnswerId' | 'saveStatus' | 'restoreNotice'>
 }
@@ -268,7 +270,7 @@ export interface PersistenceResult {
 }
 
 export function serializeState(state: PrototypeState): string {
-  const persisted: PersistedStateV3 = {
+  const persisted: PersistedState = {
     version: STORAGE_VERSION,
     state: {
       accountCreated: state.accountCreated,
@@ -301,14 +303,19 @@ export function coarsenLocationForStorage(
     return location
   }
 
+  const latitude = Number((Math.round(location.latitude * 10) / 10).toFixed(1))
+  const longitude = Number((Math.round(location.longitude * 10) / 10).toFixed(1))
+
   return {
     ...location,
-    latitude: Number(location.latitude.toFixed(2)),
-    longitude: Number(location.longitude.toFixed(2)),
+    latitude,
+    longitude,
     accuracyMeters:
       location.accuracyMeters === null
-        ? 1_000
-        : Math.max(Math.round(location.accuracyMeters), 1_000),
+        ? 10_000
+        : Math.max(Math.round(location.accuracyMeters), 10_000),
+    areaId: `grid-v1:${latitude.toFixed(1)}:${longitude.toFixed(1)}`,
+    precisionKm: 10,
   }
 }
 
@@ -405,6 +412,8 @@ function migrateV1(rawState: Record<string, unknown>) {
         latitude: null,
         longitude: null,
         accuracyMeters: null,
+        areaId: null,
+        precisionKm: null,
         timeZone: browserTimeZone(),
         units: rawProfile.units === 'metric' ? 'metric' : 'us',
         displayLabel: label,
@@ -424,9 +433,7 @@ function sanitizeState(raw: Record<string, unknown>): PrototypeState {
   const rawProfile = isRecord(raw.profile) ? raw.profile : {}
   const profile: ProfileState = {
     preferredName: sanitizeString(rawProfile.preferredName, 80),
-    ageBand: sanitizeEnum(rawProfile.ageBand, [
-      '', '18–24', '25–34', '35–44', '45–54', '55–64', '65+', 'Prefer not to say',
-    ]),
+    birthYear: sanitizeBirthYear(rawProfile.birthYear),
     location: sanitizeLocation(rawProfile.location),
     dietaryPattern: sanitizeEnum(rawProfile.dietaryPattern, [
       '', 'Omnivore', 'Vegetarian', 'Vegan', 'Pescatarian', 'Other',
@@ -560,13 +567,29 @@ function sanitizeLocation(value: unknown): LocationProfile | null {
   if (source === 'device' && (latitude === null || longitude === null)) return null
   if (source === 'map' && (latitude === null || longitude === null) && !displayLabel) return null
 
+  const coarse = latitude === null || longitude === null
+    ? null
+    : coarsenLocationForStorage({
+        source,
+        latitude,
+        longitude,
+        accuracyMeters: nullableNumber(value.accuracyMeters, 0, 1_000_000),
+        areaId: null,
+        precisionKm: null,
+        timeZone: sanitizeString(value.timeZone, 100) || browserTimeZone(),
+        units: value.units === 'metric' ? 'metric' : 'us',
+        displayLabel,
+      })
+
   return {
     source,
-    latitude: source === 'skipped' ? null : latitude,
-    longitude: source === 'skipped' ? null : longitude,
+    latitude: source === 'skipped' ? null : coarse?.latitude ?? null,
+    longitude: source === 'skipped' ? null : coarse?.longitude ?? null,
     accuracyMeters: source === 'skipped'
       ? null
-      : nullableNumber(value.accuracyMeters, 0, 1_000_000),
+      : coarse?.accuracyMeters ?? null,
+    areaId: source === 'skipped' ? null : coarse?.areaId ?? null,
+    precisionKm: source === 'skipped' ? null : coarse?.precisionKm ?? null,
     timeZone: sanitizeString(value.timeZone, 100) || browserTimeZone(),
     units: value.units === 'metric' ? 'metric' : 'us',
     displayLabel,
@@ -584,6 +607,14 @@ function sanitizeNullableString(value: unknown, maxLength: number) {
 
 function sanitizeEnum<const T extends readonly string[]>(value: unknown, allowed: T): T[number] {
   return allowed.includes(value as T[number]) ? value as T[number] : allowed[0]
+}
+
+function sanitizeBirthYear(value: unknown) {
+  const text = typeof value === 'number' ? String(value) : sanitizeString(value, 4)
+  if (!/^\d{4}$/.test(text)) return ''
+  const year = Number(text)
+  const currentYear = new Date().getFullYear()
+  return year >= currentYear - 120 && year <= currentYear - 18 ? text : ''
 }
 
 function nullableNumber(value: unknown, minimum: number, maximum: number) {
@@ -635,8 +666,8 @@ export function createDemoState(now = new Date()): PrototypeState {
     accountCreated: true,
     profile: {
       preferredName: 'Demo Editor',
-      ageBand: 'Prefer not to say',
-      location: { source: 'skipped', latitude: null, longitude: null, accuracyMeters: null, timeZone: browserTimeZone(), units: 'us', displayLabel: null },
+      birthYear: '',
+      location: { source: 'skipped', latitude: null, longitude: null, accuracyMeters: null, areaId: null, precisionKm: null, timeZone: browserTimeZone(), units: 'us', displayLabel: null },
       dietaryPattern: 'Vegetarian',
       allergies: '',
       exclusions: '',

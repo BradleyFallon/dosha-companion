@@ -1,5 +1,7 @@
 # User Profile Variables for Dosha Companion
 
+> Product implementation note: the current onboarding flow collects an optional year of birth rather than the age-band recommendation in this research document. It stores no month or day and derives age context only when needed.
+
 ## Executive summary
 
 For a mobile-first consumer web app, the strongest evidence-backed pattern is to keep **account and onboarding data minimal**, and move most **dosha-relevant information into the question stream**. Official Indian Ayurveda bodies and modern reviews consistently describe prakriti assessment as relying on **physical, physiological, psychological, and behavioral traits**; modern tools also use anthropometric or observational items, but reviews note that many published tools remain heterogeneous and only partially validated. That makes a **deterministic, transparent, versioned scoring model** a better fit for an MVP than a black-box classifier or free-form LLM scoring.[^ccras-manual][^critical-review][^scoping-review]

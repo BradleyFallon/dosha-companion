@@ -14,17 +14,20 @@ import {
   StorageIcon,
   WarningIcon,
 } from '../ui/icons'
+import { birthYearBounds, birthYearError, birthYearInput } from '../profile/birthYear'
 
 export function SettingsScreen() {
   const { state, dispatch, resetPrototype, seedDemo } = usePrototype()
   const navigate = useNavigate()
   const [preferredName, setPreferredName] = useState(state.profile.preferredName)
-  const [ageBand, setAgeBand] = useState(state.profile.ageBand)
+  const [birthYear, setBirthYear] = useState(state.profile.birthYear)
   const [dietaryPattern, setDietaryPattern] = useState(state.profile.dietaryPattern)
   const [allergies, setAllergies] = useState(state.profile.allergies)
   const [exclusions, setExclusions] = useState(state.profile.exclusions)
   const [error, setError] = useState('')
+  const [yearError, setYearError] = useState('')
   const [dataMessage, setDataMessage] = useState('')
+  const { minimum, maximum } = birthYearBounds()
 
   function save(event: FormEvent) {
     event.preventDefault()
@@ -32,12 +35,18 @@ export function SettingsScreen() {
       setError('Enter the name you would like us to use.')
       return
     }
+    const invalidYear = birthYearError(birthYear)
+    if (invalidYear) {
+      setYearError(invalidYear)
+      return
+    }
     setError('')
+    setYearError('')
     dispatch({
       type: 'update-profile',
       values: {
         preferredName: preferredName.trim(),
-        ageBand,
+        birthYear,
         dietaryPattern,
         allergies: allergies.trim(),
         exclusions: exclusions.trim(),
@@ -62,7 +71,7 @@ export function SettingsScreen() {
   }
 
   function loadDemo() {
-    if (!window.confirm('Replace this browser-local session with representative demo data?')) return
+    if (!window.confirm('Replace this browser-local session with an example profile?')) return
     seedDemo()
     navigate('/today')
   }
@@ -85,11 +94,9 @@ export function SettingsScreen() {
         <label htmlFor="settings-name">Preferred name</label>
         <input id="settings-name" value={preferredName} onChange={(event) => setPreferredName(event.target.value)} aria-describedby={error ? 'settings-name-error' : undefined} />
         {error ? <p className="field-error" id="settings-name-error" role="alert">{error}</p> : null}
-        <label htmlFor="settings-age">Age band <span className="optional">Optional</span></label>
-        <select id="settings-age" value={ageBand} onChange={(event) => setAgeBand(event.target.value)}>
-          <option value="">Select an age band</option>
-          <option>18–24</option><option>25–34</option><option>35–44</option><option>45–54</option><option>55–64</option><option>65+</option><option>Prefer not to say</option>
-        </select>
+        <label htmlFor="settings-birth-year">Year of birth <span className="optional">Optional</span></label>
+        <input id="settings-birth-year" type="text" inputMode="numeric" autoComplete="bday-year" pattern="[0-9]{4}" placeholder="YYYY" minLength={4} maxLength={4} value={birthYear} onChange={(event) => setBirthYear(birthYearInput(event.target.value))} aria-describedby={yearError ? 'settings-birth-year-error' : 'settings-birth-year-hint'} />
+        {yearError ? <p className="field-error" id="settings-birth-year-error" role="alert">{yearError}</p> : <p className="field-hint" id="settings-birth-year-hint">Enter a year from {minimum} to {maximum}. We do not need your full birth date.</p>}
         <label htmlFor="settings-diet">Dietary pattern <span className="optional">Optional</span></label>
         <select id="settings-diet" value={dietaryPattern} onChange={(event) => setDietaryPattern(event.target.value)}>
           <option value="">No preference</option><option>Omnivore</option><option>Vegetarian</option><option>Vegan</option><option>Pescatarian</option><option>Other</option>
@@ -111,10 +118,10 @@ export function SettingsScreen() {
         {state.saveStatus === 'not-saved' ? <p className="secure-context-note icon-label"><WarningIcon aria-hidden="true" className="icon-leading" focusable="false" />Changes are available only for this session.</p> : null}
         <button className="button secondary icon-label" type="button" onClick={exportData}><ExportDataIcon aria-hidden="true" className="icon-leading" focusable="false" />Export local data as JSON</button>
         <button className="button danger-button icon-label" type="button" onClick={clearData}><ClearDataIcon aria-hidden="true" className="icon-leading" focusable="false" />Clear local data and restart</button>
-        {import.meta.env.DEV ? <div className="dev-control"><strong>Development demo helper</strong><p>Replace this session with a complete profile, assessment coverage, and a completed check-in.</p><button className="button secondary icon-label" type="button" onClick={loadDemo}><ResetIcon aria-hidden="true" className="icon-leading" focusable="false" />Load seeded demo</button></div> : null}
+        {import.meta.env.DEV ? <div className="dev-control"><strong>Example profile</strong><p>Replace this session with a complete profile, assessment coverage, and a completed check-in.</p><button className="button secondary icon-label" type="button" onClick={loadDemo}><ResetIcon aria-hidden="true" className="icon-leading" focusable="false" />Load example profile</button></div> : null}
         {dataMessage ? <Status>{dataMessage}</Status> : null}
       </section>
-      <p className="boundary-note icon-label"><PrivacyIcon aria-hidden="true" className="icon-leading" focusable="false" />This milestone stores the profile only in this browser. It does not synchronize to an account or backend.</p>
+      <p className="boundary-note icon-label"><PrivacyIcon aria-hidden="true" className="icon-leading" focusable="false" />Your profile is stored only in this browser. It does not synchronize to another device.</p>
     </Screen>
   )
 }

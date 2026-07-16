@@ -29,6 +29,8 @@ function blankLocation(
     latitude: null,
     longitude: null,
     accuracyMeters: null,
+    areaId: null,
+    precisionKm: null,
     timeZone: currentTimeZone(),
     units,
     displayLabel: null,
@@ -86,6 +88,8 @@ export function LocationProfileScreen() {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           accuracyMeters: position.coords.accuracy,
+          areaId: null,
+          precisionKm: null,
           timeZone: currentTimeZone(),
           units,
           displayLabel: 'Approximate device location',
@@ -118,6 +122,8 @@ export function LocationProfileScreen() {
       source: 'map',
       ...DEFAULT_MAP_LOCATION,
       accuracyMeters: null,
+      areaId: null,
+      precisionKm: null,
       timeZone: currentTimeZone(),
       units,
       displayLabel: 'Approximate selected area',
@@ -211,7 +217,7 @@ export function LocationProfileScreen() {
                 value={manualLabel}
                 onChange={(event) => setManualLabel(event.target.value)}
               />
-              <p className="field-hint">Prototype backup: this saves only the label you enter and does not contact a geocoding service.</p>
+              <p className="field-hint">This saves only the general label you enter.</p>
               <button className="button secondary icon-label" type="submit"><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Use manual location</button>
             </form>
           </details>
@@ -260,7 +266,7 @@ function LocationConfirmation({
       </fieldset>
       <button className="button primary icon-label" type="button" onClick={onConfirm}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Use this location</button>
       <button className="button secondary icon-label" type="button" onClick={onChooseAgain}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Choose again</button>
-      <p className="privacy-line"><PrivacyIcon aria-hidden="true" className="icon-leading" focusable="false" />Only a coarse version is saved by this prototype. You can reset it at any time.</p>
+      <p className="privacy-line"><PrivacyIcon aria-hidden="true" className="icon-leading" focusable="false" />Only a general area is saved on this device. You can change or remove it at any time.</p>
     </>
   )
 }

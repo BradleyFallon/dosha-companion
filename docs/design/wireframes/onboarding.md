@@ -66,11 +66,11 @@ Low-fidelity mobile layouts for welcome, account entry, profile setup, and the h
 | Preferred name                       |
 | [ Alex                             ] |
 |                                      |
-| Age band                             |
-| [ Select age band                 v] |
+| Year of birth · optional             |
+| [ YYYY                             ] |
 |                                      |
-| We use age bands for appropriate     |
-| content and safety—not dosha points. |
+| We use the year for age-appropriate  |
+| content and do not need a full date. |
 |                                      |
 | [ Continue                         ] |
 +--------------------------------------+

@@ -60,7 +60,7 @@ These fields do not usually need to be asked repeatedly. Most support personaliz
 
 | Field                   |    Required | Suggested type             | How it is used                                                    | Dosha effect   | LLM access             |
 | ----------------------- | ----------: | -------------------------- | ----------------------------------------------------------------- | -------------- | ---------------------- |
-| `age_band`              | Recommended | Enum                       | Adjusts content tone, life-stage relevance, and safety handling   | None initially | Summary only           |
+| `birth_year`            |    Optional | Four-digit year            | Derives age for life-stage relevance and safety handling          | None initially | Derived age band only  |
 | `location_profile`      |    Optional | Structured coarse location | Seasonal, time-of-day, climate, and measurement defaults           | None           | Generalized value only |
 | `dietary_pattern`       | Recommended | Enum                       | Filters food suggestions and articles                             | None           | Yes                    |
 | `food_allergies`        | Recommended | Multi-select               | Hard exclusion against unsafe food recommendations                | None           | Yes, as exclusions     |
@@ -68,17 +68,11 @@ These fields do not usually need to be asked repeatedly. Most support personaliz
 | `major_food_exclusions` |    Optional | Multi-select               | Respects ethical, religious, cultural, or personal restrictions   | None           | Yes                    |
 | `units_preference`      |         Yes | Enum                       | Displays temperature, weight, quantity, and recipe units          | None           | Yes                    |
 
-### `age_band`
+### `birth_year`
 
-Suggested values:
+Collect the year only, never the full birth date. Accept an optional four-digit year for adults aged 18 through 120 and derive a current age or broad age band when a feature needs one.
 
-* 18–24
-* 25–34
-* 35–44
-* 45–54
-* 55–64
-* 65+
-* Prefer not to say
+Older saved age-band values cannot be converted into a truthful birth year and should migrate to an empty optional value.
 
 **Use in this app:**
 
@@ -87,9 +81,9 @@ Suggested values:
 * Support future life-stage content.
 * Apply safety restrictions if certain content is not suitable for an age group.
 
-Age should not directly add points to Vata, Pitta, or Kapha in the MVP. Age may affect Ayurvedic interpretation, but it should initially be treated as context rather than as proof of a constitution.
+Age should not directly add points to Vata, Pitta, or Kapha. It is context rather than proof of a constitution.
 
-Use an age band instead of an exact birth date unless a future feature has a concrete need for the date.
+Year of birth is more identifying than a broad band, so keep it optional, do not expose it to content search or an LLM, and derive only the minimum age context a feature needs.
 
 ### `sex_assigned_at_birth`
 
@@ -129,7 +123,7 @@ Derived weather should use broad categories such as:
 
 Location and weather should influence content selection rather than baseline dosha scoring.
 
-The structured profile should record the selection source (`device`, `map`, or `skipped`), coarse latitude and longitude when applicable, generalized accuracy, time zone, units, and an optional locality label. Do not request continuous location tracking. Let users edit or remove location later, and do not send exact coordinates to the LLM.
+The structured profile should record the selection source (`device`, `map`, or `skipped`), a versioned coarse-area ID, snapped area-center coordinates, nominal precision, time zone, units, and an optional locality label. Do not request continuous location tracking. Let users edit or remove location later, and do not send coordinates to the LLM. See [Location binning](location-binning.md).
 
 ### Dietary fields
 
@@ -329,7 +323,7 @@ A suitable payload may resemble:
 ```json
 {
   "preferred_name": "Example",
-  "age_band": "35-44",
+  "birth_year": "1990",
   "dietary_pattern": "vegetarian",
   "food_exclusions": ["tree_nuts"],
   "baseline_profile": "Vata-Pitta",
@@ -349,7 +343,7 @@ A suitable payload may resemble:
 
 | Field                           | Recommendation                                  | Reason                                                                      |
 | ------------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------- |
-| Exact birth date                | Defer                                           | Age band provides most immediate value with less identity risk              |
+| Exact birth date                | Avoid                                           | Year-only input supports age context without collecting month and day        |
 | Exact GPS location              | Avoid                                           | City or regional climate is sufficient                                      |
 | Exact weight and BMI            | Defer                                           | Sensitive, changeable, and potentially misleading for baseline constitution |
 | Face or body photographs        | Avoid                                           | Adds bias, consent, storage, and privacy concerns                           |
@@ -369,7 +363,7 @@ A suitable payload may resemble:
 Collect immediately after account creation:
 
 1. Preferred name
-2. Age band
+2. Optional year of birth
 3. Optional location through device, map, manual locality backup, or skip
 4. Preferred measurement units
 5. Dietary pattern

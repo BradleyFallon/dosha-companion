@@ -8,8 +8,8 @@
 |                                      |
 | Preferred name                       |
 | [ Alex                             ] |
-| Age band                             |
-| [ Prefer not to say               v] |
+| Year of birth · optional             |
+| [ 1990                             ] |
 | Dietary pattern                      |
 | [ Vegetarian                      v] |
 | Allergies                            |

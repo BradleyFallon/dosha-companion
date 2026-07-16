@@ -105,6 +105,15 @@ describe('prototype state and persistence', () => {
     expect(restored.notice).toContain('version 3')
   })
 
+  it('migrates an older age band without inventing a birth year', () => {
+    const legacy = persistableState(completedState())
+    legacy.profile.ageBand = '35–44'
+    delete legacy.profile.birthYear
+    const restored = restoreState({ getItem: () => JSON.stringify({ version: 4, state: legacy }) })
+    expect(restored.state.profile.birthYear).toBe('')
+    expect(restored.notice).toContain('version 4')
+  })
+
   it('sanitizes recommendation history and check-in answer references independently', () => {
     const validAnswer = currentQuestion.answers[0].id
     const value = JSON.stringify({
@@ -194,14 +203,18 @@ describe('prototype state and persistence', () => {
         latitude: 45.5231,
         longitude: -122.6765,
         accuracyMeters: 25,
+        areaId: null,
+        precisionKm: null,
         timeZone: 'America/Los_Angeles',
         units: 'us',
         displayLabel: 'Approximate device location',
       }),
     ).toMatchObject({
-      latitude: 45.52,
-      longitude: -122.68,
-      accuracyMeters: 1000,
+      latitude: 45.5,
+      longitude: -122.7,
+      accuracyMeters: 10_000,
+      areaId: 'grid-v1:45.5:-122.7',
+      precisionKm: 10,
     })
   })
 })
@@ -218,6 +231,8 @@ function completedState(values: Partial<PrototypeState> = {}): PrototypeState {
         latitude: null,
         longitude: null,
         accuracyMeters: null,
+        areaId: null,
+        precisionKm: null,
         timeZone: 'America/Los_Angeles',
         units: 'us',
         displayLabel: null,

@@ -4,6 +4,7 @@ import { BackLink, Screen } from '../components/Layout'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { nextResumePath } from '../prototype/resume'
 import { DoshaTrioMark } from '../ui/icons'
+import { birthYearBounds, birthYearError, birthYearInput } from '../profile/birthYear'
 
 export function WelcomeScreen() {
   const { state } = usePrototype()
@@ -19,7 +20,7 @@ export function WelcomeScreen() {
       </p>
       {hasProgress ? (
         <Link className="button primary" to={nextResumePath(state)}>
-          Resume prototype
+          Resume
         </Link>
       ) : (
         <Link className="button primary" to="/create-account">
@@ -32,7 +33,7 @@ export function WelcomeScreen() {
       <details className="boundary-details">
         <summary>Read the wellness disclaimer</summary>
         <p>
-          This prototype provides educational wellness information. It does not diagnose conditions or replace professional medical care.
+          This app provides educational wellness information. It does not diagnose conditions or replace professional medical care.
         </p>
       </details>
     </Screen>
@@ -52,7 +53,7 @@ export function AccountScreen() {
   function submit(event: FormEvent) {
     event.preventDefault()
     if (!email.includes('@') || !password || !accepted) {
-      setError('Enter an email and password, then accept the prototype terms.')
+      setError('Enter an email and password, then confirm the wellness-education notice.')
       return
     }
     dispatch({ type: 'account-created' })
@@ -62,9 +63,9 @@ export function AccountScreen() {
   return (
     <Screen>
       <BackLink to="/" />
-      <p className="eyebrow">Simulated account</p>
+      <p className="eyebrow">Your account</p>
       <h1 tabIndex={-1}>{signIn ? 'Sign in' : 'Create your account'}</h1>
-      <p className="supporting">Nothing entered here is sent or stored. This form only unlocks the prototype flow.</p>
+      <p className="supporting">Account details entered here are not sent or saved.</p>
       <form onSubmit={submit} noValidate>
         <label htmlFor="email">Email</label>
         <input id="email" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} />
@@ -72,7 +73,7 @@ export function AccountScreen() {
         <input id="password" type="password" autoComplete={signIn ? 'current-password' : 'new-password'} value={password} onChange={(event) => setPassword(event.target.value)} />
         <label className="check-row" htmlFor="terms">
           <input id="terms" type="checkbox" checked={accepted} onChange={(event) => setAccepted(event.target.checked)} />
-          <span>I accept the prototype terms and understand this is wellness education, not medical care.</span>
+          <span>I understand this is wellness education, not medical care.</span>
         </label>
         {error ? <p className="field-error" id="account-error" role="alert">{error}</p> : null}
         <button className="button primary" type="submit">Continue</button>
@@ -95,8 +96,10 @@ export function NameProfileScreen() {
   const { state, dispatch } = usePrototype()
   const navigate = useNavigate()
   const [name, setName] = useState(state.profile.preferredName)
-  const [ageBand, setAgeBand] = useState(state.profile.ageBand)
+  const [birthYear, setBirthYear] = useState(state.profile.birthYear)
   const [error, setError] = useState('')
+  const [yearError, setYearError] = useState('')
+  const { minimum, maximum } = birthYearBounds()
 
   function submit(event: FormEvent) {
     event.preventDefault()
@@ -104,7 +107,13 @@ export function NameProfileScreen() {
       setError('Enter the name you would like us to use.')
       return
     }
-    dispatch({ type: 'update-profile', values: { preferredName: name.trim(), ageBand } })
+    const invalidYear = birthYearError(birthYear)
+    if (invalidYear) {
+      setYearError(invalidYear)
+      return
+    }
+    setYearError('')
+    dispatch({ type: 'update-profile', values: { preferredName: name.trim(), birthYear } })
     navigate('/profile/location')
   }
 
@@ -117,12 +126,9 @@ export function NameProfileScreen() {
         <label htmlFor="preferred-name">Preferred name</label>
         <input id="preferred-name" value={name} onChange={(event) => setName(event.target.value)} aria-describedby={error ? 'name-error' : undefined} />
         {error ? <p className="field-error" id="name-error" role="alert">{error}</p> : null}
-        <label htmlFor="age-band">Age band <span className="optional">Optional</span></label>
-        <select id="age-band" value={ageBand} onChange={(event) => setAgeBand(event.target.value)}>
-          <option value="">Select an age band</option>
-          <option>18–24</option><option>25–34</option><option>35–44</option><option>45–54</option><option>55–64</option><option>65+</option><option>Prefer not to say</option>
-        </select>
-        <p className="field-hint">Used for appropriate content and safety—not dosha points.</p>
+        <label htmlFor="birth-year">Year of birth <span className="optional">Optional</span></label>
+        <input id="birth-year" type="text" inputMode="numeric" autoComplete="bday-year" pattern="[0-9]{4}" placeholder="YYYY" minLength={4} maxLength={4} value={birthYear} onChange={(event) => setBirthYear(birthYearInput(event.target.value))} aria-describedby={yearError ? 'birth-year-error' : 'birth-year-hint'} />
+        {yearError ? <p className="field-error" id="birth-year-error" role="alert">{yearError}</p> : <p className="field-hint" id="birth-year-hint">Enter a year from {minimum} to {maximum}. We do not need your full birth date.</p>}
         <button className="button primary" type="submit">Continue</button>
       </form>
     </Screen>
@@ -157,7 +163,7 @@ export function FoodProfileScreen() {
         <input id="allergies" placeholder="Enter allergies, or leave blank" value={allergies} onChange={(event) => setAllergies(event.target.value)} />
         <label htmlFor="exclusions">Other exclusions <span className="optional">Optional</span></label>
         <input id="exclusions" value={exclusions} onChange={(event) => setExclusions(event.target.value)} />
-        <p className="field-hint">These fields are only demonstrated locally. No food recommendation engine is connected.</p>
+        <p className="field-hint">These preferences are stored only on this device and help filter food guidance.</p>
         <button className="button primary" type="submit">Save and continue</button>
       </form>
     </Screen>
