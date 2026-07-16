@@ -58,6 +58,10 @@ Glossary terms require a stable ID, term, definition, aliases, related article, 
 
 Check-in sets reference question IDs from `data/quiz/questions.csv`. The generator accepts only canonical `current` questions. Check-ins never define scoring and never overwrite initial-assessment answers.
 
+## Seasonal produce
+
+Edit `seasonal-produce/produce.json` to manage the “In season near you” module. Each item declares one or more `produceRegionIds`, calendar months from 1–12, dietary compatibility, and a learning-article link. Region IDs are broad editorial groupings rather than exact growing zones. Keep seasonality claims conservative and sourceable; the app filters by saved region, current month, dietary pattern, allergies, and other exclusions.
+
 ## Preview and validation
 
 From `app/`:

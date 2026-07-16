@@ -230,6 +230,16 @@ describe('limited MVP results and settings', () => {
     expect(snapshot.state.recommendationHistory.length).toBeGreaterThan(1)
   })
 
+  it('shows local conditions, seasonal food, and stable guidance modules', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ timezone: 'America/Los_Angeles', current: { temperature_2m: 72, weather_code: 1 }, current_units: { temperature_2m: '°F' }, daily: { sunrise: ['2026-07-16T05:40'], sunset: ['2026-07-16T20:55'] } }) }))
+    renderAt('/today', { resultsReached: true, profile: completedProfile('Alex') })
+    expect(screen.getByRole('heading', { name: 'Local conditions' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'In season near you' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Your guide' })).toBeInTheDocument()
+    expect(await screen.findByText('72°F')).toBeInTheDocument()
+    vi.unstubAllGlobals()
+  })
+
   it('exports and confirms before clearing local data', async () => {
     const user = userEvent.setup()
     const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})

@@ -4,6 +4,8 @@ import { Screen } from '../components/Layout'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { calculateAssessmentCoverage } from '../quiz/coverage'
 import { selectDailyRecommendation } from '../content/recommendations'
+import { getSeasonalProduce } from '../content/seasonalProduce'
+import { loadLocalConditions, weatherLabel, type LocalConditions } from '../location/conditions'
 import {
   BalanceIcon,
   CompleteIcon,
@@ -12,7 +14,6 @@ import {
   ForwardIcon,
   GuidedHelpIcon,
   LearnIcon,
-  LocationIcon,
   NatureIcon,
   QuestionsIcon,
   SettingsIcon,
@@ -23,6 +24,8 @@ import {
 export function TodayScreen() {
   const { state, dispatch } = usePrototype()
   const [whyOpen, setWhyOpen] = useState(false)
+  const [conditions, setConditions] = useState<LocalConditions | null>(null)
+  const [conditionsError, setConditionsError] = useState('')
   const name = state.profile.preferredName || 'there'
   const coverage = calculateAssessmentCoverage({
     submittedAnswers: state.submittedAnswers,
@@ -46,10 +49,20 @@ export function TodayScreen() {
     timeZone,
   }).format(new Date())
   const greeting = greetingForTime(new Date(), timeZone)
+  const seasonalProduce = getSeasonalProduce(state.profile).slice(0, 4)
 
   useEffect(() => {
     if (!currentRecord) dispatch({ type: 'show-recommendation', recommendationId: recommendation.id, date: recommendation.selectionDate })
   }, [currentRecord, dispatch, recommendation.id, recommendation.selectionDate])
+
+  useEffect(() => {
+    if (!state.profile.location) return
+    const controller = new AbortController()
+    loadLocalConditions(state.profile.location, controller.signal).then(setConditions).catch((reason) => {
+      if (!controller.signal.aborted) setConditionsError(reason instanceof Error ? reason.message : 'Local conditions are unavailable right now.')
+    })
+    return () => controller.abort()
+  }, [state.profile.location])
 
   function updateRecommendation(status: 'completed' | 'dismissed') {
     dispatch({ type: 'recommendation-status', recommendationId: recommendation.id, date: recommendation.selectionDate, status })
@@ -88,6 +101,15 @@ export function TodayScreen() {
         </div>
         <Link className="text-link icon-label" to={`/learn/${recommendation.relatedArticleId}`}><LearnIcon aria-hidden="true" className="icon-leading" focusable="false" />Read related guidance<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></Link>
       </article>
+      <section className="local-conditions" aria-labelledby="local-conditions-title">
+        <p className="eyebrow">Near you</p><h2 id="local-conditions-title">Local conditions</h2>
+        {conditions ? <div className="conditions-grid"><div><strong>{Math.round(conditions.temperature)}{conditions.temperatureUnit}</strong><span>{weatherLabel(conditions.weatherCode)}</span></div><div><strong>{formatLocalTime(new Date(), conditions.timeZone)}</strong><span>Local time</span></div><div><strong>{formatClock(conditions.sunrise)}</strong><span>Sunrise</span></div><div><strong>{formatClock(conditions.sunset)}</strong><span>Sunset</span></div><div><strong>{conditions.season}</strong><span>General season</span></div></div> : conditionsError ? <p className="supporting">{conditionsError}</p> : <p role="status" className="supporting">Loading local weather and daylight…</p>}
+      </section>
+      <section className="seasonal-card" aria-labelledby="seasonal-title">
+        <p className="eyebrow">Regional food guide</p><h2 id="seasonal-title">In season near you</h2>
+        {seasonalProduce.length ? <ul>{seasonalProduce.map((item) => <li key={item.id}><Link to={`/learn/${item.articleId}`}>{item.name}</Link></li>)}</ul> : <p>Browse familiar foods that fit your saved dietary and safety preferences.</p>}
+        <p className="field-hint">Regional seasonality varies by source and growing conditions. These foods are not a calculated dosha recommendation.</p>
+      </section>
       <section className={recommendation.food.status === 'withheld' ? 'today-secondary withheld' : 'today-secondary'} aria-labelledby="food-title">
         <p className="eyebrow">Optional food prompt</p>
         <h2 className="section-title-with-icon" id="food-title"><FoodIcon aria-hidden="true" className="icon-leading" focusable="false" weight="duotone" />{recommendation.food.title}</h2>
@@ -111,14 +133,9 @@ export function TodayScreen() {
             <span><strong>Your usual nature</strong><small>Assessment and check-in history</small></span>
             <ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" />
           </Link>
-          <Link to="/settings">
-            <FoodIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" />
-            <span><strong>Food preferences</strong><small>{state.profile.dietaryPattern || 'No dietary pattern saved'}</small></span>
-            <ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" />
-          </Link>
-          <Link to="/profile/location">
-            <LocationIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" />
-            <span><strong>Local rhythms</strong><small>{state.profile.location?.displayName || 'Add a general area'}</small></span>
+          <Link to="/questions">
+            <QuestionsIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" />
+            <span><strong>Latest check-in</strong><small>{latestCheckInLabel(state.checkIns)}</small></span>
             <ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" />
           </Link>
         </div>
@@ -130,6 +147,19 @@ export function TodayScreen() {
       <Link className="assistant-card" to="/assistant"><span className="card-link-heading"><GuidedHelpIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" /><strong>Search the learning catalog</strong></span><span className="icon-label">Open deterministic guided help<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></span></Link>
     </Screen>
   )
+}
+
+function formatClock(value: string) {
+  return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit' }).format(new Date(value))
+}
+
+function formatLocalTime(value: Date, timeZone: string) {
+  return new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', timeZone }).format(value)
+}
+
+function latestCheckInLabel(checkIns: Array<{ completedAt: string | null }>) {
+  const latest = checkIns.find((item) => item.completedAt)
+  return latest?.completedAt ? `Completed ${new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(new Date(latest.completedAt))}` : 'No completed check-in yet'
 }
 
 function greetingForTime(now: Date, timeZone?: string) {

@@ -28,6 +28,8 @@ Today is the post-assessment home and primary retention surface. It turns the la
 
 - Editorial review status stays in structured content metadata and editor tooling rather than appearing as a repeated badge in the reader experience.
 - Deterministic rules choose the underlying guidance from context, coverage, profile exclusions, and saved-time-zone time of day.
+- Local conditions use the representative regional coordinate for current weather, local time, sunrise, sunset, and a broad hemisphere-aware season.
+- “In season near you” uses the editor-owned seasonal produce catalog filtered by region, month, diet, allergies, and exclusions; it does not claim dosha compatibility.
 - “Why this was chosen” exposes the exact matched rule and states that no dosha score was used.
 - The limited MVP does not place automatically generated AI prose on Today.
 - The AI entry opens a separate grounded chat experience.

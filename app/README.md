@@ -109,7 +109,7 @@ Today selects published content from `../content/recommendations/recommendations
 5. Local morning or evening using the saved time zone
 6. General fallback
 
-Every focus and food prompt is labeled **Provisional · not expert-approved**. Users can mark it complete, dismiss it, show another, open related reading, or start a linked check-in. Browser-local shown/completed/dismissed history avoids immediate repetition when alternatives exist. “Why this was chosen” names the exact catalog rationale and matched inputs. Food prompts are withheld whenever the profile contains allergies or exclusions.
+Users can mark the daily focus complete, dismiss it, show another, open related reading, or start a linked check-in. Browser-local shown/completed/dismissed history avoids immediate repetition when alternatives exist. “Why this was chosen” names the exact catalog rationale and matched inputs. Today also loads weather/daylight for the saved regional coordinate and filters the editor-owned seasonal produce catalog by region, month, diet, allergies, and exclusions.
 
 ## Learn, Guided help, and check-ins
 
@@ -121,7 +121,7 @@ Questions can repair initial coverage or start a five- or seven-question repeata
 
 `/settings` edits preferred name, birth year, dietary pattern, explicit allergy/exclusion status, and details without removing assessment answers. Location and units reuse the location chooser and return to Settings.
 
-Persisted state is version 4. It adds recommendation history, the active daily item, and dated check-ins. Restore logic validates their IDs, statuses, dates, set/question references, and answer relationships while retaining valid neighboring data. Versions 1–3 migrate through sanitization. Corrupt or incompatible snapshots start safely with a visible notice. Settings displays storage status, exports the allow-listed snapshot as JSON, and confirms before clearing all local data.
+Persisted state is version 7. It includes required profile readiness, normalized regional location, recommendation history, the active daily item, and dated check-ins. Restore logic validates the allow-listed shape and turns legacy skipped or unnormalized locations into incomplete setup. Corrupt or incompatible snapshots start safely with a visible notice. Settings displays storage status, exports the allow-listed snapshot as JSON, and confirms before clearing all local data.
 
 ## Testing
 

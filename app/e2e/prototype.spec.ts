@@ -65,6 +65,9 @@ test('completes the short mobile vertical slice', async ({ page }) => {
   await expect(page.getByText('Vata–Pitta')).toBeVisible()
   await page.getByRole('button', { name: 'Continue to Today' }).click()
   await expect(page.getByText('For today')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Local conditions' })).toBeVisible()
+  await expect(page.getByText('72°F')).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'In season near you' })).toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Primary navigation' })).toBeVisible()
 })
 
@@ -143,6 +146,17 @@ test('uses a one-shot device location and persists only a coarse position', asyn
       admin1Code: 'OR',
       produceRegionId: 'us-pacific-northwest',
     })
+})
+
+test('resolves a city search to a normalized regional location', async ({ page }) => {
+  await reachLocation(page)
+  await page.getByLabel('Search for your city').fill('Portland')
+  await page.getByRole('button', { name: 'Search cities' }).click()
+  await page.getByRole('button', { name: /Portland.*Oregon/i }).click()
+  await page.getByRole('button', { name: 'Use this regional location' }).click()
+  await expect(page.getByRole('heading', { name: 'Food preferences and exclusions' })).toBeVisible()
+  const location = await page.evaluate(() => JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}').state?.profile?.location)
+  expect(location).toMatchObject({ source: 'city', areaId: 'grid-v1:45.5:-122.7', countryCode: 'US', produceRegionId: 'us-pacific-northwest' })
 })
 
 test('edits profile settings, preserves answers, and recalculates Today', async ({ page }) => {
