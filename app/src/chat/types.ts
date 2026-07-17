@@ -3,6 +3,7 @@ export type ChatContextType =
   | 'article'
   | 'seasonal-food'
   | 'check-in'
+  | 'balance-domain'
   | 'general'
 
 export interface ChatContextReference {
@@ -44,6 +45,14 @@ export type ChatContextPayload =
       completedAt: string
       classification: 'current'
       answers: Array<{ question: string; answer: string }>
+    }
+  | {
+      type: 'balance-domain'
+      domain: string
+      label: string
+      usualAnswer?: string
+      recentAnswer?: string
+      comparison?: string
     }
   | { type: 'general' }
 

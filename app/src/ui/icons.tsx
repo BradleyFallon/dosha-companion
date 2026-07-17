@@ -32,8 +32,10 @@ import {
   ListChecks,
   Info,
   Leaf,
+  Lightning,
   MagnifyingGlass,
   MapPinArea,
+  MoonStars,
   PaperPlaneTilt,
   PlusCircle,
   QuestionMark,
@@ -92,6 +94,12 @@ export const CurrentBalanceIcon = Waves
 export const DailyRoutineIcon = SunHorizon
 export const AyurvedaIcon = FlowerLotus
 export const FoodIcon = BowlFood
+export const SleepIcon = MoonStars
+export const EnergyIcon = Lightning
+export const AppetiteIcon = BowlFood
+export const DigestionIcon = Spiral
+export const RoutineIcon = ArrowsClockwise
+export const StressIcon = Waves
 
 // Weather and local context
 export const ClearWeatherIcon = Sun

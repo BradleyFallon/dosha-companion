@@ -35,6 +35,7 @@ import {
   NewChatIcon,
   OpenOriginalIcon,
   BackIcon,
+  BalanceIcon,
   QuestionsIcon,
   RetryIcon,
   SeasonIcon,
@@ -353,6 +354,7 @@ function contextIcon(type: ChatContextType) {
   if (type === 'article') return LearnIcon
   if (type === 'seasonal-food') return SeasonIcon
   if (type === 'check-in') return QuestionsIcon
+  if (type === 'balance-domain') return BalanceIcon
   return ChatIcon
 }
 

@@ -40,5 +40,5 @@ export function chatReturnPath(search: string, fallback: ChatReturnPath) {
 }
 
 function isContextType(value: string | null): value is Exclude<ChatContextType, 'general'> {
-  return value === 'recommendation' || value === 'article' || value === 'seasonal-food' || value === 'check-in'
+  return value === 'recommendation' || value === 'article' || value === 'seasonal-food' || value === 'check-in' || value === 'balance-domain'
 }

@@ -48,6 +48,15 @@ export class MockChatClient implements ChatClient {
           suggestedFollowUps: ['What should I keep observing?', 'How is this different from my assessment?', 'Where can I review the source questions?'],
           boundary: null,
         }
+      case 'balance-domain':
+        return {
+          answer: anchor.recentAnswer
+            ? `Your recent ${anchor.label.toLowerCase()} response records “${anchor.recentAnswer}”${anchor.usualAnswer ? ` alongside the usual pattern you supplied` : ''}. The app can describe that information, but it does not calculate a dosha score or diagnosis from it.`
+            : `There is not enough recent ${anchor.label.toLowerCase()} information to compare yet. The app does not fill that gap with an inferred score or interpretation.`,
+          citations,
+          suggestedFollowUps: ['What should I keep observing?', 'How is recent information kept separate?', 'Where can I review my responses?'],
+          boundary: null,
+        }
       case 'general':
         return {
           answer: generalAnswer(request),

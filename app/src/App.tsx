@@ -52,6 +52,7 @@ function PrototypeRoutes() {
         <Route path="/questions/check-in/new" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><NewCheckInScreen /></Guard>} />
         <Route path="/questions/check-in/:id" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><CheckInScreen /></Guard>} />
         <Route path="/balance" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><BalanceScreen /></Guard>} />
+        <Route path="/balance/:domain" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><BalanceScreen /></Guard>} />
         <Route path="/learn" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><LearnScreen /></Guard>} />
         <Route path="/learn/glossary" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><GlossaryScreen /></Guard>} />
         <Route path="/learn/:articleId" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><ArticleScreen /></Guard>} />

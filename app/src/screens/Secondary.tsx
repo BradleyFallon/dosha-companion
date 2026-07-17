@@ -1,8 +1,15 @@
-import { Link } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import { BackLink, Screen } from '../components/Layout'
+import { CheckInTimeline } from '../components/CheckInTimeline'
+import { PatternCoverageRing } from '../components/PatternCoverageRing'
+import {
+  balanceDomains,
+  informationState,
+  informationStateLabel,
+  isBalanceDomain,
+} from '../balance/domains'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { calculateAssessmentCoverage, COVERAGE_REQUIREMENTS } from '../quiz/coverage'
-import { CoverageDetail } from './Results'
 import { getCheckInQuestionSet } from '../content/repository'
 import { initialAssessment } from '../generated/initialAssessment'
 import type { CheckIn } from '../prototype/state'
@@ -13,13 +20,9 @@ import {
   CurrentBalanceIcon,
   ForwardIcon,
   HistoryIcon,
-  LearnIcon,
-  LocationIcon,
   NatureIcon,
-  SettingsIcon,
-  WarningIcon,
+  InfoIcon,
 } from '../ui/icons'
-import { locationEntryPath } from '../location/returnTargets'
 import { ContextChatLink } from '../components/ContextChatLink'
 
 export function QuestionsScreen() {
@@ -127,42 +130,106 @@ export function AssessmentManagementScreen() {
 }
 
 export function BalanceScreen() {
+  const { domain: domainId } = useParams()
   const { state } = usePrototype()
   const coverage = calculateAssessmentCoverage({
     submittedAnswers: state.submittedAnswers,
     skippedQuestionIds: state.skippedQuestionIds,
   })
-  const completed = state.checkIns.filter((checkIn) => checkIn.completedAt)
+  if (domainId && !isBalanceDomain(domainId)) return <Navigate replace to="/balance" />
+
+  const completed = completedCheckIns(state.checkIns)
   const incomplete = state.checkIns.find((checkIn) => !checkIn.completedAt)
   const latest = completed[0]
+  const recentAnswers = latest?.answers ?? state.submittedAnswers
+  const selectedDomain = domainId ? balanceDomains.find((domain) => domain.id === domainId) : null
+  const recentRepresented = initialAssessment.questions
+    .filter((question) => question.assessmentType === 'current')
+    .filter((question) => question.answers.some((answer) => answer.id === recentAnswers[question.id] && answer.kind === 'ordinary'))
+    .length
+  const domainViews = balanceDomains.map((domain) => {
+    const currentQuestion = initialAssessment.questions.find((question) => question.assessmentType === 'current' && question.category === domain.currentCategory)
+    const baselineQuestion = initialAssessment.questions.find((question) => question.assessmentType === 'baseline' && question.category === domain.baselineCategory)
+    const recentAnswer = currentQuestion?.answers.find((answer) => answer.id === recentAnswers[currentQuestion.id]) ?? null
+    const usualAnswer = baselineQuestion?.answers.find((answer) => answer.id === state.submittedAnswers[baselineQuestion.id]) ?? null
+    const skipped = !latest && currentQuestion ? state.skippedQuestionIds.includes(currentQuestion.id) : false
+    return {
+      ...domain,
+      recentAnswer,
+      usualAnswer,
+      state: informationState(recentAnswer?.kind ?? null, skipped),
+    }
+  })
+  const selected = selectedDomain ? domainViews.find((domain) => domain.id === selectedDomain.id) : null
+  const recentHref = latest ? `/questions/check-in/${latest.id}` : '/questions'
 
   return (
-    <Screen>
-      <p className="stage-badge">{coverage.ready ? 'Coverage ready' : 'More information useful'}</p>
-      <h1 tabIndex={-1}>My Balance</h1>
-      <p className="supporting">This screen reports answer coverage only. Dosha labels and relative measurements are unavailable until expert scoring is approved.</p>
-      <CoverageCard kind="nature" title="Your usual nature" timeframe="Usual adult tendencies" substantive={coverage.baseline.substantive} total={coverage.baseline.total} categories={coverage.baseline.categoriesCovered} />
-      <CoverageCard kind="current" title="Your current check-in" timeframe="Past seven days" substantive={coverage.current.substantive} total={coverage.current.total} categories={coverage.current.categoriesCovered} />
-      <article className="result-card"><p className="eyebrow section-title-with-icon"><CheckInIcon aria-hidden="true" className="icon-leading" focusable="false" />Recent check-ins</p><h2>{completed.length} completed</h2><p>{latest?.completedAt ? `Latest completed ${formatDate(latest.completedAt)}.` : 'No dated current check-in has been completed yet.'}</p>{incomplete ? <Link className="icon-label" to={`/questions/check-in/${incomplete.id}`}>Continue incomplete check-in<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></Link> : <Link className="icon-label" to="/questions/check-in/new?set=quick-current">Start a check-in<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></Link>}</article>
-      <div className="scoring-boundary"><h2 className="section-title-with-icon"><WarningIcon aria-hidden="true" className="icon-leading" focusable="false" />No dosha result calculated</h2><p>The repository contains no approved numerical answer weights or result thresholds.</p></div>
-      <CoverageDetail coverage={coverage} />
-      {coverage.nextQuestionId ? <Link className="button primary" to={`/assessment/question/${coverage.nextQuestionId}?return=results`}>Improve coverage</Link> : null}
-      <Link className="button secondary icon-label" to="/questions"><CheckInIcon aria-hidden="true" className="icon-leading" focusable="false" />Check in and review history</Link>
-      <Link className="button secondary icon-label" to="/learn/nature-and-current-balance"><LearnIcon aria-hidden="true" className="icon-leading" focusable="false" />Learn about nature and current balance</Link>
-      <Link className="button secondary icon-label" to="/settings"><SettingsIcon aria-hidden="true" className="icon-leading" focusable="false" />Edit profile settings</Link>
-      {state.profile.location ? <Link className="button secondary icon-label" to={locationEntryPath('/balance')}><LocationIcon aria-hidden="true" className="icon-leading" focusable="false" />Change regional location</Link> : null}
+    <Screen className="balance-screen">
+      <div className="balance-heading">
+        <h1 tabIndex={-1}>My Balance</h1>
+        <details className="balance-info">
+          <summary aria-label="About My Balance"><InfoIcon aria-hidden="true" focusable="false" /></summary>
+          <p>This view summarizes information you supplied. It does not calculate a dosha score or diagnosis.</p>
+        </details>
+      </div>
+
+      <div aria-label="Pattern information" className="pattern-rings">
+        <PatternCoverageRing
+          href="/questions/assessment"
+          icon={NatureIcon}
+          label="Usual"
+          represented={coverage.baseline.categoriesCovered}
+          total={coverage.baseline.categoriesTotal}
+        />
+        <PatternCoverageRing
+          href={recentHref}
+          icon={CurrentBalanceIcon}
+          label="Recent"
+          represented={recentRepresented}
+          total={coverage.current.categoriesTotal}
+        />
+      </div>
+
+      <div aria-label="Recent balance areas" className="balance-domain-grid">
+        {domainViews.map((domain) => {
+          const Icon = domain.icon
+          return (
+            <Link
+              aria-label={`${domain.label}: ${informationStateLabel(domain.state)}`}
+              className={`balance-domain-control ${domain.state}`}
+              key={domain.id}
+              to={`/balance/${domain.id}`}
+            >
+              <span className="balance-domain-icon"><Icon aria-hidden="true" focusable="false" weight="duotone" /></span>
+              <span>{domain.label}</span>
+            </Link>
+          )
+        })}
+      </div>
+
+      {selected ? (
+        <section aria-labelledby="balance-domain-title" className={`balance-domain-detail ${selected.state}`}>
+          <Link aria-label={`Close ${selected.label} details`} className="balance-detail-close" to="/balance">Close</Link>
+          <selected.icon aria-hidden="true" focusable="false" weight="duotone" />
+          <h2 id="balance-domain-title">{selected.label}</h2>
+          <dl>
+            <div><dt>Recent</dt><dd>{selected.recentAnswer?.text ?? 'No recent information'}</dd></div>
+            <div><dt>Usual</dt><dd>{selected.usualAnswer ? selected.usualAnswer.kind === 'ordinary' ? 'Information available' : 'Not enough information' : 'No usual information'}</dd></div>
+          </dl>
+          <ContextChatLink context={{ type: 'balance-domain', id: selected.id }} returnTo="/balance">Ask about this</ContextChatLink>
+        </section>
+      ) : null}
+
+      <section aria-labelledby="balance-timeline-title" className="balance-timeline-section">
+        <h2 className="sr-only" id="balance-timeline-title">Check-in timeline</h2>
+        <CheckInTimeline checkIns={state.checkIns} />
+      </section>
+
+      <Link className="button primary balance-primary-action" to={incomplete ? `/questions/check-in/${incomplete.id}` : '/questions/check-in/new?set=quick-current'}>
+        <CheckInIcon aria-hidden="true" className="icon-leading" focusable="false" />
+        {incomplete ? 'Continue' : 'Check In'}
+      </Link>
     </Screen>
-  )
-}
-
-function CoverageCard({ kind, title, timeframe, substantive, total, categories }: { kind: 'nature' | 'current'; title: string; timeframe: string; substantive: number; total: number; categories: number }) {
-  const Icon = kind === 'nature' ? NatureIcon : CurrentBalanceIcon
-  return (
-    <article className="result-card">
-      <p className="eyebrow section-title-with-icon"><Icon aria-hidden="true" className="icon-leading" focusable="false" weight="duotone" />{title}</p><p className="time-context">{timeframe}</p>
-      <h2>{substantive} of {total} usable answers</h2>
-      <p>{categories} categories have substantive coverage. No dosha interpretation was applied.</p>
-    </article>
   )
 }
 
@@ -194,8 +261,4 @@ function assessmentRemaining(coverage: ReturnType<typeof calculateAssessmentCove
 
 function formatCheckInDate(value: string) {
   return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(new Date(value))
-}
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value))
 }

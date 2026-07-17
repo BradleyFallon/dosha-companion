@@ -16,7 +16,7 @@ import {
 import type { ResolvedChatContext } from './types'
 
 describe('chat contexts and grounding', () => {
-  it('resolves recommendation, article, seasonal-food, check-in, and general contexts', () => {
+  it('resolves recommendation, article, seasonal-food, check-in, balance-domain, and general contexts', () => {
     const state = completedState()
     const seasonalFood = getSeasonalProduce(state.profile)[0]
     expect(resolveChatContext({ type: 'recommendation', id: 'general-steady-point', sourcePath: '/unsafe' }, state)).toMatchObject({
@@ -35,6 +35,11 @@ describe('chat contexts and grounding', () => {
       reference: { type: 'check-in' },
       sourcePath: '/questions',
     })
+    expect(resolveChatContext({ type: 'balance-domain', id: 'sleep', sourcePath: '/unsafe' }, state)).toMatchObject({
+      reference: { type: 'balance-domain' },
+      title: 'Sleep',
+      sourcePath: '/balance/sleep',
+    })
     expect(resolveChatContext({ type: 'general', id: 'general', sourcePath: '/learn' }, state)).toMatchObject({
       title: 'General conversation',
       sourcePath: '/learn',
@@ -45,6 +50,7 @@ describe('chat contexts and grounding', () => {
     const state = completedState()
     expect(resolveChatContext({ type: 'article', id: 'missing', sourcePath: '/learn' }, state)).toBeNull()
     expect(resolveChatContext({ type: 'check-in', id: 'missing', sourcePath: '/questions' }, state)).toBeNull()
+    expect(resolveChatContext({ type: 'balance-domain', id: 'missing', sourcePath: '/balance' }, state)).toBeNull()
   })
 
   it('builds purposefully limited profile context without coordinates or assessment answers', () => {
@@ -78,6 +84,7 @@ describe('mock chat client and API contract', () => {
     ['article', { type: 'article', id: 'vata', sourcePath: '/learn/vata' }],
     ['seasonal-food', null],
     ['check-in', { type: 'check-in', id: 'checkin-chat', sourcePath: '/questions' }],
+    ['balance-domain', { type: 'balance-domain', id: 'sleep', sourcePath: '/balance' }],
     ['general', { type: 'general', id: 'general', sourcePath: '/today' }],
   ] as const)('returns a grounded %s response', async (kind, suppliedReference) => {
     const state = completedState()

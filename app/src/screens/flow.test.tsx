@@ -220,6 +220,49 @@ describe('calm Check In experience', () => {
   })
 })
 
+describe('graphical My Balance shell', () => {
+  it('shows rings, six domains, a compact timeline, and progressive disclosure', async () => {
+    const user = userEvent.setup()
+    const set = getCheckInQuestionSet('quick-current')!
+    const answers = checkInAnswers(set.questionIds)
+    const checkIns = Array.from({ length: 6 }, (_, index) => ({
+      id: `balance-${index}`,
+      setId: set.id,
+      startedAt: `2026-07-${String(10 + index).padStart(2, '0')}T10:00:00.000Z`,
+      completedAt: `2026-07-${String(10 + index).padStart(2, '0')}T10:05:00.000Z`,
+      answers,
+    }))
+    renderAt('/balance', {
+      resultsReached: true,
+      assessmentMode: 'full',
+      submittedAnswers: allOrdinaryAnswers(),
+      checkIns,
+    })
+
+    expect(screen.getByRole('heading', { name: 'My Balance' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Usual pattern: 19 of 19 areas represented' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Recent pattern: 5 of 7 areas represented' })).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: /^(Sleep|Energy|Appetite|Digestion|Routine|Stress):/ })).toHaveLength(6)
+    expect(screen.getAllByRole('link', { name: /Open check-in from/ })).toHaveLength(5)
+    expect(screen.queryByText(/Coverage ready|usable answers|No dosha result calculated/)).not.toBeInTheDocument()
+    expect(screen.getByText(/This view summarizes/).closest('details')).not.toHaveAttribute('open')
+
+    await user.click(screen.getByRole('link', { name: 'Sleep: information available' }))
+    const detail = screen.getByRole('heading', { name: 'Sleep' }).closest('section')
+    expect(detail).toHaveTextContent('Light, interrupted, irregular, or difficult to settle into.')
+    expect(screen.getByRole('link', { name: 'Ask about this' })).toBeInTheDocument()
+  })
+
+  it('changes the primary action to Continue for unfinished work', () => {
+    renderAt('/balance', {
+      resultsReached: true,
+      checkIns: [{ id: 'unfinished-balance', setId: 'quick-current', startedAt: '2026-07-16T10:00:00.000Z', completedAt: null, answers: {} }],
+    })
+    expect(screen.getByRole('link', { name: 'Continue' })).toHaveAttribute('href', '/questions/check-in/unfinished-balance')
+    expect(screen.getByText('Your completed check-ins will appear here.')).toBeInTheDocument()
+  })
+})
+
 describe('limited MVP results and settings', () => {
   it('shows a real insufficient-coverage result without fixture labels', () => {
     renderAt('/results', { resultsReached: true, submittedAnswers: {} })

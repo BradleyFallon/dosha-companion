@@ -3,6 +3,7 @@ import { selectDailyRecommendation } from '../content/recommendations'
 import { getSeasonalProduce } from '../content/seasonalProduce'
 import { initialAssessment } from '../generated/initialAssessment'
 import { calculateAssessmentCoverage } from '../quiz/coverage'
+import { balanceDomains, isBalanceDomain } from '../balance/domains'
 import type { PrototypeState } from '../prototype/state'
 import type {
   ChatContextReference,
@@ -29,6 +30,8 @@ export function resolveChatContext(
       return resolveSeasonalFood(reference.id, state)
     case 'check-in':
       return resolveCheckIn(reference.id, state)
+    case 'balance-domain':
+      return resolveBalanceDomain(reference.id, state)
     case 'general':
       return {
         reference: { type: 'general', id: 'general', sourcePath: safeGeneralSource(reference.sourcePath) },
@@ -44,6 +47,40 @@ export function resolveChatContext(
         sourceIds: [],
         payload: { type: 'general' },
       }
+  }
+}
+
+function resolveBalanceDomain(id: string, state: PrototypeState): ResolvedChatContext | null {
+  if (!isBalanceDomain(id)) return null
+  const domain = balanceDomains.find((candidate) => candidate.id === id)
+  if (!domain) return null
+  const latest = state.checkIns
+    .filter((checkIn) => checkIn.completedAt)
+    .sort((left, right) => new Date(right.completedAt!).getTime() - new Date(left.completedAt!).getTime())[0]
+  const recentAnswers = latest?.answers ?? state.submittedAnswers
+  const recentQuestion = initialAssessment.questions.find((question) => question.assessmentType === 'current' && question.category === domain.currentCategory)
+  const usualQuestion = initialAssessment.questions.find((question) => question.assessmentType === 'baseline' && question.category === domain.baselineCategory)
+  const recentAnswer = recentQuestion?.answers.find((answer) => answer.id === recentAnswers[recentQuestion.id])
+  const usualAnswer = usualQuestion?.answers.find((answer) => answer.id === state.submittedAnswers[usualQuestion.id])
+  return {
+    reference: { type: 'balance-domain', id, sourcePath: `/balance/${id}` },
+    title: domain.label,
+    subtitle: 'My Balance',
+    summary: recentAnswer ? `Recent ${domain.label.toLowerCase()}: ${recentAnswer.text}` : `No recent ${domain.label.toLowerCase()} information is available.`,
+    sourcePath: `/balance/${id}`,
+    suggestedQuestions: [
+      'What changed here?',
+      'How might I support this area?',
+      'How does this relate to my usual pattern?',
+    ],
+    sourceIds: ['nature-and-current-balance', 'self-assessment'],
+    payload: {
+      type: 'balance-domain',
+      domain: id,
+      label: domain.label,
+      usualAnswer: usualAnswer?.text,
+      recentAnswer: recentAnswer?.text,
+    },
   }
 }
 
