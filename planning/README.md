@@ -63,11 +63,11 @@ Avoid making every item `P1`. Prefer one or two `P0` items and three to five `P1
 
 ### Active
 
-No implementation item is currently active.
+- [PROD-002 — Run moderated usability sessions](active/PROD-002-moderated-usability-sessions.md)
 
 ### Next
 
-- [PROD-002 — Run moderated usability sessions](backlog/PROD-002-moderated-usability-sessions.md)
+No additional item is queued while moderated usability research is active.
 
 ### Product exploration
 

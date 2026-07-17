@@ -2,7 +2,7 @@
 id: PROD-002
 title: Run moderated usability sessions
 type: exploration
-status: backlog
+status: active
 priority: P1
 area: product
 created: 2026-07-17
@@ -12,6 +12,8 @@ depends_on:
   - EXP-002
 related:
   - docs/design/design-goals.md
+  - docs/research/moderated-usability-protocol.md
+  - docs/research/usability-session-notes-template.md
   - app/e2e/prototype.spec.ts
 ---
 
@@ -48,9 +50,9 @@ Run five short moderated sessions and identify the highest-impact comprehension,
 
 ## Tasks
 
-- [ ] Write a neutral moderator script.
+- [x] Write a neutral moderator script.
 - [ ] Recruit five target users.
-- [ ] Define consent and note-taking process.
+- [x] Define consent and note-taking process.
 - [ ] Run sessions without coaching the interface.
 - [ ] Summarize repeated findings.
 - [ ] Convert validated findings into prioritized work items.
@@ -61,3 +63,8 @@ Run five short moderated sessions and identify the highest-impact comprehension,
 - Findings distinguish observed behavior from opinion.
 - Repeated issues are promoted into planning items.
 - Product scope changes update the relevant specifications.
+
+## Notes
+
+- 2026-07-17: Added a repository-ready moderator protocol and session-notes template. The protocol includes neutral task prompts, consent and recording choices, participant-data minimization, daylight-phase questions, and a consistent observation taxonomy.
+- 2026-07-17: Keep this item active until five participants are recruited, sessions are completed, and repeated findings are synthesized. Do not treat the protocol itself as completion of the research.
