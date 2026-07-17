@@ -63,7 +63,7 @@ Avoid making every item `P1`. Prefer one or two `P0` items and three to five `P1
 
 ### Active
 
-- [EXP-002 — Local daylight ambient theme](active/EXP-002-local-daylight-ambient-theme.md)
+No implementation item is currently active.
 
 ### Next
 
@@ -77,6 +77,7 @@ Avoid making every item `P1`. Prefer one or two `P0` items and three to five `P1
 
 - [PROD-001 — Define the purpose of My Balance](backlog/PROD-001-define-my-balance-purpose.md)
 - [EXP-006 — Explore focused balance-domain detail](backlog/EXP-006-focused-balance-domain-detail.md)
+- [EXP-007 — Evaluate and refine daylight phases](backlog/EXP-007-evaluate-refine-daylight-phases.md)
 
 ### Blocked
 
@@ -84,6 +85,7 @@ Avoid making every item `P1`. Prefer one or two `P0` items and three to five `P1
 
 ### Recently completed
 
+- [EXP-002 — Four-phase local daylight prototype](done/EXP-002-local-daylight-ambient-theme.md)
 - [EXP-001 — Add expressive typography](done/EXP-001-expressive-typography.md)
 
 ## Triage rhythm

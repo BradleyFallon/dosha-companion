@@ -35,6 +35,7 @@ describe('local conditions', () => {
         timezone: 'America/Los_Angeles',
         current: { temperature_2m: 72, apparent_temperature: 70, weather_code: 1 },
         daily: {
+          time: ['2026-07-16'],
           temperature_2m_max: [78],
           temperature_2m_min: [58],
           precipitation_probability_max: [20],
@@ -52,6 +53,7 @@ describe('local conditions', () => {
       highTemperature: 78,
       lowTemperature: 58,
       precipitationProbability: 20,
+      forecastDate: '2026-07-16',
     })
     const url = new URL(fetchMock.mock.calls[0][0])
     expect(url.searchParams.get('latitude')).toBe('45.5')

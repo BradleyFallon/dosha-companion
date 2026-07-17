@@ -10,6 +10,7 @@ import { getAssessmentQuestions } from '../quiz/assessment'
 import { getCheckInQuestionSet } from '../content/repository'
 import { resolveChatContext } from '../chat/context'
 import { createChatMessage, createChatThread } from '../chat/thread'
+import { localDateKey } from '../daylight/model'
 
 afterEach(() => vi.unstubAllGlobals())
 
@@ -528,6 +529,58 @@ describe('limited MVP results and settings', () => {
     expect(container.querySelector('.weather-current-icon')).toHaveAttribute('aria-hidden', 'true')
     expect(container.querySelector('.weather-current-icon')).toHaveAttribute('focusable', 'false')
     container.querySelectorAll('.weather-summary svg').forEach((icon) => expect(icon).toHaveAttribute('focusable', 'false'))
+  })
+
+  it('refreshes stale solar data when Today regains focus', async () => {
+    const currentForecastDate = localDateKey(new Date(), 'America/Los_Angeles')
+    const responses = [
+      { date: '2000-01-01', temperature: 71 },
+      { date: currentForecastDate, temperature: 73 },
+    ]
+    const fetchMock = vi.fn().mockImplementation(async () => {
+      const response = responses[Math.min(fetchMock.mock.calls.length - 1, responses.length - 1)]
+      return {
+        ok: true,
+        json: async () => ({
+          timezone: 'America/Los_Angeles',
+          current: { temperature_2m: response.temperature, apparent_temperature: 70, weather_code: 1 },
+          daily: {
+            time: [response.date],
+            temperature_2m_max: [78],
+            temperature_2m_min: [58],
+            precipitation_probability_max: [20],
+            sunrise: [`${response.date}T05:40`],
+            sunset: [`${response.date}T20:55`],
+          },
+        }),
+      }
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    renderAt('/today', { resultsReached: true, profile: completedProfile('Alex') })
+    expect(await screen.findByText('71°F')).toBeInTheDocument()
+    window.dispatchEvent(new Event('focus'))
+    expect(await screen.findByText('73°F')).toBeInTheDocument()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('supports development-only daylight review overrides before paint', () => {
+    const themeColor = document.createElement('meta')
+    themeColor.name = 'theme-color'
+    themeColor.content = '#fcfbf7'
+    document.head.append(themeColor)
+    const { container, unmount } = renderAt('/today?daylight=night', {
+      resultsReached: true,
+      profile: coreProfileWithoutLocation('Alex'),
+    })
+    const frame = container.querySelector('.app-frame')
+    expect(frame).toHaveAttribute('data-daylight-phase', 'night')
+    expect(frame).toHaveAttribute('data-daylight-override', 'night')
+    expect(document.documentElement).toHaveAttribute('data-daylight-phase', 'night')
+    expect(themeColor).toHaveAttribute('content', '#242226')
+    unmount()
+    expect(document.documentElement).not.toHaveAttribute('data-daylight-phase')
+    expect(themeColor).toHaveAttribute('content', '#fcfbf7')
+    themeColor.remove()
   })
 
   it('shows one contextual location invitation and makes no weather request without location', async () => {

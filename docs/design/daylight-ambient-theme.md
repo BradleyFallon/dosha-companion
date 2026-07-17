@@ -47,6 +47,8 @@ With solar data:
 
 These boundaries are presentation rules rather than astronomical or health claims. They can be revised without changing weather retrieval.
 
+Solar windows shorter than three hours or longer than twenty-one hours are treated as implausible for this prototype. Equal, reversed, malformed, polar-day, polar-night, and otherwise implausible windows use the saved-time-zone fallback instead of forcing overlapping solar phases.
+
 The ambient position is clamped between 12% and 88% of the page width. It represents where the soft light source is placed, not a measured value shown to the user.
 
 ## Data and privacy
@@ -62,6 +64,8 @@ Fallback order:
 
 Weather failure does not disable Today. The time-zone or browser fallback remains available, and the recommendation, navigation, and seasonal content continue to work.
 
+`LocalConditions.forecastDate` records the regional day represented by the forecast. When Today regains focus, a forecast whose date no longer matches the current date in the saved regional time zone is refreshed. This prevents a long-lived tab from applying yesterday’s sunrise and sunset to a new day without adding a recurring midnight timer.
+
 ## Runtime behavior
 
 The app calculates the atmosphere when Today opens. It recalculates when:
@@ -72,6 +76,8 @@ The app calculates the atmosphere when Today opens. It recalculates when:
 - the next phase boundary is reached.
 
 One timeout is scheduled for the next boundary. There is no animation loop or continuously moving sun. CSS transitions only soften palette replacement, and reduced-motion preferences effectively remove them.
+
+The app frame receives its phase during render. A layout effect applies the same phase and mobile browser theme color to the document before the updated React tree paints. Light phases use `color-scheme: light`; twilight and night use `color-scheme: dark`.
 
 ## Styling contract
 
@@ -97,9 +103,17 @@ Phase selectors override semantic variables such as:
 --supporting-ink
 --weather-ink
 --nav-background
+--surface-status
+--status-ink
+--surface-notice
+--notice-ink
+--surface-error
+--error-ink
 ```
 
 Components must use semantic variables rather than phase-specific colors. The decorative wash is a CSS pseudo-element behind Today’s content and has no accessibility semantics.
+
+In development, `/today?daylight=midday|sunset|twilight|night` forces a phase for manual and automated review. Production builds ignore this query parameter; it is not a user appearance preference.
 
 ## Accessibility
 
@@ -112,7 +126,7 @@ Components must use semantic variables rather than phase-specific colors. The de
 
 ## Testing
 
-Pure tests cover solar phases, daylight positioning, time-zone fallback, browser fallback, invalid input, and next-boundary scheduling.
+Pure tests cover solar phases, daylight positioning, time-zone fallback, browser fallback, invalid input, next-boundary scheduling, Northern and Southern Hemisphere examples, half-hour time zones, a daylight-saving transition, exact phase boundaries, and implausible solar windows.
 
 Component tests verify that:
 
@@ -122,7 +136,9 @@ Component tests verify that:
 - users without a saved location receive the browser-time fallback;
 - weather loading and failure leave Today usable.
 
-Visual checks should cover the four phase classes at 390 × 844, 390 × 667, and 360 × 640, plus browser zoom and reduced motion.
+Playwright covers 320 × 568, 360 × 640, 390 × 667, and 390 × 844. It verifies horizontal containment, the Today header, action row, weather essentials, bottom navigation, and representative contrast in all four forced phases.
+
+Automated contrast sampling covers main and muted text, recommendation support text, accent links, primary controls, weather, active and inactive navigation, completion status, notices, errors, and focus indicators.
 
 ## Future evaluation
 

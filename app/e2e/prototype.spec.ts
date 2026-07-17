@@ -3,7 +3,7 @@ import { expect, test, type Page } from '@playwright/test'
 async function mockLocationServices(page: Page) {
   await page.route('**/nominatim.openstreetmap.org/reverse**', (route) => route.fulfill({ json: { display_name: 'Portland, Oregon, United States', address: { city: 'Portland', state: 'Oregon', country: 'United States', country_code: 'us', 'ISO3166-2-lvl4': 'OR' } } }))
   await page.route('**/geocoding-api.open-meteo.com/v1/search**', (route) => route.fulfill({ json: { results: [{ id: 1, name: 'Portland', latitude: 45.523, longitude: -122.676, country_code: 'US', country: 'United States', admin1: 'Oregon', admin1_id: 4100, timezone: 'America/Los_Angeles' }] } }))
-  await page.route('**/api.open-meteo.com/v1/forecast**', (route) => route.fulfill({ json: { timezone: 'America/Los_Angeles', current: { temperature_2m: 72, apparent_temperature: 70, weather_code: 1 }, daily: { temperature_2m_max: [78], temperature_2m_min: [58], precipitation_probability_max: [20], sunrise: ['2026-07-16T05:40'], sunset: ['2026-07-16T20:55'] } } }))
+  await page.route('**/api.open-meteo.com/v1/forecast**', (route) => route.fulfill({ json: { timezone: 'America/Los_Angeles', current: { temperature_2m: 72, apparent_temperature: 70, weather_code: 1 }, daily: { time: ['2026-07-17'], temperature_2m_max: [78], temperature_2m_min: [58], precipitation_probability_max: [20], sunrise: ['2026-07-17T05:40'], sunset: ['2026-07-17T20:55'] } } }))
 }
 
 async function reachLocation(page: Page) {
@@ -54,6 +54,15 @@ async function reachToday(page: Page) {
   await page.getByRole('link', { name: 'View complete sample' }).click()
   await page.getByRole('button', { name: 'Continue to Today' }).click()
   await expect(page.getByRole('group', { name: 'Recommendation actions' })).toBeVisible()
+}
+
+async function loadExampleProfile(page: Page) {
+  await page.goto('/settings')
+  await page.getByRole('button', { name: 'Local data' }).click()
+  page.once('dialog', (dialog) => dialog.accept())
+  await page.getByRole('button', { name: 'Load example profile' }).click()
+  await page.goto('/today')
+  await expect(page.locator('.weather-essentials')).toBeVisible()
 }
 
 async function reachTodayWithFullAssessment(page: Page) {
@@ -107,11 +116,12 @@ test('discusses a Today recommendation in a persistent focused conversation', as
 
 test('keeps Today actions calm and usable at supported mobile sizes', async ({ page }) => {
   await reachToday(page)
+  await loadExampleProfile(page)
 
   await expect(page.getByRole('button', { name: 'Show recommendation details' })).toHaveAttribute('aria-expanded', 'false')
   await expect(page.getByRole('button', { name: 'Dismiss for today' })).not.toBeVisible()
 
-  for (const viewport of [{ width: 390, height: 844 }, { width: 390, height: 667 }, { width: 360, height: 640 }]) {
+  for (const viewport of [{ width: 390, height: 844 }, { width: 390, height: 667 }, { width: 360, height: 640 }, { width: 320, height: 568 }]) {
     await page.setViewportSize(viewport)
     const controls = [
       page.getByRole('button', { name: 'Mark recommendation complete' }),
@@ -125,10 +135,122 @@ test('keeps Today actions calm and usable at supported mobile sizes', async ({ p
       expect(box?.height ?? 0).toBeGreaterThanOrEqual(44)
     })
     expect(Math.max(...boxes.map((box) => box?.y ?? 0)) - Math.min(...boxes.map((box) => box?.y ?? 0))).toBeLessThan(2)
+    const layout = await page.evaluate(() => {
+      const title = document.querySelector('.today-header > div')?.getBoundingClientRect()
+      const settings = document.querySelector('.today-header .icon-control')?.getBoundingClientRect()
+      const weather = document.querySelector<HTMLElement>('.weather-essentials')
+      const navigation = document.querySelector('.bottom-nav')?.getBoundingClientRect()
+      return {
+        noHorizontalOverflow: document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+        headerDoesNotCollide: Boolean(title && settings && title.right <= settings.left),
+        weatherFits: Boolean(weather && weather.scrollWidth <= weather.clientWidth),
+        navigationFits: Boolean(navigation && navigation.left >= 0 && navigation.right <= window.innerWidth),
+      }
+    })
+    expect(layout).toEqual({
+      noHorizontalOverflow: true,
+      headerDoesNotCollide: true,
+      weatherFits: true,
+      navigationFits: true,
+    })
   }
 
   await page.getByRole('button', { name: 'Show recommendation details' }).click()
   await expect(page.getByRole('button', { name: 'Dismiss for today' })).toBeVisible()
+})
+
+test('keeps representative daylight-theme contrast above WCAG thresholds', async ({ page }) => {
+  await reachToday(page)
+  await loadExampleProfile(page)
+
+  for (const phase of ['midday', 'sunset', 'twilight', 'night']) {
+    await page.goto(`/today?daylight=${phase}`)
+    const frame = page.locator('.app-frame')
+    await expect(frame).toHaveAttribute('data-daylight-override', phase)
+    await expect(page.locator('.weather-summary')).toBeVisible()
+
+    const ratios = await page.evaluate(() => {
+      const appFrame = document.querySelector<HTMLElement>('.app-frame')!
+      const feature = document.querySelector<HTMLElement>('.daily-focus')!
+      const weather = document.querySelector<HTMLElement>('.weather-summary')!
+      const navigation = document.querySelector<HTMLElement>('.bottom-nav')!
+      const probes = document.createElement('div')
+      probes.innerHTML = `
+        <a class="contrast-accent" href="#">Accent link</a>
+        <button class="button primary" type="button">Primary action</button>
+        <p class="completion-note">Complete for today</p>
+        <div class="global-notice">Restored notice</div>
+        <div class="global-save-error">Not saved</div>
+      `
+      appFrame.append(probes)
+
+      const parseColor = (value: string) => {
+        const channels = value.match(/[\d.]+/g)?.map(Number) ?? [0, 0, 0]
+        return [channels[0], channels[1], channels[2], channels[3] ?? 1] as const
+      }
+      const blend = (
+        foreground: readonly [number, number, number, number],
+        background: readonly [number, number, number, number],
+      ) => {
+        const alpha = foreground[3] + background[3] * (1 - foreground[3])
+        return [
+          (foreground[0] * foreground[3] + background[0] * background[3] * (1 - foreground[3])) / alpha,
+          (foreground[1] * foreground[3] + background[1] * background[3] * (1 - foreground[3])) / alpha,
+          (foreground[2] * foreground[3] + background[2] * background[3] * (1 - foreground[3])) / alpha,
+          alpha,
+        ] as const
+      }
+      const luminance = (color: readonly [number, number, number, number]) => {
+        const channels = color.slice(0, 3).map((channel) => {
+          const value = channel / 255
+          return value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4
+        })
+        return .2126 * channels[0] + .7152 * channels[1] + .0722 * channels[2]
+      }
+      const contrast = (foreground: string, background: string, backdrop = 'rgb(255, 255, 255)') => {
+        const opaqueBackdrop = parseColor(backdrop)
+        const opaqueBackground = blend(parseColor(background), opaqueBackdrop)
+        const opaqueForeground = blend(parseColor(foreground), opaqueBackground)
+        const foregroundLuminance = luminance(opaqueForeground)
+        const backgroundLuminance = luminance(opaqueBackground)
+        return (Math.max(foregroundLuminance, backgroundLuminance) + .05) /
+          (Math.min(foregroundLuminance, backgroundLuminance) + .05)
+      }
+      const style = (selector: string) => getComputedStyle(document.querySelector<HTMLElement>(selector)!)
+      const frameStyle = getComputedStyle(appFrame)
+      const featureStyle = getComputedStyle(feature)
+      const weatherStyle = getComputedStyle(weather)
+      const navStyle = getComputedStyle(navigation)
+      const settings = document.querySelector<HTMLElement>('.today-header .icon-control')!
+      settings.focus()
+      const paperFocus = getComputedStyle(settings).outlineColor
+      const recommendationInfo = document.querySelector<HTMLElement>('.recommendation-info-control')!
+      recommendationInfo.focus()
+      const featureFocus = getComputedStyle(recommendationInfo).outlineColor
+
+      const values = {
+        mainText: contrast(style('.today-header h1').color, frameStyle.backgroundColor),
+        mutedText: contrast(style('.today-date').color, frameStyle.backgroundColor),
+        supportingText: contrast(style('.recommendation-action').color, featureStyle.backgroundColor),
+        accentLink: contrast(style('.contrast-accent').color, frameStyle.backgroundColor),
+        primaryAction: contrast(style('.button.primary').color, style('.button.primary').backgroundColor),
+        weatherText: contrast(style('.weather-primary span').color, weatherStyle.backgroundColor),
+        navigationActive: contrast(style('.bottom-nav a.active').color, style('.bottom-nav a.active').backgroundColor),
+        navigationInactive: contrast(style('.bottom-nav a:not(.active)').color, navStyle.backgroundColor, frameStyle.backgroundColor),
+        completionStatus: contrast(style('.completion-note').color, style('.completion-note').backgroundColor),
+        notice: contrast(style('.global-notice').color, style('.global-notice').backgroundColor),
+        error: contrast(style('.global-save-error').color, style('.global-save-error').backgroundColor),
+        focusOnPaper: contrast(paperFocus, frameStyle.backgroundColor),
+        focusOnFeature: contrast(featureFocus, featureStyle.backgroundColor),
+      }
+      probes.remove()
+      return values
+    })
+
+    for (const [name, ratio] of Object.entries(ratios)) {
+      expect(ratio, `${phase} ${name}`).toBeGreaterThanOrEqual(name.startsWith('focus') ? 3 : 4.5)
+    }
+  }
 })
 
 test('starts an article conversation from Learn and uses a suggestion', async ({ page }) => {

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { loadLocalConditions, type LocalConditions } from '../location/conditions'
 import { resolveTemperatureUnit } from '../location/units'
 import type { ProfileState } from '../prototype/state'
+import { localDateKey } from './model'
 import { TodayEnvironmentContext } from './TodayEnvironmentContext'
 
 export function TodayEnvironmentProvider({
@@ -15,6 +16,7 @@ export function TodayEnvironmentProvider({
 }) {
   const [conditions, setConditions] = useState<LocalConditions | null>(null)
   const [conditionsError, setConditionsError] = useState('')
+  const [refreshVersion, setRefreshVersion] = useState(0)
   const location = profile.location
   const temperatureUnit = resolveTemperatureUnit(location, profile.temperatureUnitPreference)
 
@@ -32,7 +34,25 @@ export function TodayEnvironmentProvider({
         }
       })
     return () => controller.abort()
-  }, [enabled, location, temperatureUnit])
+  }, [enabled, location, refreshVersion, temperatureUnit])
+
+  useEffect(() => {
+    if (!enabled || !location || !conditions) return
+    const refreshIfStale = () => {
+      if (
+        document.visibilityState === 'visible' &&
+        conditions.forecastDate !== localDateKey(new Date(), conditions.timeZone)
+      ) {
+        setRefreshVersion((version) => version + 1)
+      }
+    }
+    window.addEventListener('focus', refreshIfStale)
+    document.addEventListener('visibilitychange', refreshIfStale)
+    return () => {
+      window.removeEventListener('focus', refreshIfStale)
+      document.removeEventListener('visibilitychange', refreshIfStale)
+    }
+  }, [conditions, enabled, location])
 
   const value = useMemo(() => ({
     conditions,

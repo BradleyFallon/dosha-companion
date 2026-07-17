@@ -9,6 +9,7 @@ export interface LocalConditions {
   highTemperature: number
   lowTemperature: number
   precipitationProbability: number
+  forecastDate: string
   sunrise: string
   sunset: string
   timeZone: string
@@ -28,7 +29,7 @@ export async function loadLocalConditions(location: RegionalLocation, temperatur
   if (!response.ok) throw new Error('Local conditions are unavailable right now.')
   const data = await response.json() as {
     current?: { temperature_2m?: number; apparent_temperature?: number; weather_code?: number }
-    daily?: { temperature_2m_max?: number[]; temperature_2m_min?: number[]; precipitation_probability_max?: number[]; sunrise?: string[]; sunset?: string[] }
+    daily?: { time?: string[]; temperature_2m_max?: number[]; temperature_2m_min?: number[]; precipitation_probability_max?: number[]; sunrise?: string[]; sunset?: string[] }
     timezone?: string
   }
   const temperature = data.current?.temperature_2m
@@ -48,6 +49,7 @@ export async function loadLocalConditions(location: RegionalLocation, temperatur
     highTemperature: highTemperature!,
     lowTemperature: lowTemperature!,
     precipitationProbability: precipitationProbability!,
+    forecastDate: data.daily?.time?.[0] ?? sunrise.slice(0, 10),
     sunrise,
     sunset,
     timeZone: data.timezone ?? location.timeZone,

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
-import { resolveDaylightTheme } from '../daylight/model'
+import { resolveDaylightTheme, type DaylightPhase } from '../daylight/model'
 import { TodayEnvironmentProvider } from '../daylight/TodayEnvironment'
 import { useTodayEnvironment } from '../daylight/TodayEnvironmentContext'
 import { usePrototype } from '../prototype/PrototypeContext'
@@ -13,6 +13,12 @@ import {
 } from '../ui/icons'
 
 const postResultPaths = ['/today', '/questions', '/balance', '/learn', '/assistant', '/chat', '/settings']
+const daylightThemeColors: Record<DaylightPhase, string> = {
+  midday: '#fcfbf7',
+  sunset: '#f8eee4',
+  twilight: '#35323a',
+  night: '#242226',
+}
 
 export function RouteFocus() {
   const location = useLocation()
@@ -32,6 +38,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const focusedQuiz = location.pathname.startsWith('/questions/check-in/')
   const focusedChat = /^\/chat\/(?:new|[^/]+)$/.test(location.pathname)
   const daylightEnabled = location.pathname === '/today'
+  const daylightOverride = import.meta.env.DEV
+    ? parseDaylightOverride(new URLSearchParams(location.search).get('daylight'))
+    : null
   const showNavigation =
     !focusedQuiz && !focusedChat && state.resultsReached && postResultPaths.some((path) => location.pathname.startsWith(path))
 
@@ -39,6 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <TodayEnvironmentProvider enabled={daylightEnabled} profile={state.profile}>
       <AppFrame
         daylightEnabled={daylightEnabled}
+        daylightOverride={daylightOverride}
         dismissRestoreNotice={dismissRestoreNotice}
         focusedChat={focusedChat}
         restoreNotice={state.restoreNotice}
@@ -55,6 +65,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 function AppFrame({
   children,
   daylightEnabled,
+  daylightOverride,
   dismissRestoreNotice,
   focusedChat,
   restoreNotice,
@@ -64,6 +75,7 @@ function AppFrame({
 }: {
   children: ReactNode
   daylightEnabled: boolean
+  daylightOverride: DaylightPhase | null
   dismissRestoreNotice: () => void
   focusedChat: boolean
   restoreNotice: string | null
@@ -73,12 +85,15 @@ function AppFrame({
 }) {
   const { conditions } = useTodayEnvironment()
   const [now, setNow] = useState(() => new Date())
-  const daylightTheme = useMemo(() => resolveDaylightTheme({
+  const resolvedDaylightTheme = useMemo(() => resolveDaylightTheme({
     now,
     timeZone: conditions?.timeZone ?? timeZone,
     sunrise: conditions?.sunrise,
     sunset: conditions?.sunset,
   }), [conditions, now, timeZone])
+  const daylightTheme = daylightOverride
+    ? { ...resolvedDaylightTheme, phase: daylightOverride }
+    : resolvedDaylightTheme
 
   useEffect(() => {
     if (!daylightEnabled) return
@@ -101,11 +116,15 @@ function AppFrame({
     return () => window.clearTimeout(timeout)
   }, [daylightEnabled, daylightTheme.nextTransitionInMinutes, daylightTheme.phase, now])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!daylightEnabled) return
+    const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+    const previousThemeColor = themeColor?.content
     document.documentElement.dataset.daylightPhase = daylightTheme.phase
+    if (themeColor) themeColor.content = daylightThemeColors[daylightTheme.phase]
     return () => {
       delete document.documentElement.dataset.daylightPhase
+      if (themeColor && previousThemeColor) themeColor.content = previousThemeColor
     }
   }, [daylightEnabled, daylightTheme.phase])
 
@@ -121,6 +140,7 @@ function AppFrame({
       className={frameClassName}
       data-daylight-phase={daylightEnabled ? daylightTheme.phase : undefined}
       data-daylight-source={daylightEnabled ? daylightTheme.source : undefined}
+      data-daylight-override={daylightOverride ?? undefined}
       style={ambientStyle}
     >
       <a className="skip-link" href="#main-content">
@@ -144,6 +164,12 @@ function AppFrame({
       {showNavigation ? <BottomNavigation /> : null}
     </div>
   )
+}
+
+function parseDaylightOverride(value: string | null): DaylightPhase | null {
+  return value === 'midday' || value === 'sunset' || value === 'twilight' || value === 'night'
+    ? value
+    : null
 }
 
 function BottomNavigation() {
