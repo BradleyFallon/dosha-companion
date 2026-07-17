@@ -138,6 +138,24 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
+## Continuous integration
+
+GitHub Actions runs the app checks on every pull request and every push to `main`. The single Ubuntu job uses Node.js 22 with npm caching, verifies that generated files match their source data, then runs linting, type checking, unit and component tests, the production build, and Chromium Playwright tests.
+
+Run the same sequence locally from `app/`:
+
+```sh
+npm ci
+npm run generate
+git diff --exit-code
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npx playwright install --with-deps chromium
+npm run test:e2e
+```
+
 ## Static build
 
 ```sh

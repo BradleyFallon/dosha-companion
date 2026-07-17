@@ -67,7 +67,6 @@ No implementation item is currently active.
 
 ### Next
 
-- [ENG-001 — Add continuous integration](backlog/ENG-001-add-continuous-integration.md)
 - [PROD-002 — Run moderated usability sessions](backlog/PROD-002-moderated-usability-sessions.md)
 - [EXP-004 — Reduce dashboard and card styling](backlog/EXP-004-reduce-card-styling.md)
 - [EXP-005 — Add joyful completion motion](backlog/EXP-005-joyful-completion-motion.md)
@@ -84,6 +83,7 @@ No implementation item is currently active.
 
 ### Recently completed
 
+- [ENG-001 — Add continuous integration](done/ENG-001-add-continuous-integration.md)
 - [EXP-003 — Add visible action labels](done/EXP-003-visible-action-labels.md)
 - [EXP-002 — Four-phase local daylight prototype](done/EXP-002-local-daylight-ambient-theme.md)
 - [EXP-001 — Add expressive typography](done/EXP-001-expressive-typography.md)
