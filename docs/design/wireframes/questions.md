@@ -1,29 +1,31 @@
-# Questions Wireframe
+# Check In Wireframe
 
-> Implemented demo update: Questions now combines initial coverage/repair with independent five- and seven-question current check-ins, incomplete-resume behavior, and a short dated history list. Check-ins do not overwrite the initial assessment.
+> The user-facing destination is Check In while the stable route remains `/questions`.
 
 ```text
 +--------------------------------------+
-| ASSESSMENT COVERAGE                  |
-| Questions                            |
+| Check In                             |
 |                                      |
-| Another substantive answer would     |
-| improve the most important gap.      |
+|                 ~                    |
+|          PAST SEVEN DAYS             |
 |                                      |
-| YOUR USUAL NATURE                    |
-| 12 of 19 usable                      |
-| 2 fallback · 3 skipped · 2 unanswered|
+|       How have you felt lately?      |
 |                                      |
-| YOUR CURRENT CHECK-IN                |
-| 3 of 7 usable                        |
-| 1 fallback · 1 skipped · 2 unanswered|
+|          [ Start check-in ]          |
+|             More options             |
 |                                      |
-| [ How coverage was determined      ] |
-| [ Answer next useful question      ] |
-| [ Refinement unavailable           ] |
+| LAST CHECK-IN                        |
+| [✓] Jul 14                 [chat]  > |
 |                                      |
-| [Today] [Questions] [Balance] [Learn]|
+| RECENT                               |
+| [✓] Jul 6                          > |
+| [✓] Jun 28                         > |
+|                                      |
+| [assessment] Initial assessment      |
+|              Complete              > |
+|                                      |
+| [Today] [Check In] [Balance] [Learn]|
 +--------------------------------------+
 ```
 
-The next question is selected by the versioned coverage policy: unmet baseline requirement first, then current, then overall submission count. Within that group, skipped, unanswered, and fallback records are offered in canonical order. Refinement remains disabled until expert-reviewed questions exist.
+An unfinished record replaces the main prompt and action with “Continue where you left off,” its answered-count, and Continue. Quick check-in is the default; Detailed check-in appears only after More options is opened. Assessment coverage, full answers, methodology, and longer history remain in focused subviews or collapsed disclosures.

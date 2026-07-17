@@ -318,24 +318,11 @@ The result may also show:
 
 The app should avoid displaying unjustifiably precise percentages unless those values are clearly presented as internal estimates.
 
-## Continuous Question Stream
+## Check In after the initial assessment
 
-After the initial assessment, the Questions screen should present a small queue of useful questions.
+After the initial assessment, Check In should present one primary recent-state task: continue an unfinished record or start the quick past-seven-days set. A detailed set remains available through progressive disclosure, and assessment refinement lives in a focused management view.
 
-A typical daily visit may show:
-
-> Three questions available
-
-The user may answer:
-
-* One question
-* The suggested batch
-* Additional available questions
-* No questions that day
-
-The system should not require daily participation.
-
-The Question Stream should feel like gradual profile refinement, not an endless unfinished test.
+The system should not require daily participation. Dated check-ins should feel like optional reflection rather than an endless unfinished test.
 
 ## Repetition and answer freshness
 

@@ -79,7 +79,7 @@ export function ResultScreen() {
       <CoverageDetail coverage={outcome.coverage} />
       <p className="boundary-note">Based on self-reported information. Educational, not a medical diagnosis.</p>
       <button className="button primary" type="button" onClick={goToToday}>Go to Today</button>
-      <Link className="button secondary" to="/questions">Review coverage</Link>
+      <Link className="button secondary" to="/questions/assessment">Manage initial assessment</Link>
       {shortModeAllowed() ? (
         <div className="dev-control">
           <strong>Sample profile</strong>

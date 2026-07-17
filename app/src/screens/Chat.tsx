@@ -336,7 +336,7 @@ function relativeDate(value: string) {
 
 function returnLabel(path: string) {
   if (path.startsWith('/learn')) return 'Learn'
-  if (path === '/questions') return 'Questions'
+  if (path === '/questions') return 'Check In'
   if (path === '/balance') return 'My Balance'
   return 'Today'
 }

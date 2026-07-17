@@ -85,6 +85,8 @@ export function QuestionScreen() {
     ? state.selectedAnswerId ?? state.submittedAnswers[question.id] ?? null
     : null
   const total = questions.length
+  const returnTarget = new URLSearchParams(routeLocation.search).get('return')
+  const assessmentReturnPath = returnTarget === 'assessment' ? '/questions/assessment' : null
 
   function advance(answerId?: string) {
     if (!question) return
@@ -95,9 +97,8 @@ export function QuestionScreen() {
       dispatch({ type: 'skip-question', questionId: question.id, nextIndex })
     }
 
-    const returnTarget = new URLSearchParams(routeLocation.search).get('return')
-    if (returnTarget === 'results' || returnTarget === 'questions') {
-      navigate(returnTarget === 'results' ? '/results' : '/questions')
+    if (returnTarget === 'results' || returnTarget === 'questions' || returnTarget === 'assessment') {
+      navigate(returnTarget === 'results' ? '/results' : returnTarget === 'assessment' ? '/questions/assessment' : '/questions')
       return
     }
 
@@ -117,6 +118,10 @@ export function QuestionScreen() {
 
   function goBack() {
     if (!question) return
+    if (assessmentReturnPath) {
+      navigate(assessmentReturnPath)
+      return
+    }
     if (index === 0) {
       navigate('/assessment')
       return
@@ -147,7 +152,7 @@ export function QuestionScreen() {
     <Screen className="question-screen">
       <div className="question-fixed-header">
         <div className="assessment-topline">
-          <Link to="/">Save and exit</Link>
+          <Link to={assessmentReturnPath ?? '/'}>{assessmentReturnPath ? 'Back to assessment' : 'Save and exit'}</Link>
           <Status>{state.saveStatus === 'saved' ? 'Saved on this device' : state.saveStatus}</Status>
         </div>
         <div className="question-progress-row">

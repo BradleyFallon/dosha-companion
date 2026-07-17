@@ -97,7 +97,7 @@ describe('navigation visibility', () => {
     const navigation = screen.getByRole('navigation', { name: 'Primary navigation' })
     expect(navigation).toBeInTheDocument()
     expect(navigation.querySelector('a[href="/today"]')).toHaveAttribute('aria-current', 'page')
-    for (const label of ['Today', 'Questions', 'My Balance', 'Learn']) {
+    for (const label of ['Today', 'Check In', 'My Balance', 'Learn']) {
       const link = screen.getByRole('link', { name: label })
       const icon = link.querySelector('svg')
       expect(icon).toBeInTheDocument()
@@ -114,6 +114,10 @@ describe('navigation visibility', () => {
     })
     expect(screen.queryByRole('navigation', { name: 'Primary navigation' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    expect(screen.getByRole('link', { name: 'Finish later' })).toBeInTheDocument()
+    expect(screen.getByRole('progressbar')).toHaveAttribute('value', '1')
+    expect(screen.queryByText('Saved on this device')).not.toBeInTheDocument()
+    expect(screen.queryByText('Arrow keys to choose · Enter to continue')).not.toBeInTheDocument()
   })
 
   it('renders the temporary dosha mark as three decorative, unfocusable icons', () => {
@@ -139,6 +143,80 @@ describe('navigation visibility', () => {
       expect(icon).toHaveAttribute('focusable', 'false')
       expect(icon).not.toHaveAttribute('tabindex')
     })
+  })
+})
+
+describe('calm Check In experience', () => {
+  it('centers the default screen on one quick check-in action', async () => {
+    const user = userEvent.setup()
+    renderAt('/questions', { resultsReached: true, checkIns: [], submittedAnswers: {} })
+    expect(screen.getByRole('heading', { name: 'Check In' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'How have you felt lately?' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Start check-in' })).toHaveAttribute('href', '/questions/check-in/new?set=quick-current')
+    expect(screen.queryByText(/usable answers|fallback|unanswered|coverage-policy/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Recent' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Initial assessment/ })).toHaveAttribute('href', '/questions/assessment')
+    expect(screen.getByRole('link', { name: 'Detailed check-in' })).not.toBeVisible()
+    await user.click(screen.getByText('More options'))
+    expect(screen.getByRole('link', { name: 'Detailed check-in' })).toBeVisible()
+  })
+
+  it('makes an unfinished check-in the only primary task', () => {
+    const set = getCheckInQuestionSet('quick-current')!
+    const question = initialAssessment.questions.find((item) => item.id === set.questionIds[0])!
+    renderAt('/questions', {
+      resultsReached: true,
+      checkIns: [{ id: 'in-progress', setId: set.id, startedAt: '2026-07-16T10:00:00.000Z', completedAt: null, answers: { [question.id]: question.answers[0].id } }],
+    })
+    expect(screen.getByRole('heading', { name: 'Continue where you left off' })).toBeInTheDocument()
+    expect(screen.getByText('1 of 5 answered')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Continue' })).toHaveAttribute('href', '/questions/check-in/in-progress')
+    expect(screen.queryByRole('link', { name: 'Start check-in' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Detailed check-in' })).not.toBeInTheDocument()
+  })
+
+  it('limits recent history, exposes date-specific chat, and opens a focused summary', async () => {
+    const user = userEvent.setup()
+    const set = getCheckInQuestionSet('quick-current')!
+    const answers = checkInAnswers(set.questionIds)
+    const checkIns = Array.from({ length: 5 }, (_, index) => ({
+      id: `complete-${index}`,
+      setId: set.id,
+      startedAt: `2026-07-${String(15 - index).padStart(2, '0')}T10:00:00.000Z`,
+      completedAt: `2026-07-${String(15 - index).padStart(2, '0')}T10:05:00.000Z`,
+      answers,
+    }))
+    renderAt('/questions', { resultsReached: true, checkIns })
+    expect(screen.getAllByRole('link', { name: /Review .* check-in/ })).toHaveLength(3)
+    expect(screen.getByRole('link', { name: /Talk through .* check-in/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View all' })).toHaveAttribute('href', '/questions/history')
+    await user.click(screen.getAllByRole('link', { name: /Review .* check-in/ })[0])
+    expect(screen.getByText('5 answers')).toBeInTheDocument()
+    expect(screen.getByText('Answers').closest('details')).not.toHaveAttribute('open')
+    expect(screen.getByText('About this check-in').closest('details')).not.toHaveAttribute('open')
+  })
+
+  it('keeps assessment coverage in a focused collapsed view', async () => {
+    const user = userEvent.setup()
+    renderAt('/questions/assessment', { resultsReached: true, submittedAnswers: {} })
+    expect(screen.getByRole('heading', { name: 'Initial assessment' })).toBeInTheDocument()
+    expect(screen.getByText(/questions remaining/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Continue assessment' })).toBeInTheDocument()
+    expect(screen.getByText('Coverage details').closest('details')).not.toHaveAttribute('open')
+    expect(screen.queryByText('Answered clearly')).not.toBeVisible()
+    await user.click(screen.getByText('Coverage details'))
+    expect(screen.getByText('Answered clearly')).toBeVisible()
+    expect(screen.getByText('Remaining')).toBeVisible()
+  })
+
+  it('returns assessment maintenance questions to the focused management screen', async () => {
+    const user = userEvent.setup()
+    const first = getAssessmentQuestions('short', true)[0]
+    renderAt(`/assessment/question/${first.id}?return=assessment`, { resultsReached: true })
+    expect(screen.getByRole('link', { name: 'Back to assessment' })).toHaveAttribute('href', '/questions/assessment')
+    await user.click(screen.getAllByRole('radio')[0])
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(screen.getByRole('heading', { name: 'Initial assessment' })).toBeInTheDocument()
   })
 })
 
@@ -255,7 +333,10 @@ describe('limited MVP results and settings', () => {
       await user.click(screen.getAllByRole('radio')[0])
       await user.click(screen.getByRole('button', { name: index === set.questionIds.length - 1 ? 'Complete check-in' : 'Continue' }))
     }
-    expect(screen.getByRole('heading', { name: 'Your recent answers were saved' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Check-in saved' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Done' })).toHaveAttribute('href', '/today')
+    expect(screen.getByRole('link', { name: /Talk through .* check-in/ })).toBeInTheDocument()
+    expect(screen.getByText('About this check-in').closest('details')).not.toHaveAttribute('open')
     const snapshot = JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}')
     expect(snapshot.state.submittedAnswers).toEqual(initial)
     expect(snapshot.state.checkIns[0].completedAt).toBeTruthy()
@@ -437,6 +518,13 @@ function allOrdinaryAnswers() {
     question.id,
     question.answers.find((answer) => answer.kind === 'ordinary')?.id ?? '',
   ]))
+}
+
+function checkInAnswers(questionIds: string[]) {
+  return Object.fromEntries(questionIds.map((questionId) => {
+    const question = initialAssessment.questions.find((item) => item.id === questionId)!
+    return [questionId, question.answers[0].id]
+  }))
 }
 
 function completedProfile(preferredName: string) {

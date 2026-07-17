@@ -144,13 +144,15 @@ test('anchors seasonal-food chat to the saved regional context', async ({ page }
 
 test('talks through a completed check-in with recent-answer context', async ({ page }) => {
   await reachToday(page)
-  await page.getByRole('link', { name: 'Questions' }).click()
-  await page.getByRole('link', { name: 'Start current check-in' }).click()
+  await page.getByRole('link', { name: 'Check In', exact: true }).click()
+  await page.getByRole('link', { name: 'Start check-in' }).click()
   for (let index = 0; index < 5; index += 1) {
     await page.getByRole('radio').first().check()
     await page.getByRole('button', { name: index === 4 ? 'Complete check-in' : 'Continue' }).click()
   }
-  await page.getByRole('link', { name: 'Talk through this check-in' }).click()
+  await expect(page.getByRole('heading', { name: 'Check-in saved' })).toBeVisible()
+  await expect(page.getByText('About this check-in').locator('..')).not.toHaveAttribute('open')
+  await page.getByRole('link', { name: /Talk through .* check-in/ }).click()
   await page.getByRole('button', { name: /Show context for/ }).click()
   await expect(page.getByText(/5 recent answers saved separately/)).toBeVisible()
   await page.getByRole('button', { name: 'What should I keep observing?' }).click()
@@ -390,16 +392,25 @@ test('uses every post-assessment destination in the mobile demo', async ({ page 
   await expect(page.getByText('Complete for today')).toBeVisible()
   await page.getByRole('button', { name: 'Show another recommendation' }).click()
 
-  await page.getByRole('link', { name: 'Questions' }).click()
-  await expect(page.getByRole('heading', { name: 'Questions' })).toBeVisible()
-  await page.getByRole('link', { name: 'Start current check-in' }).click()
+  await page.getByRole('link', { name: 'Check In', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Check In' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Start check-in' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Detailed check-in' })).not.toBeVisible()
+  await page.getByRole('link', { name: 'Start check-in' }).click()
   await expect(page.getByRole('navigation', { name: 'Primary navigation' })).not.toBeVisible()
   for (const viewport of [{ width: 390, height: 844 }, { width: 390, height: 667 }, { width: 360, height: 640 }]) {
     await page.setViewportSize(viewport)
     const action = page.getByRole('button', { name: 'Continue' })
     const actionBox = await action.boundingBox()
+    const closeBox = await page.getByRole('link', { name: 'Finish later' }).boundingBox()
+    const answerBox = await page.getByRole('radio').first().locator('..').boundingBox()
     expect(actionBox).not.toBeNull()
+    expect(closeBox).not.toBeNull()
+    expect(answerBox).not.toBeNull()
     expect((actionBox?.y ?? 0) + (actionBox?.height ?? 0)).toBeLessThanOrEqual(viewport.height)
+    expect(answerBox?.height ?? 0).toBeGreaterThanOrEqual(44)
+    expect(closeBox?.width ?? 0).toBeGreaterThanOrEqual(44)
+    expect(closeBox?.height ?? 0).toBeGreaterThanOrEqual(44)
     expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1)).toBe(true)
   }
   for (let index = 0; index < 5; index += 1) {
@@ -407,9 +418,11 @@ test('uses every post-assessment destination in the mobile demo', async ({ page 
     await page.getByRole('radio').first().check()
     await page.getByRole('button', { name: index === 4 ? 'Complete check-in' : 'Continue' }).click()
   }
-  await expect(page.getByRole('heading', { name: 'Your recent answers were saved' })).toBeVisible()
-  await page.getByRole('link', { name: 'View check-in history' }).click()
-  await expect(page.getByText(/Completed · 5 answers/)).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Check-in saved' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Done' })).toBeVisible()
+  await expect(page.getByText('About this check-in').locator('..')).not.toHaveAttribute('open')
+  await page.getByRole('link', { name: 'Check In' }).click()
+  await expect(page.getByRole('link', { name: /Review .* check-in/ }).first()).toBeVisible()
 
   await page.getByRole('link', { name: 'My Balance' }).click()
   await expect(page.getByText('1 completed')).toBeVisible()

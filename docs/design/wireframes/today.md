@@ -26,7 +26,7 @@
 | [ Why this was chosen              ] |
 | No dosha score was used.             |
 |                                      |
-| [Today] [Questions] [Balance] [Learn]|
+| [Today] [Check In] [Balance] [Learn]|
 +--------------------------------------+
 ```
 

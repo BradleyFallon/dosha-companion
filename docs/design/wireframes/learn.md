@@ -29,7 +29,7 @@
 | All recommendations use published,  |
 | expert-reviewed content.             |
 |                                      |
-| [Today] [Questions] [Balance] [Learn]|
+| [Today] [Check In] [Balance] [Learn]|
 +--------------------------------------+
 ```
 

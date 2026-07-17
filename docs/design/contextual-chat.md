@@ -25,7 +25,7 @@ Chat does not change profile data, assessment answers, check-ins, recommendation
 - `/chat/new` validates a context reference, creates a thread, and replaces itself with `/chat/:threadId`.
 - `/chat/:threadId` is the focused conversation surface.
 
-New-chat links use semantic return keys for Today, Learn, Questions, and My Balance. Article and other source paths are resolved from known catalog IDs rather than trusted from query strings. Invalid references show a recoverable state.
+New-chat links use semantic return keys for Today, Learn, Check In, and My Balance. Article and other source paths are resolved from known catalog IDs rather than trusted from query strings. Invalid references show a recoverable state.
 
 ## Focused layout
 

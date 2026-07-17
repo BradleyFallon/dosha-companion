@@ -31,7 +31,7 @@ flowchart TD
 - Welcome, sign-up, profile setup, and assessment are focused flows without bottom navigation.
 - A back action appears where it will not discard required profile state.
 - “Save and exit” appears from assessment introduction onward and returns to a resumable home/interstitial state.
-- Primary bottom navigation appears after the assessment reaches Results and the user enters Today.
+- Primary bottom navigation appears after the assessment reaches Results and the user enters Today. Its operational question destination is labeled Check In while retaining the `/questions` route.
 - Deep links into post-assessment screens redirect an incomplete user to the appropriate resume point.
 
 ## Flow states
@@ -47,7 +47,7 @@ flowchart TD
 | Current question | “Your current balance,” progress, recent time window | Continue after selection | Not sure; skip; back; save and exit |
 | Missing coverage | More information needed and why | Answer next useful question | Exit |
 | Coverage result | Separate baseline/current coverage and scoring boundary | Go to Today | Repair coverage |
-| Today | Daily focus and practical action | View action or guidance | Questions; why chosen; AI entry |
+| Today | Daily focus and practical action | View action or guidance | Check In; why chosen; AI entry |
 
 Location is collected contextually after core onboarding. The location route requires only completed name and birth-year fields and safely returns to Today, Settings, Learn, or My Balance through an allowlisted return key.
 
@@ -75,6 +75,18 @@ Location is collected contextually after core onboarding. The location route req
 6. Editing an already saved answer creates the appropriate superseding record in production behavior.
 
 On keyboard-capable browsers, Left/Up and Right/Down move through answers with wrapping. Enter confirms the selected answer. Keyboard shortcuts do not take over while a link, button, text field, or disclosure has focus.
+
+### Repeat check-ins
+
+Repeat check-ins use the same persistence and keyboard behavior but quieter presentation than the initial assessment:
+
+- The quick past-seven-days set is the default from Check In; the detailed set is disclosed under More options.
+- An unfinished record replaces Start check-in with Continue and a simple answered-count.
+- The fixed header contains an icon-only Finish later action and progress dots with a hidden “Question n of total” equivalent.
+- Set names, permanent keyboard hints, save-success copy, and repeated methodology text are omitted.
+- Answers remain native radio controls presented as large text rows with a soft selected state.
+- The fixed action area uses an accessible icon-first Continue or Complete check-in control.
+- Completion and reopened summaries collapse full answers and the assessment/scoring explanation.
 
 ### Saving and connectivity
 

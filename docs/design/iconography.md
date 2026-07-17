@@ -2,7 +2,7 @@
 
 The interactive prototype uses `@phosphor-icons/react` as its temporary icon source. Application screens normally import semantic names from `app/src/ui/icons.tsx`, never Phosphor components directly. This boundary keeps product intent separate from a particular icon drawing and makes later replacement straightforward.
 
-Phosphor React 2.1.10 exports the requested designs without an `Icon` suffix (`Sun`, `Spiral`, and so on). The semantic layer deliberately exposes application names such as `TodayIcon`, `QuestionsIcon`, `NatureIcon`, and `CompleteIcon`; no requested design needed a visual substitution.
+Phosphor React 2.1.10 exports the requested designs without an `Icon` suffix (`Sun`, `Spiral`, and so on). The semantic layer deliberately exposes application names such as `TodayIcon`, `CheckInIcon`, `NatureIcon`, and `CompleteIcon`; no requested design needed a visual substitution.
 
 Weather presentation uses the same semantic boundary and keeps every value visible as text. The mappings are:
 

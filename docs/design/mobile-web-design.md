@@ -30,7 +30,7 @@ The MVP is a mobile-first responsive web app. See `decisions/0001-mobile-first-w
 
 ## Initial navigation
 
-The proposed primary destinations are Today, Questions, My Balance, and Learn, with a clear entry point to the AI assistant.
+The primary destinations are Today, Check In, My Balance, and Learn, with a clear entry point to the AI assistant.
 
 ## Validation
 
@@ -38,4 +38,3 @@ The proposed primary destinations are Today, Questions, My Balance, and Learn, w
 - TODO: Test at 320 px, 390 px, large mobile, tablet, and desktop widths.
 - TODO: Set the desktop content-width token.
 - TODO: Run accessibility and one-handed-use reviews on critical flows.
-

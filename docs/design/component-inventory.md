@@ -9,7 +9,7 @@ This is a low-fidelity inventory of reusable interaction patterns. Names describ
 | Component | Purpose | Key states |
 | --------- | ------- | ---------- |
 | App header | Product identity, back, close, or settings action | Default, focused flow, offline |
-| Bottom navigation | Today, Questions, My Balance, Learn | Hidden during onboarding/assessment; active destination; badge |
+| Bottom navigation | Today, Check In, My Balance, Learn | Hidden during onboarding, assessment, and active check-ins; active destination |
 | Page title block | One dominant heading with only essential orientation | Default, with compact status |
 | Primary action | Advance or complete the main task | Default, disabled, loading, success |
 | Secondary action | Alternate path without competing with primary | Default, disabled |
@@ -41,6 +41,21 @@ This is a low-fidelity inventory of reusable interaction patterns. Names describ
 | Skip action | Defer without answering | Available, confirmation for required coverage |
 | Assessment footer | Back, Continue, save/exit | Continue disabled/enabled, saving, offline |
 | Section transition | Reset time frame between sections | Baseline complete, current introduction |
+| Assessment management row | Open focused initial-assessment maintenance from Check In | Complete, questions remaining |
+| Coverage disclosure | Reveal plain-language assessment completeness details | Collapsed by default, expanded |
+
+## Check In
+
+| Component | Purpose | Key states |
+| --------- | ------- | ---------- |
+| Primary check-in prompt | Start the quick recent-state check-in or resume unfinished work | Ready to start, incomplete with answer count |
+| More-options disclosure | Reveal the detailed check-in without competing with the primary action | Collapsed, expanded |
+| Completed check-in row | Open a dated summary or contextual chat | Latest, recent, history list |
+| Check-in question header | Finish later and communicate progress with minimal chrome | Question position, final question |
+| Check-in answer row | Preserve native radio behavior in a quiet, large target | Default, focused, selected |
+| Check-in summary | Confirm persistence and offer one primary return action | Just completed, reopened |
+| Answer disclosure | Reveal the stored question-and-answer list | Collapsed, expanded |
+| Check-in information | Explain assessment separation and scoring boundary | Collapsed, expanded |
 
 ## Results and balance
 

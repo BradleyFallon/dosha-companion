@@ -20,12 +20,12 @@
 | NO DOSHA RESULT CALCULATED           |
 | Weights and thresholds are unapproved|
 |                                      |
-| [ How coverage was determined      ] |
+| [ Check in and review history      ] |
 | [ Edit profile settings            ] |
 | [ Change regional location         ] |
 |                                      |
-| [Today] [Questions] [Balance] [Learn]|
+| [Today] [Check In] [Balance] [Learn]|
 +--------------------------------------+
 ```
 
-Score tracks, percentages, and constitution/current-dosha labels are omitted until expert-approved scoring exists.
+Score tracks, percentages, and constitution/current-dosha labels are omitted until expert-approved scoring exists. Check In owns starting, resuming, and reviewing dated records plus initial-assessment maintenance. My Balance does not duplicate that operational history; it is reserved for future approved interpretation and comparison.

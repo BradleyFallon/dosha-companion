@@ -440,6 +440,72 @@ progress::-moz-progress-bar { background: var(--accent); }
 .settings-section-panel .privacy-line { margin-bottom: 0; }
 .settings-screen > .save-status { margin-top: 16px; text-align: left; }
 
+/* Check In */
+.check-in-screen > h1 { margin-bottom: var(--space-section); }
+.check-in-primary { display: flex; max-width: 430px; margin: 0 auto var(--space-section); flex-direction: column; align-items: center; text-align: center; }
+.check-in-primary-icon { width: 72px; height: 72px; margin-bottom: 14px; color: var(--accent); }
+.check-in-timeframe { margin: 0 0 6px; color: var(--muted); font-size: .82rem; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
+.check-in-primary h2 { max-width: 21rem; margin-bottom: 10px; font-size: clamp(1.9rem, 8vw, 2.6rem); line-height: 1.12; }
+.check-in-primary > p:not(.check-in-timeframe) { color: var(--muted); }
+.check-in-primary > .button { max-width: 320px; margin-top: 8px; }
+.check-in-options { margin-top: 10px; color: var(--muted); }
+.check-in-options summary { display: inline-flex; min-height: 44px; align-items: center; color: var(--accent); font-weight: 700; cursor: pointer; }
+.check-in-options .text-link { justify-content: center; }
+.check-in-latest, .check-in-recent { margin-top: 30px; }
+.check-in-latest h2, .check-in-recent h2 { margin-bottom: 6px; color: var(--muted); font-size: .86rem; letter-spacing: .07em; text-transform: uppercase; }
+.compact-check-in-list { margin: 0; padding: 0; list-style: none; }
+.compact-check-in-list li { display: grid; min-height: 58px; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 8px; border-top: 1px solid var(--line); }
+.compact-check-in-list li > svg:first-child { width: 22px; height: 22px; color: var(--accent); }
+.compact-check-in-list li > svg:last-child { width: 18px; height: 18px; color: var(--muted); }
+.compact-check-in-list li > a:not(.icon-control) { display: flex; min-height: 52px; align-items: center; color: var(--ink); font-weight: 750; text-decoration: none; }
+.compact-check-in-list .icon-control { width: 44px; height: 44px; }
+.compact-destination-row { display: grid; min-height: 68px; margin-top: var(--space-section); padding: 8px 2px; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; color: var(--ink); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); text-decoration: none; }
+.compact-destination-row > svg:first-child { width: 26px; height: 26px; color: var(--accent); }
+.compact-destination-row > svg:last-child { width: 18px; height: 18px; color: var(--muted); }
+.compact-destination-row span { display: flex; flex-direction: column; }
+.compact-destination-row small { color: var(--muted); }
+.focused-screen-icon { width: 58px; height: 58px; margin: 12px 0 18px; color: var(--accent); }
+.check-in-history-screen > h1, .assessment-management-screen > h1 { margin-bottom: 28px; }
+.assessment-status { margin: 0 0 22px; color: var(--muted); font-size: 1.15rem; font-weight: 750; }
+.assessment-status.complete { color: var(--accent); }
+.assessment-management-screen > .text-link { display: flex; width: fit-content; margin-top: 10px; }
+.assessment-coverage { margin-top: 28px; }
+
+.check-in-question-header { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 10px; }
+.check-in-header-spacer { width: 44px; height: 44px; }
+.check-in-progress-dots { display: flex; min-width: 0; align-items: center; justify-content: center; gap: clamp(5px, 2vw, 9px); }
+.check-in-progress-dots span { width: 7px; height: 7px; flex: 0 0 auto; border-radius: 50%; background: var(--line); }
+.check-in-progress-dots span.complete { background: #8ba49d; }
+.check-in-progress-dots span.active { width: 9px; height: 9px; background: var(--accent); }
+.check-in-question-screen .question-scroll-region { padding-top: 20px; }
+.check-in-question-screen h1 { max-width: 30rem; margin: 0 auto 24px; text-align: center; }
+.check-in-question-screen .check-in-timeframe { text-align: center; }
+.check-in-answer-list { max-width: 34rem; margin: 12px auto 0; gap: 0; border-top: 1px solid var(--line); }
+.check-in-answer-option { min-height: 56px; padding: 12px 8px; grid-template-columns: minmax(0, 1fr) 24px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; font-size: 1.03rem; }
+.check-in-answer-option.selected { border: 0; border-bottom: 1px solid var(--line); background: var(--accent-soft); box-shadow: none; }
+.check-in-selection { display: grid; width: 24px; height: 24px; place-items: center; color: var(--accent); }
+.check-in-selection svg { width: 21px; height: 21px; }
+.check-in-action-shell { display: flex; min-height: 61px; padding-top: 8px; justify-content: flex-end; }
+.check-in-next-control { width: 52px; height: 52px; flex-basis: 52px; }
+.check-in-next-control:disabled { color: #88847d; background: #ddd8ce; }
+
+.check-in-summary-screen { text-align: center; }
+.check-in-summary-screen .back-link { width: fit-content; }
+.check-in-complete-icon { width: 74px; height: 74px; margin: 30px auto 18px; color: var(--accent); }
+.check-in-summary-screen .focused-screen-icon { display: block; margin: 30px auto 18px; }
+.check-in-summary-screen h1 { margin-bottom: 8px; }
+.check-in-answer-count { color: var(--muted); font-size: 1.05rem; }
+.check-in-summary-actions { display: flex; max-width: 360px; margin: 24px auto 34px; flex-direction: column; }
+.check-in-answer-details, .check-in-about { max-width: 520px; margin-right: auto; margin-left: auto; text-align: left; }
+.check-in-answer-details { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.check-in-answer-details summary { display: flex; min-height: 56px; align-items: center; justify-content: space-between; color: var(--ink); font-weight: 750; cursor: pointer; }
+.check-in-answer-details summary svg { width: 18px; height: 18px; color: var(--muted); transition: transform 160ms ease; }
+.check-in-answer-details[open] summary svg { transform: rotate(90deg); }
+.check-in-answer-details dl { margin: 0; }
+.check-in-answer-details dl div { padding: 14px 0; border-top: 1px solid var(--line); }
+.check-in-answer-details dt { font-weight: 700; }
+.check-in-answer-details dd { margin: 4px 0 0; color: var(--muted); }
+
 @keyframes calm-reveal {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }

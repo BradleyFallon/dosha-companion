@@ -2,7 +2,7 @@
 
 ## One idea at a time
 
-Each primary screen has one dominant purpose. Today centers the recommendation, Chat centers the question or conversation, Learn centers browsing, and Settings centers the selected section. Secondary destinations remain available without receiving equal visual weight.
+Each primary screen has one dominant purpose. Today centers the recommendation, Check In centers starting or continuing a recent-state check-in, Chat centers the question or conversation, Learn centers browsing, and Settings centers the selected section. Secondary destinations remain available without receiving equal visual weight.
 
 ## Reduce text before reducing meaning
 
@@ -22,7 +22,7 @@ Use visible text for less familiar actions such as Add location, Start check-in,
 
 ## Progressive disclosure
 
-The calm default shows what is necessary to understand and act. Disclosures hold recommendation reasoning, weather details, context summaries, boundary explanations, and settings controls. Only one Settings section is open at once. Disclosures must not conceal information required for a safe choice.
+The calm default shows what is necessary to understand and act. Disclosures hold recommendation reasoning, weather details, context summaries, boundary explanations, settings controls, detailed check-in choices, full answer history, and assessment coverage. Only one Settings section is open at once. Disclosures must not conceal information required for a safe choice.
 
 ## Space and typography
 
@@ -38,6 +38,7 @@ The same interaction model works from 360-pixel phones through desktop. At 390 Ã
 
 - focused chat owns the viewport and keeps its composer visible;
 - quiz actions stay above safe-area insets;
+- quiz progress and exit controls remain visible while only the variable question region scrolls;
 - icon action rows remain on one usable line;
 - weather values stay scannable;
 - context titles truncate safely;

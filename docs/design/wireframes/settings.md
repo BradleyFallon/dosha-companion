@@ -24,7 +24,7 @@
 | [ Change regional location         ] |
 |                                      |
 | Stored only in this browser.         |
-| [Today] [Questions] [Balance] [Learn]|
+| [Today] [Check In] [Balance] [Learn]|
 +--------------------------------------+
 ```
 

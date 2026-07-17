@@ -14,13 +14,16 @@ import {
   CaretDown,
   CaretUp,
   CirclesThree,
+  ClipboardText,
   Cloud,
   CloudFog,
   CloudLightning,
   CloudRain,
   CloudSnow,
   CloudSun,
+  ClockCounterClockwise,
   DeviceMobile,
+  DotsThree,
   Drop,
   Export,
   Fingerprint,
@@ -48,6 +51,7 @@ import {
   UserCircle,
   WarningCircle,
   Waves,
+  X,
   XCircle,
   type IconProps,
 } from '@phosphor-icons/react'
@@ -108,6 +112,7 @@ export const SeasonIcon = Leaf
 // Primary navigation
 export const TodayIcon = Sun
 export const QuestionsIcon = ListChecks
+export const CheckInIcon = ListChecks
 export const BalanceIcon = CirclesThree
 export const LearnIcon = BookOpenText
 export const GuidedHelpIcon = MagnifyingGlass
@@ -139,5 +144,9 @@ export const ExpandIcon = CaretDown
 export const CollapseIcon = CaretUp
 export const OpenOriginalIcon = ArrowSquareOut
 export const InfoIcon = Info
+export const HistoryIcon = ClockCounterClockwise
+export const AssessmentIcon = ClipboardText
+export const MoreIcon = DotsThree
+export const CloseIcon = X
 
 export type { IconProps }

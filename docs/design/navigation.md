@@ -1,6 +1,6 @@
 # Navigation
 
-The focused onboarding and assessment flow hides primary navigation. After Results, the persistent destinations are Today, Questions, My Balance, and Learn.
+The focused onboarding and assessment flow hides primary navigation. After Results, the persistent destinations are Today, Check In, My Balance, and Learn. Check In retains the `/questions` route for stable links.
 
 Settings is reached from Today and My Balance rather than occupying a bottom-navigation slot. The unavailable Assistant is reached from Today. Location editing is a nested Settings/My Balance flow and returns to its caller.
 

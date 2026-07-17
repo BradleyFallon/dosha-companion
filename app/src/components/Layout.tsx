@@ -4,8 +4,8 @@ import { usePrototype } from '../prototype/PrototypeContext'
 import {
   BackIcon,
   BalanceIcon,
+  CheckInIcon,
   LearnIcon,
-  QuestionsIcon,
   TodayIcon,
 } from '../ui/icons'
 
@@ -59,7 +59,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 function BottomNavigation() {
   const links = [
     ['/today', 'Today', TodayIcon],
-    ['/questions', 'Questions', QuestionsIcon],
+    ['/questions', 'Check In', CheckInIcon],
     ['/balance', 'My Balance', BalanceIcon],
     ['/learn', 'Learn', LearnIcon],
   ] as const
@@ -104,7 +104,7 @@ export function Screen({
 
 export function BackLink({ to, label = 'Back' }: { to: string; label?: string }) {
   return (
-    <NavLink className="back-link" to={to}>
+    <NavLink className="back-link" end to={to}>
       <BackIcon aria-hidden="true" className="icon-leading" focusable="false" />
       <span>{label}</span>
     </NavLink>

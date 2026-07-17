@@ -46,7 +46,7 @@ The MVP should establish whether users complete the initial assessment, understa
 
 - Mobile-first responsive web application
 - Today screen
-- Questions screen
+- Check In screen
 - My Balance screen
 - Learn screen
 - Article view

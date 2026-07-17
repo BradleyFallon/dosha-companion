@@ -11,7 +11,7 @@ import { nextResumePath } from './prototype/resume'
 import { AssessmentIntroScreen, QuestionScreen, TransitionScreen } from './screens/Assessment'
 import { ResultScreen } from './screens/Results'
 import { TodayScreen } from './screens/Today'
-import { BalanceScreen, QuestionsScreen } from './screens/Secondary'
+import { AssessmentManagementScreen, BalanceScreen, CheckInHistoryScreen, QuestionsScreen } from './screens/Secondary'
 import { SettingsScreen } from './screens/Settings'
 import { ArticleScreen, GlossaryScreen, LearnScreen } from './screens/Learn'
 import { CheckInScreen, NewCheckInScreen } from './screens/CheckIns'
@@ -47,6 +47,8 @@ function PrototypeRoutes() {
         <Route path="/results" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><ResultScreen /></Guard>} />
         <Route path="/today" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><TodayScreen /></Guard>} />
         <Route path="/questions" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><QuestionsScreen /></Guard>} />
+        <Route path="/questions/history" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><CheckInHistoryScreen /></Guard>} />
+        <Route path="/questions/assessment" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><AssessmentManagementScreen /></Guard>} />
         <Route path="/questions/check-in/new" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><NewCheckInScreen /></Guard>} />
         <Route path="/questions/check-in/:id" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><CheckInScreen /></Guard>} />
         <Route path="/balance" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><BalanceScreen /></Guard>} />

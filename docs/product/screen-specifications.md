@@ -1,6 +1,6 @@
 # Screen Specifications
 
-> Contextual-chat demo update: Today actions, repeatable Questions check-ins, check-in-aware My Balance, Learn listing/detail/glossary, and a mock context-aware conversation interface are implemented. No dosha interpretation or real LLM provider is present.
+> Contextual-chat demo update: Today actions, repeatable Check In records, assessment maintenance, Learn listing/detail/glossary, and a mock context-aware conversation interface are implemented. No dosha interpretation or real LLM provider is present.
 
 ## Current limited-MVP behavior
 
@@ -22,9 +22,17 @@ Today is centered on one deterministically selected recommendation: concept icon
 
 Without location Today shows one contextual benefit card and makes no weather request. With location it shows a visual weather summary and up to four compact seasonal-food rows. The weather default contains current conditions, high/low, and precipitation; feels-like, daylight, season, and forecast area are disclosed on request. Recommendation selection remains deterministic; chat can only explain it.
 
-### Questions and My Balance
+### Check In and My Balance
 
-Questions reports real baseline/current coverage and links to the next repair question. Unapproved refinement questions are visibly unavailable. My Balance reports coverage only and explains why scoring is unavailable.
+The `/questions` route is labeled **Check In** in the interface. Its default state has one dominant task: resume the newest unfinished check-in or start the quick past-seven-days check-in. The detailed check-in is available under More options and does not receive equal visual weight.
+
+The screen shows the latest completed record, at most two additional recent records, a View all history route when needed, and one compact Initial assessment row. Completed records open a focused dated summary; answers and scoring boundaries are collapsed by default. Contextual chat remains available with record-specific context.
+
+Initial-assessment maintenance lives at `/questions/assessment`. It reports Complete or the remaining-question count, continues at the next useful question, and returns there after assessment editing. Plain-language coverage details remain available in a disclosure rather than on the Check In landing screen.
+
+Active repeat check-ins use a focused, no-document-scroll layout. A minimal exit control and progress dots remain fixed above the independently scrollable question region, while the fixed action stays visible above the safe area. Native radio semantics and arrow/Enter keyboard controls are retained.
+
+Check In owns operational tasks and dated records. My Balance is reserved for interpretation or comparison of usual nature and current state; while scoring is unavailable it remains deliberately limited and links back to Check In rather than duplicating history.
 
 ### Learn and Ask Dosha Companion
 
