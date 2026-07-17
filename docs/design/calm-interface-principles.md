@@ -30,7 +30,7 @@ Prefer whitespace, line length, and type hierarchy over nested cards. Shared scr
 
 ## Color and motion
 
-Keep the existing warm palette. Use semantic dosha colors selectively, not as decoration for every icon. Avoid generic AI gradients, glow, glass, and heavy shadows. Motion is brief and explanatory: a small disclosure reveal, gentle pending indication, and smooth message scrolling. Reduced-motion preferences shorten or remove those effects.
+Keep the existing warm palette. Use semantic dosha colors selectively, not as decoration for every icon. Avoid generic AI gradients, glow, glass, and heavy shadows. Motion is brief and explanatory: a small disclosure reveal, gentle pending indication, smooth message scrolling, or a completion icon settling into a faint halo in 400ms or less. Completion motion runs only for the action the user just completed; restored completion states render their final appearance without replaying it. Reduced-motion preferences show that final state immediately.
 
 Today may use the reviewed [local daylight and ambient theme](daylight-ambient-theme.md). Its phase palettes and static sundial wash reflect regional daylight only; they never communicate wellness, balance, diagnosis, or dosha meaning. Atmosphere must retain the same information hierarchy and interaction contrast as the neutral theme.
 

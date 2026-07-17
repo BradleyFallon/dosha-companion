@@ -21,6 +21,7 @@ import {
 export function TodayScreen() {
   const { state, dispatch } = usePrototype()
   const [detailsOpen, setDetailsOpen] = useState(false)
+  const [justCompleted, setJustCompleted] = useState(false)
   const coverage = calculateAssessmentCoverage({
     submittedAnswers: state.submittedAnswers,
     skippedQuestionIds: state.skippedQuestionIds,
@@ -50,10 +51,21 @@ export function TodayScreen() {
     if (!currentRecord) dispatch({ type: 'show-recommendation', recommendationId: recommendation.id, date: recommendation.selectionDate })
   }, [currentRecord, dispatch, recommendation.id, recommendation.selectionDate])
 
+  useEffect(() => setJustCompleted(false), [recommendation.id, recommendation.selectionDate])
+
   function updateRecommendation(status: 'completed' | 'dismissed') {
+    setJustCompleted(status === 'completed')
     dispatch({ type: 'recommendation-status', recommendationId: recommendation.id, date: recommendation.selectionDate, status })
     if (status === 'dismissed') dispatch({ type: 'clear-active-recommendation' })
   }
+
+  function showAnotherRecommendation() {
+    setJustCompleted(false)
+    dispatch({ type: 'clear-active-recommendation' })
+  }
+
+  const recommendationComplete = currentRecord?.status === 'completed'
+  const focusClassName = `daily-focus${recommendationComplete ? ' recommendation-complete' : ''}${justCompleted ? ' recommendation-just-completed' : ''}`
 
   return (
     <Screen className="today-screen">
@@ -62,15 +74,15 @@ export function TodayScreen() {
         <Link className="icon-control" to="/settings" aria-label="Open settings"><SettingsIcon aria-hidden="true" focusable="false" /></Link>
       </header>
 
-      <article className="daily-focus">
+      <article className={focusClassName}>
         <button className="icon-control recommendation-info-control" type="button" aria-label={detailsOpen ? 'Hide recommendation details' : 'Show recommendation details'} aria-expanded={detailsOpen} onClick={() => setDetailsOpen(!detailsOpen)}><InfoIcon aria-hidden="true" focusable="false" /></button>
         <DailyRoutineIcon aria-hidden="true" className="recommendation-icon" focusable="false" weight="duotone" />
         <h2>{recommendation.title}</h2>
         <p className="recommendation-action">{recommendation.action}</p>
-        {currentRecord?.status === 'completed' ? <p className="completion-note icon-label" role="status"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" weight="fill" />Complete for today</p> : null}
+        {recommendationComplete ? <p className="completion-note icon-label" role="status"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" weight="fill" />Complete for today</p> : null}
         <div className="recommendation-icon-actions" aria-label="Recommendation actions" role="group">
-          <button className="recommendation-action-control primary-recommendation-action" type="button" aria-label="Mark recommendation complete" disabled={currentRecord?.status === 'completed'} onClick={() => updateRecommendation('completed')}><CompleteIcon aria-hidden="true" focusable="false" weight={currentRecord?.status === 'completed' ? 'fill' : 'regular'} /><span>Done</span></button>
-          <button className="recommendation-action-control" type="button" aria-label="Show another recommendation" onClick={() => dispatch({ type: 'clear-active-recommendation' })}><ShowAnotherIcon aria-hidden="true" focusable="false" /><span>Another</span></button>
+          <button className="recommendation-action-control primary-recommendation-action" type="button" aria-label="Mark recommendation complete" disabled={recommendationComplete} onClick={() => updateRecommendation('completed')}><CompleteIcon aria-hidden="true" focusable="false" weight={recommendationComplete ? 'fill' : 'regular'} /><span>Done</span></button>
+          <button className="recommendation-action-control" type="button" aria-label="Show another recommendation" onClick={showAnotherRecommendation}><ShowAnotherIcon aria-hidden="true" focusable="false" /><span>Another</span></button>
           <ContextChatLink ariaLabel="Ask about this recommendation" className="recommendation-action-control" context={{ type: 'recommendation', id: recommendation.id }} returnTo="/today">Ask</ContextChatLink>
         </div>
         {detailsOpen ? (

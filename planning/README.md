@@ -63,7 +63,7 @@ Avoid making every item `P1`. Prefer one or two `P0` items and three to five `P1
 
 ### Active
 
-- [EXP-005 — Add joyful completion motion](active/EXP-005-joyful-completion-motion.md)
+No implementation item is currently active.
 
 ### Next
 
@@ -82,6 +82,7 @@ Avoid making every item `P1`. Prefer one or two `P0` items and three to five `P1
 
 ### Recently completed
 
+- [EXP-005 — Add joyful completion motion](done/EXP-005-joyful-completion-motion.md)
 - [ENG-001 — Add continuous integration](done/ENG-001-add-continuous-integration.md)
 - [EXP-003 — Add visible action labels](done/EXP-003-visible-action-labels.md)
 - [EXP-002 — Four-phase local daylight prototype](done/EXP-002-local-daylight-ambient-theme.md)

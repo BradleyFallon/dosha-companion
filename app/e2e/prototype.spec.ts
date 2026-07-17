@@ -176,6 +176,23 @@ test('keeps Today actions calm and usable at supported mobile sizes', async ({ p
   expect(scaledLabelBoxes[1].right).toBeLessThanOrEqual(scaledLabelBoxes[2].left)
   await page.evaluate(() => { document.documentElement.style.removeProperty('font-size') })
 
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.getByRole('button', { name: 'Mark recommendation complete' }).click()
+  await expect(page.getByRole('status')).toHaveText('Complete for today')
+  await expect(page.locator('.daily-focus')).toHaveClass(/recommendation-just-completed/)
+  await expect(page.getByRole('button', { name: 'Show another recommendation' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Ask about this recommendation' })).toBeVisible()
+  const reducedCompletionMotion = await page.locator('.primary-recommendation-action').evaluate((control) => ({
+    halo: getComputedStyle(control, '::after').animationName,
+    icon: getComputedStyle(control.querySelector('svg')!).animationName,
+    note: getComputedStyle(document.querySelector('.daily-focus .completion-note')!).animationName,
+  }))
+  expect(reducedCompletionMotion).toEqual({ halo: 'none', icon: 'none', note: 'none' })
+  expect(await page.evaluate(() => {
+    const actions = document.querySelector<HTMLElement>('.recommendation-icon-actions')
+    return Boolean(actions && actions.scrollWidth <= actions.clientWidth && document.documentElement.scrollWidth <= window.innerWidth + 1)
+  })).toBe(true)
+
   await page.getByRole('button', { name: 'Show recommendation details' }).click()
   await expect(page.getByRole('button', { name: 'Dismiss for today' })).toBeVisible()
 })
@@ -183,12 +200,17 @@ test('keeps Today actions calm and usable at supported mobile sizes', async ({ p
 test('keeps representative daylight-theme contrast above WCAG thresholds', async ({ page }) => {
   await reachToday(page)
   await loadExampleProfile(page)
+  await page.getByRole('button', { name: 'Mark recommendation complete' }).click()
+  await expect(page.getByRole('status')).toHaveText('Complete for today')
 
   for (const phase of ['midday', 'sunset', 'twilight', 'night']) {
     await page.goto(`/today?daylight=${phase}`)
     const frame = page.locator('.app-frame')
     await expect(frame).toHaveAttribute('data-daylight-override', phase)
     await expect(page.locator('.weather-summary')).toBeVisible()
+    await expect(page.locator('.daily-focus')).toHaveClass(/recommendation-complete/)
+    await expect(page.locator('.daily-focus')).not.toHaveClass(/recommendation-just-completed/)
+    await expect(page.getByRole('status')).toHaveText('Complete for today')
     await expect(page.getByRole('group', { name: 'Recommendation actions' }).getByText('Another', { exact: true })).toBeVisible()
 
     const ratios = await page.evaluate(() => {

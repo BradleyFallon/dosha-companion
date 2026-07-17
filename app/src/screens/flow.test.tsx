@@ -500,14 +500,33 @@ describe('limited MVP results and settings', () => {
 
   it('records Today completion and rotates to another catalog item', async () => {
     const user = userEvent.setup()
-    renderAt('/today', { resultsReached: true, assessmentMode: 'full', submittedAnswers: allOrdinaryAnswers(), profile: completedProfile('Alex') })
+    const { container } = renderAt('/today', { resultsReached: true, assessmentMode: 'full', submittedAnswers: allOrdinaryAnswers(), profile: completedProfile('Alex') })
     await user.click(screen.getByRole('button', { name: 'Mark recommendation complete' }))
-    expect(screen.getByText('Complete for today')).toBeInTheDocument()
+    expect(screen.getByText('Complete for today')).toHaveAttribute('role', 'status')
+    expect(container.querySelector('.daily-focus')).toHaveClass('recommendation-complete', 'recommendation-just-completed')
+    expect(screen.getByRole('button', { name: 'Show another recommendation' })).toBeEnabled()
+    expect(screen.getByRole('link', { name: 'Ask about this recommendation' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Show another recommendation' }))
     await waitFor(() => expect(screen.queryByText('Complete for today')).not.toBeInTheDocument())
+    expect(container.querySelector('.daily-focus')).not.toHaveClass('recommendation-just-completed')
     const snapshot = JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}')
     expect(snapshot.state.recommendationHistory.some((record: { status: string }) => record.status === 'completed')).toBe(true)
     expect(snapshot.state.recommendationHistory.length).toBeGreaterThan(1)
+  })
+
+  it('does not replay Today completion motion for a stored completed recommendation', async () => {
+    const user = userEvent.setup()
+    const first = renderAt('/today', { resultsReached: true, assessmentMode: 'full', submittedAnswers: allOrdinaryAnswers(), profile: completedProfile('Alex') })
+    await user.click(screen.getByRole('button', { name: 'Mark recommendation complete' }))
+    const saved = JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}').state
+    first.unmount()
+
+    const revisit = renderAt('/today', saved)
+    expect(screen.getByText('Complete for today')).toHaveAttribute('role', 'status')
+    expect(revisit.container.querySelector('.daily-focus')).toHaveClass('recommendation-complete')
+    expect(revisit.container.querySelector('.daily-focus')).not.toHaveClass('recommendation-just-completed')
+    expect(screen.getByRole('button', { name: 'Show another recommendation' })).toBeEnabled()
+    expect(screen.getByRole('link', { name: 'Ask about this recommendation' })).toBeInTheDocument()
   })
 
   it('shows local conditions, seasonal food, and stable guidance modules', async () => {
