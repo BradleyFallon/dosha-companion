@@ -74,6 +74,9 @@ Contains the answer choices belonging to each question.
 | `text`             | Text     |      Yes | User-facing answer text                                     |
 | `default_order`    | Integer  |      Yes | Default display position                                    |
 | `answer_kind`      | Enum     |      Yes | `ordinary`, `not_sure`, `none_fit`, `prefer_not`, or `skip` |
+| `short_label`      | Text     | Conditional | Editor-authored 2–6 word label for compact displays; required for ordinary current answers |
+| `icon_key`         | Enum     |       No | Optional semantic key from the controlled `balance_icon_key` values |
+| `pattern_key`      | Key      |       No | Explicit neutral comparison key using lowercase snake case; never inferred from answer order |
 | `exclusive`        | Boolean  |      Yes | Whether selection excludes all other options                |
 | `status`           | Enum     |      Yes | Editorial lifecycle status                                  |
 | `expert_notes`     | Text     |       No | Internal notes                                              |
@@ -83,12 +86,18 @@ Contains the answer choices belonging to each question.
 ### Example
 
 ```csv
-answer_id,question_id,question_version,answer_version,text,default_order,answer_kind,exclusive,status,expert_notes
-a_baseline_appetite_001_variable,q_baseline_appetite_001,1,1,"It is variable and can be unpredictable.",1,ordinary,true,draft,"Provisional Vata direction"
-a_baseline_appetite_001_strong,q_baseline_appetite_001,1,1,"It is strong and arrives predictably.",2,ordinary,true,draft,"Provisional Pitta direction"
-a_baseline_appetite_001_steady,q_baseline_appetite_001,1,1,"It is steady but not usually urgent.",3,ordinary,true,draft,"Provisional Kapha direction"
-a_baseline_appetite_001_unsure,q_baseline_appetite_001,1,1,"I am not sure.",4,not_sure,true,draft,"No score"
+answer_id,question_id,question_version,answer_version,text,short_label,icon_key,pattern_key,default_order,answer_kind,exclusive,status,expert_notes
+a_baseline_appetite_001_variable,q_baseline_appetite_001,1,1,"It is variable and can be unpredictable.",Variable appetite,bowl-food,appetite_variable,1,ordinary,true,draft,"Neutral display metadata"
+a_baseline_appetite_001_strong,q_baseline_appetite_001,1,1,"It is strong and arrives predictably.",Strong and predictable,bowl-food,appetite_intense,2,ordinary,true,draft,"Neutral display metadata"
+a_baseline_appetite_001_steady,q_baseline_appetite_001,1,1,"It is steady but not usually urgent.",Steady and patient,bowl-food,appetite_steady,3,ordinary,true,draft,"Neutral display metadata"
+a_baseline_appetite_001_unsure,q_baseline_appetite_001,1,1,"I am not sure.",Not sure,bowl-food,uncertain,4,not_sure,true,draft,"No comparison"
 ```
+
+### Balance display metadata
+
+`short_label` is written and reviewed by an editor; the application never truncates or summarizes answer prose into a label. `icon_key` must be one of the active `balance_icon_key` rows in `controlled-values.csv`.
+
+`pattern_key` is a neutral comparison token, not a score. It must be lowercase snake case and normally follows `<domain>_<pattern>`, for example `sleep_variable` or `routine_steady`. The explicit `<domain>_usual` suffix is reserved for an answer whose source wording says it is close to the person’s usual pattern. Fallback choices use `uncertain` or remain empty. Keys do not imply better, worse, balanced, imbalanced, or a dosha association.
 
 ## `data/quiz/answer-scores.csv`
 
@@ -358,4 +367,3 @@ Do **not** finalize these without expert review:
 * Confidence formulas
 * Decay formulas
 * Interpretation language
-

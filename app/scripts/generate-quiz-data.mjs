@@ -6,6 +6,7 @@ import Papa from 'papaparse'
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const dataRoot = path.resolve(appRoot, '../data/quiz')
 const outputPath = path.join(appRoot, 'src/generated/initialAssessment.ts')
+const PATTERN_KEY_FORMAT = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/
 
 function readCsv(fileName) {
   const filePath = path.join(dataRoot, fileName)
@@ -62,7 +63,33 @@ function assertUnique(rows, key, source) {
   }
 }
 
-function generate() {
+export function validateAnswerMetadata(answer, question, checkControlled) {
+  const source = `answer ${answer.answer_id}`
+  const shortLabel = answer.short_label?.trim() || null
+  const iconKey = answer.icon_key?.trim() || null
+  const patternKey = answer.pattern_key?.trim() || null
+
+  if (shortLabel && shortLabel.length > 60) {
+    throw new Error(`Quiz generation failed: ${source} short_label must be 60 characters or fewer`)
+  }
+  if (iconKey) checkControlled('balance_icon_key', iconKey, source)
+  if (patternKey && !PATTERN_KEY_FORMAT.test(patternKey)) {
+    throw new Error(`Quiz generation failed: ${source} has malformed pattern_key "${patternKey}"`)
+  }
+  if (patternKey && !shortLabel) {
+    throw new Error(`Quiz generation failed: ${source} has pattern_key but no short_label`)
+  }
+  if (question.assessment_type === 'current' && answer.answer_kind === 'ordinary' && !shortLabel) {
+    throw new Error(`Quiz generation failed: ordinary current ${source} has a blank short_label`)
+  }
+  if (answer.answer_kind !== 'ordinary' && patternKey && patternKey !== 'uncertain') {
+    throw new Error(`Quiz generation failed: fallback ${source} must use pattern_key "uncertain" or leave it blank`)
+  }
+
+  return { shortLabel, iconKey, patternKey }
+}
+
+export function generate() {
   const questions = readCsv('questions.csv')
   const answerOptions = readCsv('answer-options.csv')
   const questionSets = readCsv('question-sets.csv')
@@ -154,15 +181,21 @@ function generate() {
           integer(left.default_order, `answer order for ${left.answer_id}`) -
           integer(right.default_order, `answer order for ${right.answer_id}`),
       )
-      .map((answer) => ({
-        id: required(answer, 'answer_id', 'answer-options.csv'),
-        version: integer(answer.answer_version, `answer version for ${answer.answer_id}`),
-        text: required(answer, 'text', `answer ${answer.answer_id}`),
-        defaultOrder: integer(answer.default_order, `answer order for ${answer.answer_id}`),
-        kind: required(answer, 'answer_kind', `answer ${answer.answer_id}`),
-        exclusive: boolean(answer.exclusive, `exclusive for ${answer.answer_id}`),
-        status: required(answer, 'status', `answer ${answer.answer_id}`),
-      }))
+      .map((answer) => {
+        const metadata = validateAnswerMetadata(answer, question, checkControlled)
+        return {
+          id: required(answer, 'answer_id', 'answer-options.csv'),
+          version: integer(answer.answer_version, `answer version for ${answer.answer_id}`),
+          text: required(answer, 'text', `answer ${answer.answer_id}`),
+          shortLabel: metadata.shortLabel,
+          iconKey: metadata.iconKey,
+          patternKey: metadata.patternKey,
+          defaultOrder: integer(answer.default_order, `answer order for ${answer.answer_id}`),
+          kind: required(answer, 'answer_kind', `answer ${answer.answer_id}`),
+          exclusive: boolean(answer.exclusive, `exclusive for ${answer.answer_id}`),
+          status: required(answer, 'status', `answer ${answer.answer_id}`),
+        }
+      })
 
     if (answers.length === 0) {
       throw new Error(`Quiz generation failed: ${question.question_id} has no answer options`)
@@ -202,14 +235,17 @@ function generate() {
   }
 
   fs.mkdirSync(path.dirname(outputPath), { recursive: true })
-  const source = `/* eslint-disable */\n// GENERATED FILE — DO NOT EDIT. Run \`npm run generate:quiz\` from app/.\n// Source: ../data/quiz/{questions,answer-options,question-sets,question-set-items,controlled-values}.csv\n\nexport const initialAssessment = ${JSON.stringify(payload, null, 2)} as const\n\nexport type InitialAssessment = typeof initialAssessment\nexport type QuizQuestion = InitialAssessment['questions'][number]\nexport type QuizAnswer = QuizQuestion['answers'][number]\n`
+  const iconKeys = [...(allowed.get('balance_icon_key') ?? [])]
+  const source = `/* eslint-disable */\n// GENERATED FILE — DO NOT EDIT. Run \`npm run generate:quiz\` from app/.\n// Source: ../data/quiz/{questions,answer-options,question-sets,question-set-items,controlled-values}.csv\n\nexport const balanceIconKeys = ${JSON.stringify(iconKeys)} as const\nexport type BalanceIconKey = typeof balanceIconKeys[number]\n\nexport const initialAssessment = ${JSON.stringify(payload, null, 2)} as const\n\nexport type InitialAssessment = typeof initialAssessment\nexport type QuizQuestion = InitialAssessment['questions'][number]\nexport type QuizAnswer = QuizQuestion['answers'][number]\n`
   fs.writeFileSync(outputPath, source)
   console.log(`Generated ${generatedQuestions.length} questions at ${path.relative(appRoot, outputPath)}`)
 }
 
-try {
-  generate()
-} catch (error) {
-  console.error(error instanceof Error ? error.message : error)
-  process.exitCode = 1
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  try {
+    generate()
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : error)
+    process.exitCode = 1
+  }
 }

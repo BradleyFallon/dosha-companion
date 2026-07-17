@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { initialAssessment } from '../generated/initialAssessment'
+import { balanceIconKeys, initialAssessment } from '../generated/initialAssessment'
 import { getAssessmentQuestions } from './assessment'
 
 describe('generated initial assessment', () => {
@@ -25,5 +25,24 @@ describe('generated initial assessment', () => {
     expect(questions.map((question) => question.assessmentType)).toEqual([
       'baseline', 'baseline', 'baseline', 'current', 'current',
     ])
+  })
+
+  it('includes validated editor display metadata for current answers', () => {
+    const currentAnswers: Array<{
+      kind: string
+      shortLabel: string | null
+      iconKey: string | null
+      patternKey: string | null
+    }> = []
+    for (const question of initialAssessment.questions) {
+      if (question.assessmentType === 'current') currentAnswers.push(...question.answers)
+    }
+    const ordinary = currentAnswers.filter((answer) => answer.kind === 'ordinary')
+    const fallback = currentAnswers.filter((answer) => answer.kind !== 'ordinary')
+    const knownIcons = new Set<string>(balanceIconKeys)
+
+    expect(ordinary.every((answer) => answer.shortLabel && answer.patternKey)).toBe(true)
+    expect(ordinary.every((answer) => answer.iconKey && knownIcons.has(answer.iconKey))).toBe(true)
+    expect(fallback.every((answer) => !answer.patternKey || answer.patternKey === 'uncertain')).toBe(true)
   })
 })

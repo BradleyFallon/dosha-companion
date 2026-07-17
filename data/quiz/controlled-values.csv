@@ -44,3 +44,10 @@ editorial_status,retired,Retired,No longer offered to users,true
 score_target,baseline,Baseline,Contributes only to baseline constitution,true
 score_target,current,Current,Contributes only to current balance,true
 score_target,none,None,Does not contribute to dosha scoring,true
+balance_icon_key,moon-stars,Moon stars,Semantic display icon for sleep,true
+balance_icon_key,lightning,Lightning,Semantic display icon for energy,true
+balance_icon_key,bowl-food,Bowl food,Semantic display icon for appetite,true
+balance_icon_key,spiral,Spiral,Semantic display icon for digestion,true
+balance_icon_key,arrows-clockwise,Arrows clockwise,Semantic display icon for routine,true
+balance_icon_key,waves,Waves,Semantic display icon for stress response,true
+balance_icon_key,person-simple,Person simple,Semantic display icon for body qualities,true
