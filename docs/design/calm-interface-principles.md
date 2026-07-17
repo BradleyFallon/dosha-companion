@@ -10,7 +10,7 @@ Use one heading and, when needed, one short supporting line. Remove labels that 
 
 ## Icon-first familiar actions
 
-Icons may stand alone for familiar actions such as Back, Send, Complete, Show another, Settings, Chat, Expand, Collapse, and Open original. Every icon-only control needs:
+Icons may stand alone for familiar actions such as Back, Send, Settings, Chat, Expand, Collapse, and Open original. A compact group of recommendation actions uses quiet labels—Done, Another, and Ask—under the primary icons so a first-time user does not have to infer the whole set. Every icon control needs:
 
 - an explicit accessible name;
 - a visible focus state;

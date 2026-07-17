@@ -69,9 +69,9 @@ export function TodayScreen() {
         <p className="recommendation-action">{recommendation.action}</p>
         {currentRecord?.status === 'completed' ? <p className="completion-note icon-label" role="status"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" weight="fill" />Complete for today</p> : null}
         <div className="recommendation-icon-actions" aria-label="Recommendation actions" role="group">
-          <button className="icon-control primary-icon-control" type="button" aria-label="Mark recommendation complete" disabled={currentRecord?.status === 'completed'} onClick={() => updateRecommendation('completed')}><CompleteIcon aria-hidden="true" focusable="false" weight={currentRecord?.status === 'completed' ? 'fill' : 'regular'} /></button>
-          <button className="icon-control" type="button" aria-label="Show another recommendation" onClick={() => dispatch({ type: 'clear-active-recommendation' })}><ShowAnotherIcon aria-hidden="true" focusable="false" /></button>
-          <ContextChatLink ariaLabel="Ask about this recommendation" className="icon-control" context={{ type: 'recommendation', id: recommendation.id }} returnTo="/today" />
+          <button className="recommendation-action-control primary-recommendation-action" type="button" aria-label="Mark recommendation complete" disabled={currentRecord?.status === 'completed'} onClick={() => updateRecommendation('completed')}><CompleteIcon aria-hidden="true" focusable="false" weight={currentRecord?.status === 'completed' ? 'fill' : 'regular'} /><span>Done</span></button>
+          <button className="recommendation-action-control" type="button" aria-label="Show another recommendation" onClick={() => dispatch({ type: 'clear-active-recommendation' })}><ShowAnotherIcon aria-hidden="true" focusable="false" /><span>Another</span></button>
+          <ContextChatLink ariaLabel="Ask about this recommendation" className="recommendation-action-control" context={{ type: 'recommendation', id: recommendation.id }} returnTo="/today">Ask</ContextChatLink>
         </div>
         {detailsOpen ? (
           <div className="recommendation-details">

@@ -489,6 +489,17 @@ html[data-daylight-phase="twilight"], html[data-daylight-phase="night"] { color-
 .recommendation-info-control { position: absolute; top: 10px; right: 10px; }
 .recommendation-action { max-width: 30rem; margin: 0 auto 22px; color: var(--supporting-ink); font-size: 1.08rem; line-height: 1.6; }
 .recommendation-icon-actions { display: flex; justify-content: center; gap: 16px; }
+.recommendation-action-control { display: inline-grid; width: 64px; min-height: 64px; padding: 0; flex: 0 0 64px; grid-template: 44px auto / 1fr; place-items: center; gap: 3px; color: var(--accent); border: 0; background: transparent; text-decoration: none; cursor: pointer; }
+.recommendation-action-control::before { width: 44px; height: 44px; grid-area: 1 / 1; border-radius: 50%; background: transparent; content: ""; transition: background-color 140ms ease; }
+.recommendation-action-control > svg { z-index: 1; width: 23px; height: 23px; grid-area: 1 / 1; }
+.recommendation-action-control > span { grid-area: 2 / 1; color: var(--muted); font-size: .72rem; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+.recommendation-action-control:hover::before { background: var(--accent-soft); }
+.primary-recommendation-action::before { background: var(--accent); }
+.primary-recommendation-action > svg { color: var(--on-accent); }
+.primary-recommendation-action:hover::before { background: var(--accent-strong); }
+.recommendation-action-control:disabled { color: #9b978f; cursor: not-allowed; }
+.recommendation-action-control:disabled::before { background: var(--accent); }
+.recommendation-action-control:disabled > svg { color: #9b978f; }
 .daily-focus .completion-note { display: inline-flex; margin: 0 auto 16px; padding: 8px 12px; }
 .recommendation-details { margin: 26px -4px 0; padding-top: 22px; border-top: 1px solid var(--accent-divider); text-align: left; animation: calm-reveal 160ms ease-out; }
 .recommendation-details h3 { margin: 20px 0 8px; font-size: 1rem; }

@@ -139,6 +139,9 @@ describe('navigation visibility', () => {
     expect(screen.getByRole('button', { name: 'Show recommendation details' })).toHaveAttribute('aria-expanded', 'false')
     expect(screen.getByRole('button', { name: 'Show another recommendation' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Ask about this recommendation' })).toBeInTheDocument()
+    expect(screen.getByText('Done')).toBeVisible()
+    expect(screen.getByText('Another')).toBeVisible()
+    expect(screen.getByText('Ask')).toBeVisible()
     expect(screen.queryByRole('button', { name: 'Dismiss for today' })).not.toBeInTheDocument()
     container.querySelectorAll('svg').forEach((icon) => {
       expect(icon).toHaveAttribute('focusable', 'false')

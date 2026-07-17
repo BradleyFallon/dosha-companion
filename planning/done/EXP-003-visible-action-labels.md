@@ -2,7 +2,7 @@
 id: EXP-003
 title: Add visible action labels
 type: implementation
-status: backlog
+status: done
 priority: P1
 area: experience
 created: 2026-07-17
@@ -38,14 +38,21 @@ Low-contrast visible labels clarify less familiar icon actions while preserving 
 
 ## Tasks
 
-- [ ] Prototype labels under the three Today actions.
-- [ ] Test `Done` versus `Complete`.
-- [ ] Test `Another` versus `Show another`.
-- [ ] Audit remaining icon-only controls.
-- [ ] Check wrapping and zoom at 320px and 200%.
+- [x] Prototype labels under the three Today actions.
+- [x] Test `Done` versus `Complete`.
+- [x] Test `Another` versus `Show another`.
+- [x] Audit remaining icon-only controls.
+- [x] Check wrapping and zoom at 320px and 200%.
 
 ## Acceptance criteria
 
 - A first-time user can predict each recommendation action.
 - Labels remain quiet and readable.
 - The action row fits supported mobile widths.
+
+## Notes
+
+- 2026-07-17: Chose `Done` over `Complete` and `Another` over `Show another` to keep the row calm and scannable at narrow widths. The longer, precise accessible names remain unchanged.
+- 2026-07-17: Kept each icon in a 44 × 44 visual area inside a 64-pixel-wide labeled control. The complete action remains visually primary; labels use the existing muted theme token.
+- 2026-07-17: Audited the remaining icon-only controls. Settings, disclosure, navigation, close, and focused chat controls remain familiar single-purpose actions with explicit accessible names; labeling them is outside this focused recommendation-row change.
+- 2026-07-17: Verified the row at 320, 360, and 390 pixels, including 200% root text scaling at 320 pixels. Verified label contrast in midday, sunset, twilight, and night.

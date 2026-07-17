@@ -120,6 +120,10 @@ test('keeps Today actions calm and usable at supported mobile sizes', async ({ p
 
   await expect(page.getByRole('button', { name: 'Show recommendation details' })).toHaveAttribute('aria-expanded', 'false')
   await expect(page.getByRole('button', { name: 'Dismiss for today' })).not.toBeVisible()
+  const actionRow = page.getByRole('group', { name: 'Recommendation actions' })
+  await expect(actionRow.getByText('Done', { exact: true })).toBeVisible()
+  await expect(actionRow.getByText('Another', { exact: true })).toBeVisible()
+  await expect(actionRow.getByText('Ask', { exact: true })).toBeVisible()
 
   for (const viewport of [{ width: 390, height: 844 }, { width: 390, height: 667 }, { width: 360, height: 640 }, { width: 320, height: 568 }]) {
     await page.setViewportSize(viewport)
@@ -140,11 +144,13 @@ test('keeps Today actions calm and usable at supported mobile sizes', async ({ p
       const settings = document.querySelector('.today-header .icon-control')?.getBoundingClientRect()
       const weather = document.querySelector<HTMLElement>('.weather-essentials')
       const navigation = document.querySelector('.bottom-nav')?.getBoundingClientRect()
+      const actions = document.querySelector<HTMLElement>('.recommendation-icon-actions')
       return {
         noHorizontalOverflow: document.documentElement.scrollWidth <= document.documentElement.clientWidth,
         headerDoesNotCollide: Boolean(title && settings && title.right <= settings.left),
         weatherFits: Boolean(weather && weather.scrollWidth <= weather.clientWidth),
         navigationFits: Boolean(navigation && navigation.left >= 0 && navigation.right <= window.innerWidth),
+        actionRowFits: Boolean(actions && actions.scrollWidth <= actions.clientWidth),
       }
     })
     expect(layout).toEqual({
@@ -152,8 +158,23 @@ test('keeps Today actions calm and usable at supported mobile sizes', async ({ p
       headerDoesNotCollide: true,
       weatherFits: true,
       navigationFits: true,
+      actionRowFits: true,
     })
   }
+
+  await page.setViewportSize({ width: 320, height: 568 })
+  await page.evaluate(() => { document.documentElement.style.fontSize = '200%' })
+  const scaledLabelBoxes = await page.locator('.recommendation-action-control > span').evaluateAll((labels) =>
+    labels.map((label) => {
+      const box = label.getBoundingClientRect()
+      return { left: box.left, right: box.right, height: box.height }
+    }),
+  )
+  expect(scaledLabelBoxes).toHaveLength(3)
+  expect(scaledLabelBoxes.every((box) => box.height > 0)).toBe(true)
+  expect(scaledLabelBoxes[0].right).toBeLessThanOrEqual(scaledLabelBoxes[1].left)
+  expect(scaledLabelBoxes[1].right).toBeLessThanOrEqual(scaledLabelBoxes[2].left)
+  await page.evaluate(() => { document.documentElement.style.removeProperty('font-size') })
 
   await page.getByRole('button', { name: 'Show recommendation details' }).click()
   await expect(page.getByRole('button', { name: 'Dismiss for today' })).toBeVisible()
@@ -168,6 +189,7 @@ test('keeps representative daylight-theme contrast above WCAG thresholds', async
     const frame = page.locator('.app-frame')
     await expect(frame).toHaveAttribute('data-daylight-override', phase)
     await expect(page.locator('.weather-summary')).toBeVisible()
+    await expect(page.getByRole('group', { name: 'Recommendation actions' }).getByText('Another', { exact: true })).toBeVisible()
 
     const ratios = await page.evaluate(() => {
       const appFrame = document.querySelector<HTMLElement>('.app-frame')!
@@ -232,6 +254,7 @@ test('keeps representative daylight-theme contrast above WCAG thresholds', async
         mainText: contrast(style('.today-header h1').color, frameStyle.backgroundColor),
         mutedText: contrast(style('.today-date').color, frameStyle.backgroundColor),
         supportingText: contrast(style('.recommendation-action').color, featureStyle.backgroundColor),
+        actionLabel: contrast(style('.recommendation-action-control > span').color, featureStyle.backgroundColor),
         accentLink: contrast(style('.contrast-accent').color, frameStyle.backgroundColor),
         primaryAction: contrast(style('.button.primary').color, style('.button.primary').backgroundColor),
         weatherText: contrast(style('.weather-primary span').color, weatherStyle.backgroundColor),
