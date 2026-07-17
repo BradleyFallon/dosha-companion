@@ -62,7 +62,7 @@ export function ArticleScreen() {
     return item ? [item] : []
   })
   return (
-    <Screen>
+    <Screen className="article-screen">
       <BackLink to="/learn" label="Learn" />
       <p className="eyebrow">{formatCategory(article.category)}</p>
       <h1 tabIndex={-1}>{article.title}</h1>
