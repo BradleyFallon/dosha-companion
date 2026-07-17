@@ -52,4 +52,4 @@ Every pull request and main-branch push proves that generated data, type checkin
 - 2026-07-17: Added one Ubuntu job using Node.js 22, npm caching, and the existing Chromium-only Playwright project. No matrix, coverage gate, deployment, or third-party service was added.
 - 2026-07-17: The workflow runs generation before a clean-tree diff check, followed by lint, type checking, unit/component tests, the production build, Chromium installation, and the full end-to-end suite.
 - 2026-07-17: The complete workflow sequence passed locally: generated files were stable, 167 unit/component tests passed, 14 Playwright tests passed, and the production build completed with only its existing chunk-size warning.
-- 2026-07-17: The GitHub-hosted run remains the final environment check after the workflow is pushed.
+- 2026-07-17: The first GitHub-hosted run exposed a Linux font-metrics overlap between `Another` and `Ask` at 320 pixels with 200% text scaling. The direct narrow-screen spacing fix retains the existing labels, targets, and one-row layout.

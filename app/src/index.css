@@ -797,6 +797,7 @@ html[data-daylight-phase="twilight"], html[data-daylight-phase="night"] { color-
   .screen { padding-right: 16px; padding-left: 16px; }
   .assessment-topline { margin-bottom: 16px; }
   .answer-option { padding: 11px 10px; font-size: .94rem; }
+  .recommendation-icon-actions { margin-right: -12px; margin-left: -12px; gap: 34px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
