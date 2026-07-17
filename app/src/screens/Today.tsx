@@ -6,13 +6,14 @@ import { calculateAssessmentCoverage } from '../quiz/coverage'
 import { selectDailyRecommendation } from '../content/recommendations'
 import { LocationBenefitCard } from '../components/LocationBenefitCard'
 import { LocalizedTodayContent } from '../components/LocalizedTodayContent'
+import { ContextChatLink } from '../components/ContextChatLink'
 import {
   BalanceIcon,
   CompleteIcon,
+  ChatIcon,
   DismissIcon,
   FoodIcon,
   ForwardIcon,
-  GuidedHelpIcon,
   LearnIcon,
   NatureIcon,
   QuestionsIcon,
@@ -86,6 +87,7 @@ export function TodayScreen() {
           <button className="button primary icon-label" type="button" disabled={currentRecord?.status === 'completed'} onClick={() => updateRecommendation('completed')}><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" />Mark complete</button>
           <button className="button secondary icon-label" type="button" onClick={() => updateRecommendation('dismissed')}><DismissIcon aria-hidden="true" className="icon-leading" focusable="false" />Dismiss</button>
           <button className="text-button icon-label" type="button" onClick={() => dispatch({ type: 'clear-active-recommendation' })}><ShowAnotherIcon aria-hidden="true" className="icon-leading" focusable="false" />Show another</button>
+          <ContextChatLink context={{ type: 'recommendation', id: recommendation.id }} returnTo="/today">Ask about this</ContextChatLink>
         </div>
         <Link className="text-link icon-label" to={`/learn/${recommendation.relatedArticleId}`}><LearnIcon aria-hidden="true" className="icon-leading" focusable="false" />Read related guidance<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></Link>
       </article>
@@ -124,7 +126,7 @@ export function TodayScreen() {
         <span className="card-link-heading"><QuestionsIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" /><strong>{coverage.ready ? 'Review assessment coverage' : 'More information is useful'}</strong></span>
         <span className="icon-label">{coverage.ready ? 'See answer coverage' : 'Answer the next useful question'}<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></span>
       </Link>
-      <Link className="assistant-card" to="/assistant"><span className="card-link-heading"><GuidedHelpIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" /><strong>Search the learning catalog</strong></span><span className="icon-label">Open deterministic guided help<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></span></Link>
+      <Link className="assistant-card" to="/chat"><span className="card-link-heading"><ChatIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" /><strong>Ask Dosha Companion</strong></span><span className="icon-label">Start a grounded conversation<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></span></Link>
     </Screen>
   )
 }

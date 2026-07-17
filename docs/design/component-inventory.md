@@ -60,7 +60,12 @@ This is a low-fidelity inventory of reusable interaction patterns. Names describ
 | Food suggestion | Optional compatible suggestion | Available, excluded, not applicable |
 | “Why chosen” disclosure | Explain deterministic selection signals | Collapsed, expanded |
 | Question availability | Show useful questions without pressure | Count, none, stale-profile prompt |
-| AI entry card | Open grounded assistant | Subscriber, free-user gate, unavailable |
+| Chat entry action | Start a conversation anchored to the visible item | Recommendation, article, seasonal food, completed check-in |
+| Chat context card | Identify the source and return to it | Resolved, source unavailable |
+| Chat message | Present user or grounded assistant content | Pending, complete, boundary, error/retry |
+| Chat citations | Link an answer to retrieved in-app sources | Article, glossary, recommendation, seasonal food |
+| Chat composer | Send a question without moving off the source context | Blank, ready, pending, character limit |
+| Conversation history | Reopen browser-local threads | Empty, recent threads, cleared |
 
 ## Feedback and system states
 

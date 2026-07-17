@@ -4,10 +4,11 @@ import { BackLink, Screen } from '../components/Layout'
 import { MarkdownBody } from '../components/MarkdownBody'
 import { getGlossaryEntries, getLearningArticle, getLearningArticles } from '../content/repository'
 import { selectArticleIcon } from '../ui/articleIcons'
+import { ContextChatLink } from '../components/ContextChatLink'
 import {
+  ChatIcon,
   ForwardIcon,
   GlossaryIcon,
-  GuidedHelpIcon,
   LearnIcon,
   SearchIcon,
 } from '../ui/icons'
@@ -54,7 +55,7 @@ export function LearnScreen() {
       </div>
       {filtered.length === 0 ? <p className="empty-state">No articles match those filters.</p> : null}
       <Link className="button secondary icon-label" to="/learn/glossary"><GlossaryIcon aria-hidden="true" className="icon-leading" focusable="false" />Open glossary</Link>
-      <Link className="button secondary icon-label" to="/assistant"><GuidedHelpIcon aria-hidden="true" className="icon-leading" focusable="false" />Search with guided help</Link>
+      <Link className="button secondary icon-label" to="/chat"><ChatIcon aria-hidden="true" className="icon-leading" focusable="false" />Ask Dosha Companion</Link>
     </Screen>
   )
 }
@@ -74,6 +75,7 @@ export function ArticleScreen() {
       <h1 tabIndex={-1}>{article.title}</h1>
       <p className="lede">{article.summary}</p>
       <MarkdownBody markdown={article.body} />
+      <ContextChatLink className="button secondary icon-label" context={{ type: 'article', id: article.id }} returnTo="/learn">Ask about this article</ContextChatLink>
       {related.length > 0 ? <section className="related-content" aria-labelledby="related-title"><h2 className="section-title-with-icon" id="related-title"><LearnIcon aria-hidden="true" className="icon-leading" focusable="false" />Related reading</h2>{related.map((item) => <Link className="icon-label" key={item.id} to={`/learn/${item.id}`}>{item.title}<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></Link>)}</section> : null}
       <p className="boundary-note">Educational content only. This article does not provide a diagnosis or treatment plan.</p>
     </Screen>

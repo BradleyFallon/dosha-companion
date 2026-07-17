@@ -1,6 +1,6 @@
 # Learn Wireframe
 
-> Implemented demo update: Learn has data-backed article cards, text and category filtering, article details, related reading, glossary search, and links into deterministic Guided help. Published provisional items remain visibly labeled.
+> Implemented demo update: Learn has data-backed article cards, text and category filtering, article details, related reading, glossary search, and article-anchored Ask Dosha Companion actions. Deterministic catalog search remains the chat retrieval layer.
 
 ## Library landing
 

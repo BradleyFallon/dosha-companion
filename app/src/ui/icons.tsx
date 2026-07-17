@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from 'react'
 import {
   ArrowCounterClockwise,
+  ArrowClockwise,
   ArrowLeft,
   ArrowRight,
   ArrowsClockwise,
@@ -8,6 +9,7 @@ import {
   Books,
   BowlFood,
   CheckCircle,
+  ChatCircleDots,
   CirclesThree,
   Cloud,
   CloudFog,
@@ -25,7 +27,10 @@ import {
   Leaf,
   MagnifyingGlass,
   MapPinArea,
+  PaperPlaneTilt,
+  PlusCircle,
   QuestionMark,
+  Quotes,
   ShieldCheck,
   SlidersHorizontal,
   Spiral,
@@ -102,6 +107,7 @@ export const QuestionsIcon = ListChecks
 export const BalanceIcon = CirclesThree
 export const LearnIcon = BookOpenText
 export const GuidedHelpIcon = MagnifyingGlass
+export const ChatIcon = ChatCircleDots
 export const SettingsIcon = SlidersHorizontal
 
 // Actions and utility
@@ -121,5 +127,9 @@ export const ResetIcon = ArrowCounterClockwise
 export const PrivacyIcon = ShieldCheck
 export const StorageIcon = DeviceMobile
 export const WarningIcon = WarningCircle
+export const SendIcon = PaperPlaneTilt
+export const NewChatIcon = PlusCircle
+export const RetryIcon = ArrowClockwise
+export const SourceIcon = Quotes
 
 export type { IconProps }

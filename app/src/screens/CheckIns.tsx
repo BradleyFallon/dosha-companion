@@ -6,6 +6,7 @@ import { initialAssessment } from '../generated/initialAssessment'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { CompleteIcon, QuestionsIcon } from '../ui/icons'
 import { useQuestionKeyboard } from '../quiz/useQuestionKeyboard'
+import { ContextChatLink } from '../components/ContextChatLink'
 
 export function NewCheckInScreen() {
   const { dispatch } = usePrototype()
@@ -61,7 +62,7 @@ export function CheckInScreen() {
   if (checkIn.completedAt || !question) {
     if (!checkIn.completedAt) return <Screen><p role="status">Finishing check-in…</p></Screen>
     return (
-      <Screen><p className="stage-badge icon-label"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" weight="fill" />Check-in complete</p><h1 tabIndex={-1}>Your recent answers were saved</h1><p className="lede">This dated record stays separate from your initial assessment. No dosha score was calculated.</p><Link className="button primary" to="/today">Return to Today</Link><Link className="button secondary icon-label" to="/questions"><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />View check-in history</Link></Screen>
+      <Screen><p className="stage-badge icon-label"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" weight="fill" />Check-in complete</p><h1 tabIndex={-1}>Your recent answers were saved</h1><p className="lede">This dated record stays separate from your initial assessment. No dosha score was calculated.</p><ContextChatLink className="button primary icon-label" context={{ type: 'check-in', id: checkIn.id }} returnTo="/questions">Talk through this check-in</ContextChatLink><Link className="button secondary" to="/today">Return to Today</Link><Link className="button secondary icon-label" to="/questions"><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />View check-in history</Link></Screen>
     )
   }
 

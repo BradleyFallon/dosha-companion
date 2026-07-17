@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { initialAssessment } from '../generated/initialAssessment'
+import { createChatMessage, createChatThread } from '../chat/thread'
+import { resolveChatContext } from '../chat/context'
 import {
   defaultState,
   coarsenLocationForStorage,
@@ -134,6 +136,36 @@ describe('prototype state and persistence', () => {
     expect(restored.todayVisited).toBe(true)
     expect(restored.submittedAnswers[firstQuestion.id]).toBe(firstAnswer.id)
     expect(restored.profile.temperatureUnitPreference).toBe('automatic')
+  })
+
+  it('migrates version 8 snapshots with empty conversation history', () => {
+    const legacy = persistableState(completedState())
+    delete legacy.chatThreads
+    const restored = restoreState({ getItem: () => JSON.stringify({ version: 8, state: legacy }) })
+    expect(restored.state.chatThreads).toEqual([])
+    expect(restored.notice).toContain('version 8')
+  })
+
+  it('persists at most 20 newest threads and 40 messages with sanitized references', () => {
+    const base = completedState({ resultsReached: true })
+    const context = resolveChatContext({ type: 'article', id: 'vata', sourcePath: '/unsafe' }, base)!
+    const threads = Array.from({ length: 24 }, (_, index) => {
+      const thread = createChatThread(context, new Date(`2026-07-${String(index + 1).padStart(2, '0')}T10:00:00.000Z`))
+      thread.messages = Array.from({ length: 45 }, (__, messageIndex) =>
+        createChatMessage(messageIndex % 2 ? 'assistant' : 'user', `Message ${messageIndex}`, 'complete', new Date(`2026-07-16T10:${String(messageIndex).padStart(2, '0')}:00.000Z`)),
+      )
+      return thread
+    })
+    const restored = restoreState({
+      getItem: () => JSON.stringify({
+        version: STORAGE_VERSION,
+        state: { ...persistableState(base), chatThreads: threads },
+      }),
+    }).state
+    expect(restored.chatThreads).toHaveLength(20)
+    expect(restored.chatThreads[0].updatedAt).toBe('2026-07-24T10:00:00.000Z')
+    expect(restored.chatThreads[0].messages).toHaveLength(40)
+    expect(restored.chatThreads[0].context[0].sourcePath).toBe('/learn/vata')
   })
 
   it('sanitizes recommendation history and check-in answer references independently', () => {

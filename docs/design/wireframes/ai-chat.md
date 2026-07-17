@@ -1,20 +1,19 @@
 # AI Chat Wireframe
 
-> Current demo replacement: no AI chat is implemented. The route provides deterministic Guided help that searches published local articles, glossary terms, and recommendation rationales and can repeat the active Today explanation.
+> Current prototype: contextual chat routes, browser-local history, grounded citations, and scripted mock responses are implemented. Deterministic catalog search supplies retrieval and fallback sources; no real LLM is connected.
 
-## Subscriber entry
+## Contextual conversation
 
 ```text
 +--------------------------------------+
-| < Today             AI assistant     |
+| < Today          New conversation    |
 |                                      |
-| Uses approved educational content    |
-| and a limited summary of your        |
-| profile. It cannot diagnose or       |
-| replace professional care.           |
-| [How your context is used]           |
+| DISCUSSING                           |
+| Today's focus                        |
+| Keep your morning steady             |
+| [Open original]                      |
 |                                      |
-| TRY ASKING                            |
+| TRY ASKING                           |
 | [ Explain my current balance       ] |
 | [ Why was today’s guidance chosen? ] |
 | [ Find an article about routine    ] |
@@ -37,20 +36,20 @@
 +--------------------------------------+
 ```
 
-## Free-user gate
+## General chat home
 
 ```text
 +--------------------------------------+
-| AI assistant                         |
+| Ask Dosha Companion                  |
 |                                      |
-| Ask questions about your profile     |
-| and approved learning content.       |
+| Ask about Ayurveda, Today guidance,  |
+| check-ins, or learning content.      |
 |                                      |
-| Included with one paid subscription. |
-| [ View subscription                ] |
+| [ Ask a question...                ] |
+| [ Start conversation               ] |
 |                                      |
-| You can still use Today, Questions,  |
-| My Balance, and Learn for free.      |
+| Recent conversations                 |
+| Morning consistency          Today   |
 +--------------------------------------+
 ```
 
@@ -85,7 +84,7 @@
 
 ## Notes
 
-- This is not part of the first prototype’s required vertical slice.
-- Source links refer to approved internal content, not invented citations.
-- AI failure never blocks the rest of the product.
-- Conversation history, usage limits, deletion, and detailed escalation behavior require later specification.
+- Source links refer to retrieved internal content, not invented or external citations.
+- Chat failure never blocks the rest of the product.
+- Conversation history is limited and browser-local.
+- Provider integration, authentication, production usage limits, and detailed escalation review remain deferred.

@@ -8,6 +8,8 @@ import { PrototypeProvider } from '../prototype/PrototypeContext'
 import { createTestState } from '../prototype/state'
 import { getAssessmentQuestions } from '../quiz/assessment'
 import { getCheckInQuestionSet } from '../content/repository'
+import { resolveChatContext } from '../chat/context'
+import { createChatThread } from '../chat/thread'
 
 afterEach(() => vi.unstubAllGlobals())
 
@@ -245,15 +247,68 @@ describe('limited MVP results and settings', () => {
     expect(snapshot.state.checkIns[0].completedAt).toBeTruthy()
   })
 
-  it('searches catalog content and explains the current recommendation', async () => {
+  it('shows the general chat home and creates a grounded conversation from a suggestion', async () => {
     const user = userEvent.setup()
     renderAt('/assistant', { resultsReached: true, assessmentMode: 'full', submittedAnswers: allOrdinaryAnswers(), profile: completedProfile('Alex') })
+    expect(await screen.findByRole('heading', { name: 'Ask Dosha Companion' })).toBeInTheDocument()
+    expect(screen.getByText(/educational wellness information/)).toBeInTheDocument()
+    expect(screen.queryByText('This is not a conversational AI.')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'What is Vata?' }))
-    expect(screen.getByRole('heading', { name: 'Matching content' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /articleVataAn educational overview/i })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Why was this recommendation shown?' }))
-    expect(screen.getByRole('heading', { name: 'Why Today chose its recommendation' })).toBeInTheDocument()
-    expect(screen.getByText('No dosha score was calculated or used.')).toBeInTheDocument()
+    expect(await screen.findByText(/closest match in the app’s learning catalog/)).toBeInTheDocument()
+    expect(screen.getByText('Based on')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Vata' })).toHaveAttribute('href', '/learn/vata')
+  })
+
+  it('opens a focused recommendation thread with context, suggestions, pending state, and citations', async () => {
+    const user = userEvent.setup()
+    renderAt('/today', { resultsReached: true, assessmentMode: 'full', submittedAnswers: allOrdinaryAnswers(), profile: completedProfile('Alex') })
+    await user.click(screen.getAllByRole('link', { name: 'Ask about this' })[0])
+    expect(await screen.findByText('Discussing')).toBeInTheDocument()
+    expect(screen.queryByRole('navigation', { name: 'Primary navigation' })).not.toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Conversation messages' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Why was this recommended?' }))
+    expect(screen.getByText('Thinking…')).toBeInTheDocument()
+    expect(screen.getByLabelText('Ask a follow-up')).toBeDisabled()
+    expect(await screen.findByText(/deterministic guidance rules/)).toBeInTheDocument()
+    expect(screen.getByText('Based on')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Routine and consistency|How Today chooses guidance|Self-assessment/ })).toBeInTheDocument()
+  })
+
+  it('supports Enter to send, Shift+Enter for a newline, mock failure, and retry', async () => {
+    const user = userEvent.setup()
+    renderAt('/chat/new?return=today', { resultsReached: true })
+    const composer = await screen.findByLabelText('Ask a follow-up')
+    await user.type(composer, 'first line{Shift>}{Enter}{/Shift}second line')
+    expect(composer).toHaveValue('first line\nsecond line')
+    await user.clear(composer)
+    await user.type(composer, 'simulate mock failure{Enter}')
+    expect(await screen.findByRole('alert')).toHaveTextContent('could not respond')
+    await user.click(screen.getByRole('button', { name: 'Retry response' }))
+    expect(screen.getByText('Thinking…')).toBeInTheDocument()
+    expect(await screen.findByRole('alert')).toBeInTheDocument()
+  })
+
+  it('renders article context and sends suggested questions', async () => {
+    const user = userEvent.setup()
+    renderAt('/learn/vata', { resultsReached: true })
+    await user.click(screen.getByRole('link', { name: 'Ask about this article' }))
+    expect(await screen.findByRole('heading', { name: 'Vata' })).toBeInTheDocument()
+    expect(screen.getByText('Learning article')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Can you explain this more simply?' }))
+    expect(await screen.findByText(/educational organizing concepts rather than diagnoses/)).toBeInTheDocument()
+  })
+
+  it('clears browser-local conversation history from Settings', async () => {
+    const user = userEvent.setup()
+    const state = createTestState({ resultsReached: true, profile: completedProfile('Alex') })
+    const context = resolveChatContext({ type: 'article', id: 'vata', sourcePath: '/learn/vata' }, state)!
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    renderAt('/settings', { resultsReached: true, chatThreads: [createChatThread(context)] })
+    expect(screen.getByText('1 saved on this device')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Clear conversation history' }))
+    expect(confirm).toHaveBeenCalled()
+    expect(screen.getByText('0 saved on this device')).toBeInTheDocument()
+    expect(screen.getByText('Conversation history cleared.')).toBeInTheDocument()
   })
 
   it('records Today completion and rotates to another catalog item', async () => {

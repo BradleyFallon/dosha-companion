@@ -9,7 +9,7 @@ import {
   TodayIcon,
 } from '../ui/icons'
 
-const postResultPaths = ['/today', '/questions', '/balance', '/learn', '/assistant', '/settings']
+const postResultPaths = ['/today', '/questions', '/balance', '/learn', '/assistant', '/chat', '/settings']
 
 export function RouteFocus() {
   const location = useLocation()
@@ -27,8 +27,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { state, dismissRestoreNotice } = usePrototype()
   const location = useLocation()
   const focusedQuiz = location.pathname.startsWith('/questions/check-in/')
+  const focusedChat = /^\/chat\/(?:new|[^/]+)$/.test(location.pathname)
   const showNavigation =
-    !focusedQuiz && state.resultsReached && postResultPaths.some((path) => location.pathname.startsWith(path))
+    !focusedQuiz && !focusedChat && state.resultsReached && postResultPaths.some((path) => location.pathname.startsWith(path))
 
   return (
     <div className="app-frame">
@@ -47,7 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           Not saved—changes remain available only for this session.
         </div>
       ) : null}
-      <main id="main-content" className={showNavigation ? 'app-main with-nav' : 'app-main'}>
+      <main id="main-content" className={`${showNavigation ? 'app-main with-nav' : 'app-main'}${focusedChat ? ' focused-chat' : ''}`}>
         {children}
       </main>
       {showNavigation ? <BottomNavigation /> : null}

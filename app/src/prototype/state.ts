@@ -1,11 +1,23 @@
 import { initialAssessment } from '../generated/initialAssessment'
-import { checkInQuestionSets, recommendationCatalog } from '../generated/contentCatalog'
+import {
+  checkInQuestionSets,
+  learningArticles,
+  recommendationCatalog,
+  seasonalProduceCatalog,
+} from '../generated/contentCatalog'
 import type { AssessmentMode } from '../quiz/assessment'
 import { getAssessmentQuestions } from '../quiz/assessment'
 import { getProfileReadiness } from '../profile/readiness'
+import { isKnownCitation } from '../chat/retrieval'
+import type {
+  ChatCitation,
+  ChatContextReference,
+  ChatMessage,
+  ChatThread,
+} from '../chat/types'
 
 export const STORAGE_KEY = 'dosha-companion-prototype-state'
-export const STORAGE_VERSION = 8
+export const STORAGE_VERSION = 9
 
 export type SaveStatus = 'saved' | 'saving' | 'not-saved'
 
@@ -69,6 +81,7 @@ export interface PrototypeState {
   recommendationHistory: RecommendationHistoryRecord[]
   todayRecommendationId: string | null
   checkIns: CheckIn[]
+  chatThreads: ChatThread[]
   saveStatus: SaveStatus
   restoreNotice: string | null
 }
@@ -91,6 +104,13 @@ export type PrototypeAction =
   | { type: 'start-check-in'; checkIn: CheckIn }
   | { type: 'answer-check-in'; checkInId: string; questionId: string; answerId: string }
   | { type: 'complete-check-in'; checkInId: string; completedAt: string }
+  | { type: 'create-chat-thread'; thread: ChatThread }
+  | { type: 'add-chat-message'; threadId: string; message: ChatMessage }
+  | { type: 'complete-chat-message'; threadId: string; messageId: string; content: string; citations: ChatCitation[]; suggestedFollowUps: string[]; boundary: ChatMessage['boundary']; completedAt: string }
+  | { type: 'fail-chat-message'; threadId: string; messageId: string }
+  | { type: 'retry-chat-message'; threadId: string; messageId: string }
+  | { type: 'delete-chat-thread'; threadId: string }
+  | { type: 'clear-chat-history' }
   | { type: 'replace-state'; state: PrototypeState }
   | { type: 'set-save-status'; status: SaveStatus }
   | { type: 'clear-restore-notice' }
@@ -123,6 +143,7 @@ export const defaultState: PrototypeState = {
   recommendationHistory: [],
   todayRecommendationId: null,
   checkIns: [],
+  chatThreads: [],
   saveStatus: 'saved',
   restoreNotice: null,
 }
@@ -249,6 +270,74 @@ export function prototypeReducer(
           : checkIn),
         saveStatus: 'saving',
       }
+    case 'create-chat-thread':
+      return {
+        ...state,
+        chatThreads: [action.thread, ...state.chatThreads.filter((thread) => thread.id !== action.thread.id)].slice(0, 20),
+        saveStatus: 'saving',
+      }
+    case 'add-chat-message':
+      return {
+        ...state,
+        chatThreads: updateChatThread(state.chatThreads, action.threadId, (thread) => ({
+          ...thread,
+          title: thread.title === 'New conversation' && action.message.role === 'user'
+            ? action.message.content.slice(0, 60)
+            : thread.title,
+          updatedAt: action.message.createdAt,
+          messages: [...thread.messages, action.message].slice(-40),
+        })),
+        saveStatus: 'saving',
+      }
+    case 'complete-chat-message':
+      return {
+        ...state,
+        chatThreads: updateChatThread(state.chatThreads, action.threadId, (thread) => ({
+          ...thread,
+          updatedAt: action.completedAt,
+          messages: thread.messages.map((message) => message.id === action.messageId
+            ? {
+                ...message,
+                content: action.content,
+                status: 'complete',
+                citations: action.citations,
+                suggestedFollowUps: action.suggestedFollowUps,
+                boundary: action.boundary,
+              }
+            : message),
+        })),
+        saveStatus: 'saving',
+      }
+    case 'fail-chat-message':
+      return {
+        ...state,
+        chatThreads: updateChatThread(state.chatThreads, action.threadId, (thread) => ({
+          ...thread,
+          messages: thread.messages.map((message) => message.id === action.messageId
+            ? { ...message, status: 'error' }
+            : message),
+        })),
+        saveStatus: 'saving',
+      }
+    case 'retry-chat-message':
+      return {
+        ...state,
+        chatThreads: updateChatThread(state.chatThreads, action.threadId, (thread) => ({
+          ...thread,
+          messages: thread.messages.map((message) => message.id === action.messageId
+            ? { ...message, status: 'pending' }
+            : message),
+        })),
+        saveStatus: 'saving',
+      }
+    case 'delete-chat-thread':
+      return {
+        ...state,
+        chatThreads: state.chatThreads.filter((thread) => thread.id !== action.threadId),
+        saveStatus: 'saving',
+      }
+    case 'clear-chat-history':
+      return { ...state, chatThreads: [], saveStatus: 'saving' }
     case 'replace-state':
       return { ...action.state, saveStatus: 'saving', restoreNotice: null }
     case 'set-save-status':
@@ -301,6 +390,7 @@ export function serializeState(state: PrototypeState): string {
       recommendationHistory: state.recommendationHistory,
       todayRecommendationId: state.todayRecommendationId,
       checkIns: state.checkIns,
+      chatThreads: state.chatThreads,
     },
   }
   return JSON.stringify(persisted)
@@ -463,6 +553,7 @@ function sanitizeState(raw: Record<string, unknown>): PrototypeState {
     ? raw.todayRecommendationId
     : null
   const checkIns = sanitizeCheckIns(raw.checkIns)
+  const chatThreads = sanitizeChatThreads(raw.chatThreads, checkIns)
 
   return {
     accountCreated,
@@ -481,9 +572,111 @@ function sanitizeState(raw: Record<string, unknown>): PrototypeState {
     recommendationHistory,
     todayRecommendationId,
     checkIns,
+    chatThreads,
     saveStatus: 'saved',
     restoreNotice: null,
   }
+}
+
+function updateChatThread(
+  threads: ChatThread[],
+  threadId: string,
+  update: (thread: ChatThread) => ChatThread,
+) {
+  const updated = threads.map((thread) => thread.id === threadId ? update(thread) : thread)
+  return updated.sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt)).slice(0, 20)
+}
+
+function sanitizeChatThreads(value: unknown, checkIns: CheckIn[]): ChatThread[] {
+  if (!Array.isArray(value)) return []
+  const validRecommendationIds = new Set(recommendationCatalog.map((item) => item.id))
+  const validArticleIds = new Set(learningArticles.map((item) => item.id))
+  const validProduceIds = new Set(seasonalProduceCatalog.map((item) => item.id))
+  const validCheckInIds = new Set(checkIns.map((item) => item.id))
+  const threads: ChatThread[] = []
+  const seen = new Set<string>()
+  for (const item of value.slice(0, 100)) {
+    if (!isRecord(item) || typeof item.id !== 'string' || !/^[a-zA-Z0-9_-]{4,100}$/.test(item.id) || seen.has(item.id)) continue
+    if (!validIsoDate(item.createdAt) || !validIsoDate(item.updatedAt) || !Array.isArray(item.context) || !Array.isArray(item.messages)) continue
+    const context = item.context.flatMap((reference) => {
+      const sanitized = sanitizeChatContextReference(reference, validRecommendationIds, validArticleIds, validProduceIds, validCheckInIds)
+      return sanitized ? [sanitized] : []
+    }).slice(0, 4)
+    if (context.length === 0) continue
+    const messages = sanitizeChatMessages(item.messages)
+    seen.add(item.id)
+    threads.push({
+      id: item.id,
+      title: sanitizeString(item.title, 100) || 'Conversation',
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      context,
+      messages,
+    })
+  }
+  return threads.sort((left, right) => Date.parse(right.updatedAt) - Date.parse(left.updatedAt)).slice(0, 20)
+}
+
+function sanitizeChatContextReference(
+  value: unknown,
+  recommendationIds: Set<string>,
+  articleIds: Set<string>,
+  produceIds: Set<string>,
+  checkInIds: Set<string>,
+): ChatContextReference | null {
+  if (!isRecord(value) || typeof value.id !== 'string') return null
+  if (value.type === 'recommendation' && recommendationIds.has(value.id)) return { type: value.type, id: value.id, sourcePath: '/today' }
+  if (value.type === 'article' && articleIds.has(value.id)) return { type: value.type, id: value.id, sourcePath: `/learn/${value.id}` }
+  if (value.type === 'seasonal-food' && produceIds.has(value.id)) return { type: value.type, id: value.id, sourcePath: '/today' }
+  if (value.type === 'check-in' && checkInIds.has(value.id)) return { type: value.type, id: value.id, sourcePath: '/questions' }
+  if (value.type === 'general' && value.id === 'general') {
+    const sourcePath = ['/today', '/learn', '/questions', '/balance'].includes(String(value.sourcePath)) ? String(value.sourcePath) : '/today'
+    return { type: 'general', id: 'general', sourcePath }
+  }
+  return null
+}
+
+function sanitizeChatMessages(value: unknown): ChatMessage[] {
+  if (!Array.isArray(value)) return []
+  const messages: ChatMessage[] = []
+  const seen = new Set<string>()
+  for (const item of value.slice(-40)) {
+    if (!isRecord(item) || typeof item.id !== 'string' || !/^[a-zA-Z0-9_-]{4,120}$/.test(item.id) || seen.has(item.id)) continue
+    if ((item.role !== 'user' && item.role !== 'assistant') || !validIsoDate(item.createdAt)) continue
+    const content = sanitizeString(item.content, 12_000)
+    if (!content) continue
+    const status = item.status === 'complete' ? 'complete' : item.status === 'error' ? 'error' : 'error'
+    const citations = Array.isArray(item.citations)
+      ? item.citations.flatMap((citation) => {
+          const sanitized = sanitizeChatCitation(citation)
+          return sanitized ? [sanitized] : []
+        }).slice(0, 5)
+      : []
+    const suggestedFollowUps = Array.isArray(item.suggestedFollowUps)
+      ? item.suggestedFollowUps.flatMap((question) => {
+          const sanitized = sanitizeString(question, 240)
+          return sanitized ? [sanitized] : []
+        }).slice(0, 4)
+      : []
+    const boundary = item.boundary === 'medical' || item.boundary === 'medication' || item.boundary === 'unsupported' || item.boundary === 'emergency'
+      ? item.boundary
+      : null
+    seen.add(item.id)
+    messages.push({ id: item.id, role: item.role, content, createdAt: item.createdAt, status, citations, suggestedFollowUps, boundary })
+  }
+  return messages
+}
+
+function sanitizeChatCitation(value: unknown): ChatCitation | null {
+  if (!isRecord(value) || typeof value.id !== 'string' || typeof value.title !== 'string' || typeof value.href !== 'string') return null
+  if (value.type !== 'article' && value.type !== 'glossary' && value.type !== 'recommendation' && value.type !== 'seasonal-food') return null
+  const citation: ChatCitation = {
+    id: value.id.slice(0, 100),
+    title: value.title.trim().slice(0, 200),
+    href: value.href,
+    type: value.type,
+  }
+  return isKnownCitation(citation) ? citation : null
 }
 
 function sanitizeRecommendationHistory(value: unknown, validIds: Set<string>): RecommendationHistoryRecord[] {

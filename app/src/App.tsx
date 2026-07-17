@@ -14,9 +14,9 @@ import { TodayScreen } from './screens/Today'
 import { BalanceScreen, QuestionsScreen } from './screens/Secondary'
 import { SettingsScreen } from './screens/Settings'
 import { ArticleScreen, GlossaryScreen, LearnScreen } from './screens/Learn'
-import { AssistantScreen } from './screens/GuidedHelp'
 import { CheckInScreen, NewCheckInScreen } from './screens/CheckIns'
 import { getProfileReadiness } from './profile/readiness'
+import { ChatHomeScreen, ChatThreadScreen, NewChatScreen } from './screens/Chat'
 
 const LocationProfileScreen = lazy(() =>
   import('./screens/LocationProfile').then((module) => ({
@@ -53,7 +53,10 @@ function PrototypeRoutes() {
         <Route path="/learn" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><LearnScreen /></Guard>} />
         <Route path="/learn/glossary" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><GlossaryScreen /></Guard>} />
         <Route path="/learn/:articleId" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><ArticleScreen /></Guard>} />
-        <Route path="/assistant" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><AssistantScreen /></Guard>} />
+        <Route path="/assistant" element={<Navigate to="/chat" replace />} />
+        <Route path="/chat" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><ChatHomeScreen /></Guard>} />
+        <Route path="/chat/new" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><NewChatScreen /></Guard>} />
+        <Route path="/chat/:threadId" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><ChatThreadScreen /></Guard>} />
         <Route path="/settings" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><SettingsScreen /></Guard>} />
         <Route path="*" element={<Navigate to={resumePath} replace />} />
       </Routes>

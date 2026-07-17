@@ -5,6 +5,7 @@ import { loadLocalConditions, type LocalConditions } from '../location/condition
 import { resolveTemperatureUnit } from '../location/units'
 import { weatherPresentation } from '../location/weatherPresentation'
 import type { ProfileState } from '../prototype/state'
+import { ContextChatLink } from './ContextChatLink'
 import {
   HighTemperatureIcon,
   LowTemperatureIcon,
@@ -60,7 +61,7 @@ export function LocalizedTodayContent({ profile }: { profile: ProfileState }) {
       </section>
       <section className="seasonal-card" aria-labelledby="seasonal-title">
         <p className="eyebrow">Regional food guide</p><h2 id="seasonal-title">In season near you</h2>
-        {!location.produceRegionId ? <p>Regional food guidance is not available for this area yet.</p> : seasonalProduce.length ? <ul>{seasonalProduce.map((item) => <li key={item.id}><Link to={`/learn/${item.articleId}`}>{item.name}</Link></li>)}</ul> : <p>No matching regional foods are available for your preferences this month.</p>}
+        {!location.produceRegionId ? <p>Regional food guidance is not available for this area yet.</p> : seasonalProduce.length ? <ul className="seasonal-food-list">{seasonalProduce.map((item) => <li key={item.id}><strong>{item.name}</strong><span>In season near you</span><div><Link to={`/learn/${item.articleId}`}>Read more</Link><ContextChatLink context={{ type: 'seasonal-food', id: item.id }} returnTo="/today">Ask about this</ContextChatLink></div></li>)}</ul> : <p>No matching regional foods are available for your preferences this month.</p>}
         {location.produceRegionId ? <p className="field-hint">Regional seasonality varies by source and growing conditions. These foods are not a calculated dosha recommendation.</p> : null}
       </section>
     </div>

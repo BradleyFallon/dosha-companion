@@ -5,6 +5,7 @@ import { usePrototype } from '../prototype/PrototypeContext'
 import { serializeState } from '../prototype/state'
 import {
   ClearDataIcon,
+  ChatIcon,
   CompleteIcon,
   ExportDataIcon,
   LocationIcon,
@@ -70,9 +71,15 @@ export function SettingsScreen() {
   }
 
   function clearData() {
-    if (!window.confirm('Clear all browser-local profile, assessment, check-in, and recommendation history?')) return
+    if (!window.confirm('Clear all browser-local profile, assessment, check-in, recommendation, and conversation history?')) return
     resetPrototype()
     navigate('/')
+  }
+
+  function clearConversationHistory() {
+    if (!window.confirm('Clear all conversations saved in this browser?')) return
+    dispatch({ type: 'clear-chat-history' })
+    setDataMessage('Conversation history cleared.')
   }
 
   function loadDemo() {
@@ -124,6 +131,13 @@ export function SettingsScreen() {
         <button className="button danger-button icon-label" type="button" onClick={clearData}><ClearDataIcon aria-hidden="true" className="icon-leading" focusable="false" />Clear local data and restart</button>
         {import.meta.env.DEV ? <div className="dev-control"><strong>Example profile</strong><p>Replace this session with a complete profile, assessment coverage, and a completed check-in.</p><button className="button secondary icon-label" type="button" onClick={loadDemo}><ResetIcon aria-hidden="true" className="icon-leading" focusable="false" />Load example profile</button></div> : null}
         {dataMessage ? <Status>{dataMessage}</Status> : null}
+      </section>
+      <section className="settings-data" aria-labelledby="settings-conversations-title">
+        <h2 className="section-title-with-icon" id="settings-conversations-title"><ChatIcon aria-hidden="true" className="icon-leading" focusable="false" />Conversations</h2>
+        <p>{state.chatThreads.length} saved on this device</p>
+        <p className="field-hint">Conversation history is stored only in this browser.</p>
+        <button className="button danger-button icon-label" disabled={state.chatThreads.length === 0} onClick={clearConversationHistory} type="button"><ClearDataIcon aria-hidden="true" className="icon-leading" focusable="false" />Clear conversation history</button>
+        {import.meta.env.DEV ? <p className="field-hint">Chat mode: {import.meta.env.VITE_CHAT_MODE === 'api' ? 'API' : 'Mock'}</p> : null}
       </section>
       <p className="boundary-note icon-label"><PrivacyIcon aria-hidden="true" className="icon-leading" focusable="false" />Your profile is stored only in this browser. It does not synchronize to another device.</p>
     </Screen>

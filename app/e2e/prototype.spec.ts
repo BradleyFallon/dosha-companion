@@ -35,6 +35,97 @@ async function reachAssessment(page: Page, short = true) {
   await page.getByRole('button', { name: 'Begin assessment' }).click()
 }
 
+async function reachToday(page: Page) {
+  await reachAssessment(page)
+  for (let index = 0; index < 3; index += 1) {
+    await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 1))
+    await page.getByRole('radio').first().check()
+    await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled()
+    await page.getByRole('button', { name: 'Continue' }).click()
+  }
+  await expect(page.getByRole('heading', { name: /how you’ve been feeling recently/i })).toBeVisible()
+  await page.getByRole('button', { name: 'Continue' }).click()
+  for (let index = 0; index < 2; index += 1) {
+    await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 4))
+    await page.getByRole('radio').first().check()
+    await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled()
+    await page.getByRole('button', { name: 'Continue' }).click()
+  }
+  await page.getByRole('link', { name: 'View complete sample' }).click()
+  await page.getByRole('button', { name: 'Continue to Today' }).click()
+  await expect(page.getByText('For today')).toBeVisible()
+}
+
+test('discusses a Today recommendation in a persistent focused conversation', async ({ page }) => {
+  await reachToday(page)
+  await page.getByRole('link', { name: 'Ask about this' }).first().click()
+  await expect(page.getByText('Discussing')).toBeVisible()
+  await expect(page.getByText('Today’s focus')).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'Primary navigation' })).not.toBeVisible()
+
+  for (const height of [844, 667]) {
+    await page.setViewportSize({ width: 390, height })
+    const composer = page.getByRole('textbox', { name: 'Ask a follow-up' })
+    const composerBox = await composer.boundingBox()
+    expect(composerBox).not.toBeNull()
+    expect((composerBox?.y ?? 0) + (composerBox?.height ?? 0)).toBeLessThanOrEqual(height)
+    expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1)).toBe(true)
+  }
+
+  await page.getByRole('textbox', { name: 'Ask a follow-up' }).fill('Why might consistency help me today?')
+  await page.keyboard.press('Enter')
+  await expect(page.getByText(/deterministic guidance rules/)).toBeVisible()
+  const citedArticle = page.locator('.chat-citations a[href^="/learn/"]').first()
+  await expect(citedArticle).toBeVisible()
+  await citedArticle.click()
+  await expect(page.locator('.article-body')).toBeVisible()
+  await page.goBack()
+  await expect(page.getByText(/deterministic guidance rules/)).toBeVisible()
+  await page.reload()
+  await expect(page.getByText(/deterministic guidance rules/)).toBeVisible()
+})
+
+test('starts an article conversation from Learn and uses a suggestion', async ({ page }) => {
+  await reachToday(page)
+  await page.getByRole('link', { name: 'Learn' }).click()
+  await page.locator('a[href="/learn/vata"]').click()
+  await page.getByRole('link', { name: 'Ask about this article' }).click()
+  await expect(page.getByRole('heading', { name: 'Vata' })).toBeVisible()
+  await expect(page.getByText('Learning article')).toBeVisible()
+  await page.getByRole('button', { name: 'Can you explain this more simply?' }).click()
+  await expect(page.getByText(/educational organizing concepts rather than diagnoses/)).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Vata', exact: true })).toBeVisible()
+})
+
+test('anchors seasonal-food chat to the saved regional context', async ({ page }) => {
+  await reachToday(page)
+  await page.getByRole('link', { name: 'Add my location' }).click()
+  await page.getByRole('button', { name: 'Choose on map' }).click()
+  await page.getByRole('button', { name: 'Use this regional location' }).click()
+  await expect(page.getByRole('heading', { name: 'In season near you' })).toBeVisible()
+  const food = page.locator('.seasonal-food-list li').first()
+  const name = (await food.locator('strong').textContent()) ?? ''
+  await food.getByRole('link', { name: 'Ask about this' }).click()
+  await expect(page.getByRole('heading', { name })).toBeVisible()
+  await expect(page.getByText(/Portland, Oregon, United States/)).toBeVisible()
+  await page.getByRole('button', { name: 'Why is this shown as seasonal?' }).click()
+  await expect(page.getByText(/currently listed as seasonal/)).toBeVisible()
+})
+
+test('talks through a completed check-in with recent-answer context', async ({ page }) => {
+  await reachToday(page)
+  await page.getByRole('link', { name: 'Questions' }).click()
+  await page.getByRole('link', { name: 'Start current check-in' }).click()
+  for (let index = 0; index < 5; index += 1) {
+    await page.getByRole('radio').first().check()
+    await page.getByRole('button', { name: index === 4 ? 'Complete check-in' : 'Continue' }).click()
+  }
+  await page.getByRole('link', { name: 'Talk through this check-in' }).click()
+  await expect(page.getByText(/5 recent answers saved separately/)).toBeVisible()
+  await page.getByRole('button', { name: 'What should I keep observing?' }).click()
+  await expect(page.getByText(/temporary pattern to observe/)).toBeVisible()
+})
+
 test('completes the short mobile vertical slice', async ({ page }) => {
   let weatherRequests = 0
   page.on('request', (request) => { if (request.url().includes('api.open-meteo.com/v1/forecast')) weatherRequests += 1 })
@@ -283,11 +374,11 @@ test('uses every post-assessment destination in the mobile demo', async ({ page 
   await page.getByRole('link', { name: /Routine and consistency/i }).click()
   await expect(page.getByRole('heading', { name: 'Routine and consistency' })).toBeVisible()
   await page.getByRole('link', { name: 'Learn' }).first().click()
-  await page.getByRole('link', { name: 'Search with guided help' }).click()
+  await page.getByRole('link', { name: 'Ask Dosha Companion' }).click()
   await page.getByRole('button', { name: 'What is Vata?' }).click()
-  await expect(page.getByRole('heading', { name: 'Matching content' })).toBeVisible()
+  await expect(page.getByText(/closest match in the app’s learning catalog/)).toBeVisible()
 
-  await page.getByRole('navigation', { name: 'Primary navigation' }).getByRole('link', { name: 'Today', exact: true }).click()
+  await page.getByRole('link', { name: 'Today', exact: true }).click()
   await page.getByRole('link', { name: 'Open profile settings' }).click()
   await expect(page.getByText('Browser localStorage')).toBeVisible()
   const downloadPromise = page.waitForEvent('download')

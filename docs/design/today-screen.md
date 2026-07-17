@@ -22,7 +22,7 @@ Today is the post-assessment home and primary retention surface. It turns the la
 7. “Why this was chosen” disclosure
 8. Stable “Your guide” links for usual nature, food preferences, and local rhythms
 9. Related learning content
-10. Available-question indicator and Guided help entry point
+10. Available-question indicator and Ask Dosha Companion entry point
 
 ## Content responsibility
 
@@ -50,7 +50,7 @@ Today is the post-assessment home and primary retention surface. It turns the la
 | Loading | Preserve card heights with meaningful labels where possible |
 | Content unavailable | Keep balance summary and questions accessible; explain guidance is temporarily unavailable |
 | AI unavailable | Keep the rest of Today intact and disable only the AI entry |
-| No LLM available | Preserve Today guidance and link to deterministic Guided help content search |
+| Chat response unavailable | Preserve Today guidance and offer retry; deterministic content retrieval remains available to the mock or future client |
 
 ## Interaction details
 
