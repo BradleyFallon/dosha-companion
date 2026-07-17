@@ -28,6 +28,8 @@ The calm default shows what is necessary to understand and act. Disclosures hold
 
 Prefer whitespace, line length, and type hierarchy over nested cards. Shared screen, section, card, and item spacing tokens establish rhythm. Body text uses a comfortable line height and reading measure; borders and shadows are reserved for controls or surfaces that truly need separation.
 
+Use three surface roles. A **primary surface** is the single filled feature area that carries the main task on a screen. A **contextual surface** may use a quiet tint for status, safety, or focused context when separation matters. A **plain section** is the default for supporting content: open page background, deliberate spacing, and thin rules between interactive rows. Avoid placing a filled supporting surface inside another filled surface. On Today, the recommendation is primary; weather, seasonal foods, and destination links are plain supporting sections. Learn results and Settings disclosures also use ruled rows or open sections.
+
 ## Color and motion
 
 Keep the existing warm palette. Use semantic dosha colors selectively, not as decoration for every icon. Avoid generic AI gradients, glow, glass, and heavy shadows. Motion is brief and explanatory: a small disclosure reveal, gentle pending indication, smooth message scrolling, or a completion icon settling into a faint halo in 400ms or less. Completion motion runs only for the action the user just completed; restored completion states render their final appearance without replaying it. Reduced-motion preferences show that final state immediately.

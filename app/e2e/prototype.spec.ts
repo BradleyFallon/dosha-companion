@@ -298,6 +298,56 @@ test('keeps representative daylight-theme contrast above WCAG thresholds', async
   }
 })
 
+test('keeps supporting surfaces quiet and interactive', async ({ page }) => {
+  await reachToday(page)
+  await loadExampleProfile(page)
+
+  const todayRoles = await page.evaluate(() => {
+    const frame = document.querySelector<HTMLElement>('.app-frame')!
+    const feature = document.querySelector<HTMLElement>('.daily-focus')!
+    const weather = document.querySelector<HTMLElement>('.weather-summary')!
+    const seasonal = document.querySelector<HTMLElement>('.seasonal-card')!
+    const shortcuts = [...document.querySelectorAll<HTMLElement>('.today-destinations a')]
+    const transparent = 'rgba(0, 0, 0, 0)'
+    return {
+      primaryIsFilled: getComputedStyle(feature).backgroundColor !== getComputedStyle(frame).backgroundColor,
+      weatherMatchesPage: getComputedStyle(weather).backgroundColor === getComputedStyle(frame).backgroundColor,
+      seasonalIsOpen: getComputedStyle(seasonal).backgroundColor === transparent && getComputedStyle(seasonal).borderLeftWidth === '0px',
+      shortcutsAreRuledRows: shortcuts.length === 2 && shortcuts.every((shortcut) => {
+        const style = getComputedStyle(shortcut)
+        return style.backgroundColor === transparent && style.borderRadius === '0px' && style.borderTopStyle === 'solid' && shortcut.getBoundingClientRect().height >= 44
+      }),
+    }
+  })
+  expect(todayRoles).toEqual({
+    primaryIsFilled: true,
+    weatherMatchesPage: true,
+    seasonalIsOpen: true,
+    shortcutsAreRuledRows: true,
+  })
+
+  await page.goto('/learn')
+  const learnRowsAreOpen = await page.locator('.learn-list .content-card').evaluateAll((rows) =>
+    rows.length > 0 && rows.every((row) => {
+      const style = getComputedStyle(row)
+      return style.backgroundColor === 'rgba(0, 0, 0, 0)' && style.borderRadius === '0px' && row.getBoundingClientRect().height >= 44
+    }),
+  )
+  expect(learnRowsAreOpen).toBe(true)
+
+  await page.goto('/settings')
+  await page.getByRole('button', { name: 'Profile' }).click()
+  const settingsRoles = await page.evaluate(() => {
+    const row = document.querySelector<HTMLElement>('.settings-row.active')!
+    const panel = document.querySelector<HTMLElement>('.settings-section-panel')!
+    return {
+      activeRowIsOpen: getComputedStyle(row).backgroundColor === 'rgba(0, 0, 0, 0)' && getComputedStyle(row).boxShadow.includes('inset'),
+      panelIsOpen: getComputedStyle(panel).backgroundColor === 'rgba(0, 0, 0, 0)' && getComputedStyle(panel).borderRadius === '0px',
+    }
+  })
+  expect(settingsRoles).toEqual({ activeRowIsOpen: true, panelIsOpen: true })
+})
+
 test('starts an article conversation from Learn and uses a suggestion', async ({ page }) => {
   await reachToday(page)
   await page.getByRole('link', { name: 'Learn', exact: true }).click()

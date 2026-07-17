@@ -516,13 +516,15 @@ html[data-daylight-phase="twilight"], html[data-daylight-phase="night"] { color-
 .recommendation-food { display: flex; margin: 18px 0 0; flex-direction: column; gap: 3px; }
 .recommendation-food span { color: var(--muted); }
 .localized-today-content { margin-top: var(--space-section); }
-.today-destinations { display: grid; margin: var(--space-section) 0 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.today-destinations a { display: grid; min-height: 72px; padding: 14px 12px; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px; color: var(--ink); border-radius: 10px; background: var(--surface-shortcut); text-decoration: none; }
+.location-benefit-card { margin: var(--space-section) 0 0; padding: 24px 2px; border-width: 1px 0; border-radius: 0; background: transparent; }
+.today-destinations { display: grid; margin: var(--space-section) 0 0; grid-template-columns: minmax(0, 1fr); gap: 0; }
+.today-destinations a { display: grid; min-height: 64px; padding: 9px 2px; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; color: var(--ink); border-top: 1px solid var(--line); border-radius: 0; background: transparent; text-decoration: none; }
+.today-destinations a:last-child { border-bottom: 1px solid var(--line); }
 .today-destinations a > svg { width: 25px; height: 25px; color: var(--accent); }
 .today-destinations span { display: flex; min-width: 0; flex-direction: column; }
 .today-destinations small { overflow: hidden; color: var(--muted); font-size: .78rem; text-overflow: ellipsis; white-space: nowrap; }
 
-.weather-summary { padding: 26px var(--space-card) 20px; border-radius: var(--radius); background: var(--accent-soft); }
+.weather-summary { padding: 26px 2px 20px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); border-radius: 0; background: var(--paper); }
 .weather-primary { display: flex; align-items: center; justify-content: center; gap: 18px; }
 .weather-primary > div { display: flex; flex-direction: column; }
 .weather-primary strong { font-size: clamp(2.4rem, 12vw, 3.8rem); font-weight: 650; line-height: 1; letter-spacing: -.05em; }
@@ -544,6 +546,7 @@ html[data-daylight-phase="twilight"], html[data-daylight-phase="night"] { color-
 .seasonal-food-main { display: flex; min-height: 48px; min-width: 0; align-items: center; gap: 12px; color: var(--ink); text-decoration: none; }
 .seasonal-food-main svg { width: 23px; height: 23px; flex: 0 0 auto; color: var(--accent); }
 .seasonal-food-main strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seasonal-food-list li:last-child { border-bottom: 1px solid var(--line); }
 .compact-details { margin-top: 10px; color: var(--muted); font-size: .86rem; }
 .compact-details summary { min-height: 40px; color: var(--accent); font-weight: 700; cursor: pointer; }
 .compact-details p { margin: 6px 0 0; }
@@ -584,6 +587,7 @@ html[data-daylight-phase="twilight"], html[data-daylight-phase="night"] { color-
 .content-filters select { margin: 0; }
 .learn-list { gap: 0; margin: 0 0 22px; }
 .content-card { display: grid; min-height: 64px; padding: 10px 4px; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 13px; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: transparent; }
+.learn-list .content-card:last-child { border-bottom: 1px solid var(--line); }
 .content-card .article-icon { width: 34px; height: 34px; }
 .learn-secondary-links { display: flex; padding-top: 18px; flex-wrap: wrap; gap: 8px 22px; border-top: 1px solid var(--line); }
 .learn-secondary-links a { min-height: 44px; align-items: center; font-weight: 700; }
@@ -597,8 +601,8 @@ html[data-daylight-phase="twilight"], html[data-daylight-phase="night"] { color-
 .settings-row.active > svg:last-child { transform: rotate(90deg); }
 .settings-row span { font-weight: 750; }
 .settings-row small { max-width: 180px; overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
-.settings-row.active { background: #f7f4ed; }
-.settings-section-panel { margin-top: 22px; padding: var(--space-card); border-radius: var(--radius); background: #f7f4ed; animation: calm-reveal 160ms ease-out; }
+.settings-row.active { color: var(--accent); background: transparent; box-shadow: inset 3px 0 0 var(--accent); }
+.settings-section-panel { margin-top: 22px; padding: 0 2px 26px; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; animation: calm-reveal 160ms ease-out; }
 .settings-section-panel form { margin-top: 16px; }
 .settings-section-panel .settings-temperature-units { margin-top: 0; padding-top: 0; border-top: 0; }
 .settings-section-panel .privacy-line { margin-bottom: 0; }

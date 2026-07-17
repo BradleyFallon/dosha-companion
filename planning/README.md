@@ -68,7 +68,6 @@ No implementation item is currently active.
 ### Next
 
 - [PROD-002 — Run moderated usability sessions](backlog/PROD-002-moderated-usability-sessions.md)
-- [EXP-004 — Reduce dashboard and card styling](backlog/EXP-004-reduce-card-styling.md)
 
 ### Product exploration
 
@@ -82,6 +81,7 @@ No implementation item is currently active.
 
 ### Recently completed
 
+- [EXP-004 — Reduce dashboard and card styling](done/EXP-004-reduce-card-styling.md)
 - [EXP-005 — Add joyful completion motion](done/EXP-005-joyful-completion-motion.md)
 - [ENG-001 — Add continuous integration](done/ENG-001-add-continuous-integration.md)
 - [EXP-003 — Add visible action labels](done/EXP-003-visible-action-labels.md)
