@@ -32,6 +32,8 @@ Prefer whitespace, line length, and type hierarchy over nested cards. Shared scr
 
 Keep the existing warm palette. Use semantic dosha colors selectively, not as decoration for every icon. Avoid generic AI gradients, glow, glass, and heavy shadows. Motion is brief and explanatory: a small disclosure reveal, gentle pending indication, and smooth message scrolling. Reduced-motion preferences shorten or remove those effects.
 
+Today may use the reviewed [local daylight and ambient theme](daylight-ambient-theme.md). Its phase palettes and static sundial wash reflect regional daylight only; they never communicate wellness, balance, diagnosis, or dosha meaning. Atmosphere must retain the same information hierarchy and interaction contrast as the neutral theme.
+
 ## Mobile first
 
 The same interaction model works from 360-pixel phones through desktop. At 390 × 844, 390 × 667, and 360 × 640:

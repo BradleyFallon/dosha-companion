@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getSeasonalProduce } from '../content/seasonalProduce'
-import { loadLocalConditions, type LocalConditions } from '../location/conditions'
-import { resolveTemperatureUnit } from '../location/units'
+import { useTodayEnvironment } from '../daylight/TodayEnvironmentContext'
 import { weatherPresentation } from '../location/weatherPresentation'
 import type { ProfileState } from '../prototype/state'
 import {
@@ -17,23 +16,10 @@ import {
 import { ContextChatLink } from './ContextChatLink'
 
 export function LocalizedTodayContent({ profile }: { profile: ProfileState }) {
-  const [conditions, setConditions] = useState<LocalConditions | null>(null)
-  const [conditionsError, setConditionsError] = useState('')
   const [detailsOpen, setDetailsOpen] = useState(false)
+  const { conditions, conditionsError, loading } = useTodayEnvironment()
   const location = profile.location
-  const temperatureUnit = resolveTemperatureUnit(location, profile.temperatureUnitPreference)
   const seasonalProduce = getSeasonalProduce(profile).slice(0, 4)
-
-  useEffect(() => {
-    if (!location) return
-    const controller = new AbortController()
-    setConditions(null)
-    setConditionsError('')
-    loadLocalConditions(location, temperatureUnit, controller.signal).then(setConditions).catch((reason) => {
-      if (!controller.signal.aborted) setConditionsError(reason instanceof Error ? reason.message : 'Local conditions are unavailable right now.')
-    })
-    return () => controller.abort()
-  }, [location, temperatureUnit])
 
   if (!location) return null
   const presentation = conditions ? weatherPresentation(conditions.weatherCode) : null
@@ -64,7 +50,7 @@ export function LocalizedTodayContent({ profile }: { profile: ProfileState }) {
               </dl>
             ) : null}
           </>
-        ) : conditionsError ? <p className="supporting">{conditionsError}</p> : <p role="status" className="supporting">Loading local weather…</p>}
+        ) : conditionsError ? <p className="supporting">{conditionsError}</p> : loading ? <p role="status" className="supporting">Loading local weather…</p> : null}
       </section>
 
       <section className="seasonal-card" aria-labelledby="seasonal-title">
