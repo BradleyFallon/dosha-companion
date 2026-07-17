@@ -9,7 +9,7 @@ import { createTestState } from '../prototype/state'
 import { getAssessmentQuestions } from '../quiz/assessment'
 import { getCheckInQuestionSet } from '../content/repository'
 import { resolveChatContext } from '../chat/context'
-import { createChatThread } from '../chat/thread'
+import { createChatMessage, createChatThread } from '../chat/thread'
 
 afterEach(() => vi.unstubAllGlobals())
 
@@ -129,10 +129,12 @@ describe('navigation visibility', () => {
 
   it('preserves accessible names and keeps Today icons out of the tab order', () => {
     const { container } = renderAt('/today', { resultsReached: true })
-    expect(screen.getByRole('link', { name: 'Open profile settings' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Mark complete' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Show another' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Open settings' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mark recommendation complete' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Show recommendation details' })).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByRole('button', { name: 'Show another recommendation' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Ask about this recommendation' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Dismiss for today' })).not.toBeInTheDocument()
     container.querySelectorAll('svg').forEach((icon) => {
       expect(icon).toHaveAttribute('focusable', 'false')
       expect(icon).not.toHaveAttribute('tabindex')
@@ -176,12 +178,13 @@ describe('limited MVP results and settings', () => {
       submittedAnswers: { [first.id]: first.answers[0].id },
       profile: completedProfile('Alex'),
     })
+    await user.click(screen.getByRole('button', { name: 'Profile' }))
     const name = screen.getByLabelText('Preferred name')
     await user.clear(name)
     await user.type(name, 'Jordan')
-    await user.click(screen.getByRole('button', { name: 'Save profile changes' }))
+    await user.click(screen.getByRole('button', { name: 'Save profile' }))
 
-    await waitFor(() => expect(screen.getAllByText('Saved on this device').length).toBeGreaterThan(0))
+    await waitFor(() => expect(screen.getByText('Profile saved.')).toBeInTheDocument())
     const snapshot = JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}')
     expect(snapshot.state.profile.preferredName).toBe('Jordan')
     expect(snapshot.state.submittedAnswers[first.id]).toBe(first.answers[0].id)
@@ -190,22 +193,31 @@ describe('limited MVP results and settings', () => {
   it('offers automatic temperature units with explicit overrides in Settings', async () => {
     const user = userEvent.setup()
     renderAt('/settings', { resultsReached: true, profile: completedProfile('Alex') })
+    await user.click(screen.getByRole('button', { name: 'Units' }))
     expect(screen.getByLabelText('Automatic (°F)')).toBeChecked()
     await user.click(screen.getByLabelText('Celsius (°C)'))
     await waitFor(() => expect(JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}').state.profile.temperatureUnitPreference).toBe('celsius'))
   })
 
-  it('offers location setup and hides temperature controls when location is not provided yet', () => {
+  it('offers location setup and hides temperature controls when location is not provided yet', async () => {
+    const user = userEvent.setup()
     renderAt('/settings', { resultsReached: true, profile: coreProfileWithoutLocation('Alex') })
-    expect(screen.getByText(/Add your general area for weather/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Units' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Location' }))
+    expect(screen.getByText(/Add your general area for local weather/)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Add regional location' })).toHaveAttribute('href', '/profile/location?return=settings')
     expect(screen.queryByRole('group', { name: 'Temperature units' })).not.toBeInTheDocument()
   })
 
-  it('shows a saved location, change action, and temperature controls in Settings', () => {
+  it('shows a saved location, change action, and temperature controls in Settings', async () => {
+    const user = userEvent.setup()
     renderAt('/settings', { resultsReached: true, profile: completedProfile('Alex') })
+    expect(screen.getByRole('button', { name: 'Location' })).toHaveTextContent('Portland')
+    expect(screen.getByRole('button', { name: 'Units' })).toHaveTextContent('°F')
+    await user.click(screen.getByRole('button', { name: 'Location' }))
     expect(screen.getByText('Portland, Oregon, United States')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Change regional location' })).toHaveAttribute('href', '/profile/location?return=settings')
+    await user.click(screen.getByRole('button', { name: 'Units' }))
     expect(screen.getByRole('group', { name: 'Temperature units' })).toBeInTheDocument()
   })
 
@@ -215,8 +227,9 @@ describe('limited MVP results and settings', () => {
     })
     const user = userEvent.setup()
     renderAt('/settings', { resultsReached: true, profile: completedProfile('Alex') })
+    await user.click(screen.getByRole('button', { name: 'Profile' }))
     await user.selectOptions(screen.getByLabelText(/Dietary pattern/), 'Vegan')
-    await user.click(screen.getByRole('button', { name: 'Save profile changes' }))
+    await user.click(screen.getByRole('button', { name: 'Save profile' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Not saved—changes remain available only for this session.')
   })
 
@@ -226,8 +239,9 @@ describe('limited MVP results and settings', () => {
     expect(screen.getByText('Ayurveda basics')).toBeInTheDocument()
     expect(screen.queryByText('Provisional · not expert-approved')).not.toBeInTheDocument()
     await user.type(screen.getByLabelText('Search articles'), 'Vata')
-    expect(screen.getByText('2 articles')).toBeInTheDocument()
-    await user.click(screen.getByRole('link', { name: /An educational overview of qualities commonly associated with Vata/i }))
+    expect(screen.getByRole('status')).toHaveTextContent('2 articles')
+    expect(screen.queryByText(/An educational overview of qualities commonly associated with Vata/i)).not.toBeInTheDocument()
+    await user.click(screen.getByRole('link', { name: 'Vata' }))
     expect(screen.getByRole('heading', { name: 'Vata' })).toBeInTheDocument()
   })
 
@@ -250,8 +264,9 @@ describe('limited MVP results and settings', () => {
   it('shows the general chat home and creates a grounded conversation from a suggestion', async () => {
     const user = userEvent.setup()
     renderAt('/assistant', { resultsReached: true, assessmentMode: 'full', submittedAnswers: allOrdinaryAnswers(), profile: completedProfile('Alex') })
-    expect(await screen.findByRole('heading', { name: 'Ask Dosha Companion' })).toBeInTheDocument()
-    expect(screen.getByText(/educational wellness information/)).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'What would you like to understand?' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Recent' })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /\?/ })).toHaveLength(2)
     expect(screen.queryByText('This is not a conversational AI.')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'What is Vata?' }))
     expect(await screen.findByText(/closest match in the app’s learning catalog/)).toBeInTheDocument()
@@ -259,11 +274,31 @@ describe('limited MVP results and settings', () => {
     expect(screen.getByRole('link', { name: 'Vata' })).toHaveAttribute('href', '/learn/vata')
   })
 
+  it('starts a general conversation from the compact composer', async () => {
+    const user = userEvent.setup()
+    renderAt('/assistant', { resultsReached: true })
+    await user.type(screen.getByLabelText('Ask anything'), 'What is Pitta?')
+    await user.click(screen.getByRole('button', { name: 'Start conversation' }))
+    expect(await screen.findByText(/closest match in the app’s learning catalog/)).toBeInTheDocument()
+  })
+
+  it('preserves assistant line breaks in the open message layout', () => {
+    const state = createTestState({ resultsReached: true, profile: completedProfile('Alex') })
+    const context = resolveChatContext({ type: 'general', id: 'general', sourcePath: '/today' }, state)!
+    const thread = createChatThread(context)
+    thread.messages.push(createChatMessage('assistant', 'First line\nSecond line'))
+    renderAt(`/chat/${thread.id}`, { resultsReached: true, chatThreads: [thread] })
+    const response = screen.getByText((_, element) => element?.textContent === 'First line\nSecond line')
+    expect(response).toHaveClass('chat-message-content')
+    expect(response.textContent).toContain('\n')
+  })
+
   it('opens a focused recommendation thread with context, suggestions, pending state, and citations', async () => {
     const user = userEvent.setup()
     renderAt('/today', { resultsReached: true, assessmentMode: 'full', submittedAnswers: allOrdinaryAnswers(), profile: completedProfile('Alex') })
-    await user.click(screen.getAllByRole('link', { name: 'Ask about this' })[0])
-    expect(await screen.findByText('Discussing')).toBeInTheDocument()
+    await user.click(screen.getByRole('link', { name: 'Ask about this recommendation' }))
+    expect(await screen.findByRole('button', { name: /Show context for/ })).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByText('Discussing')).not.toBeInTheDocument()
     expect(screen.queryByRole('navigation', { name: 'Primary navigation' })).not.toBeInTheDocument()
     expect(screen.getByRole('region', { name: 'Conversation messages' })).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Why was this recommended?' }))
@@ -293,7 +328,9 @@ describe('limited MVP results and settings', () => {
     renderAt('/learn/vata', { resultsReached: true })
     await user.click(screen.getByRole('link', { name: 'Ask about this article' }))
     expect(await screen.findByRole('heading', { name: 'Vata' })).toBeInTheDocument()
-    expect(screen.getByText('Learning article')).toBeInTheDocument()
+    expect(screen.queryByText('Learning article')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Show context for Vata' }))
+    expect(screen.getByRole('link', { name: 'Open Vata' })).toHaveAttribute('href', '/learn/vata')
     await user.click(screen.getByRole('button', { name: 'Can you explain this more simply?' }))
     expect(await screen.findByText(/educational organizing concepts rather than diagnoses/)).toBeInTheDocument()
   })
@@ -304,20 +341,22 @@ describe('limited MVP results and settings', () => {
     const context = resolveChatContext({ type: 'article', id: 'vata', sourcePath: '/learn/vata' }, state)!
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true)
     renderAt('/settings', { resultsReached: true, chatThreads: [createChatThread(context)] })
-    expect(screen.getByText('1 saved on this device')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Conversations' })).toHaveTextContent('1')
+    await user.click(screen.getByRole('button', { name: 'Conversations' }))
+    expect(screen.getByText('1 saved on this device.')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Clear conversation history' }))
     expect(confirm).toHaveBeenCalled()
-    expect(screen.getByText('0 saved on this device')).toBeInTheDocument()
+    expect(screen.getByText('0 saved on this device.')).toBeInTheDocument()
     expect(screen.getByText('Conversation history cleared.')).toBeInTheDocument()
   })
 
   it('records Today completion and rotates to another catalog item', async () => {
     const user = userEvent.setup()
     renderAt('/today', { resultsReached: true, assessmentMode: 'full', submittedAnswers: allOrdinaryAnswers(), profile: completedProfile('Alex') })
-    await user.click(screen.getByRole('button', { name: 'Mark complete' }))
-    expect(screen.getByText('Marked complete for today.')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Show another' }))
-    await waitFor(() => expect(screen.queryByText('Marked complete for today.')).not.toBeInTheDocument())
+    await user.click(screen.getByRole('button', { name: 'Mark recommendation complete' }))
+    expect(screen.getByText('Complete for today')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Show another recommendation' }))
+    await waitFor(() => expect(screen.queryByText('Complete for today')).not.toBeInTheDocument())
     const snapshot = JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}')
     expect(snapshot.state.recommendationHistory.some((record: { status: string }) => record.status === 'completed')).toBe(true)
     expect(snapshot.state.recommendationHistory.length).toBeGreaterThan(1)
@@ -326,19 +365,20 @@ describe('limited MVP results and settings', () => {
   it('shows local conditions, seasonal food, and stable guidance modules', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => ({ timezone: 'America/Los_Angeles', current: { temperature_2m: 72, apparent_temperature: 70, weather_code: 1 }, daily: { temperature_2m_max: [78], temperature_2m_min: [58], precipitation_probability_max: [20], sunrise: ['2026-07-16T05:40'], sunset: ['2026-07-16T20:55'] } }) }))
     const { container } = renderAt('/today', { resultsReached: true, profile: completedProfile('Alex') })
-    expect(screen.getByRole('heading', { name: 'Local conditions' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Local weather' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'In season near you' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Your guide' })).toBeInTheDocument()
-    expect(screen.getByText('Forecast for')).toHaveTextContent('Portland, Oregon, United States')
     expect(await screen.findByText('72°F')).toBeInTheDocument()
-    expect(screen.getByText('Feels like 70°F')).toBeInTheDocument()
-    expect(screen.getByText('78°F')).toBeInTheDocument()
-    expect(screen.getByText('58°F')).toBeInTheDocument()
+    expect(screen.getByText('78°F / 58°F')).toBeInTheDocument()
     expect(screen.getByText('20%')).toBeInTheDocument()
+    expect(screen.queryByText('Feels like')).not.toBeInTheDocument()
+    expect(screen.queryByText('Portland, Oregon, United States')).not.toBeInTheDocument()
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Show weather details' }))
+    expect(screen.getByText('Feels like')).toBeInTheDocument()
+    expect(screen.getByText('70°F')).toBeInTheDocument()
+    expect(screen.getByText('Portland, Oregon, United States')).toBeInTheDocument()
     expect(container.querySelector('.weather-current-icon')).toHaveAttribute('aria-hidden', 'true')
     expect(container.querySelector('.weather-current-icon')).toHaveAttribute('focusable', 'false')
-    expect(container.querySelectorAll('.weather-metric-icon')).toHaveLength(6)
-    container.querySelectorAll('.weather-metric-icon').forEach((icon) => expect(icon).toHaveAttribute('aria-hidden', 'true'))
+    container.querySelectorAll('.weather-summary svg').forEach((icon) => expect(icon).toHaveAttribute('focusable', 'false'))
   })
 
   it('shows one contextual location invitation and makes no weather request without location', async () => {
@@ -346,9 +386,9 @@ describe('limited MVP results and settings', () => {
     vi.stubGlobal('fetch', fetchMock)
     const user = userEvent.setup()
     renderAt('/today', { resultsReached: true, profile: coreProfileWithoutLocation('Alex') })
-    expect(screen.getByRole('button', { name: 'Mark complete' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mark recommendation complete' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'See what supports you where you live' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Local conditions' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Local weather' })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'In season near you' })).not.toBeInTheDocument()
     expect(fetchMock).not.toHaveBeenCalled()
     await user.click(screen.getByRole('link', { name: 'Add my location' }))
@@ -364,18 +404,17 @@ describe('limited MVP results and settings', () => {
     expect(screen.queryByRole('link', { name: 'Add my location' })).not.toBeInTheDocument()
   })
 
-  it('keeps the regional forecast label and Today content during weather loading and failure', async () => {
+  it('keeps Today content usable during weather loading and failure', async () => {
     vi.stubGlobal('fetch', vi.fn().mockImplementation(() => new Promise(() => {})))
     const loading = renderAt('/today', { resultsReached: true, profile: completedProfile('Alex') })
-    expect(screen.getByText('Forecast for')).toHaveTextContent('Portland, Oregon, United States')
-    expect(screen.getByRole('status')).toHaveTextContent('Loading local weather and daylight')
+    expect(screen.getByRole('status')).toHaveTextContent('Loading local weather')
+    expect(screen.getByRole('navigation', { name: 'Today shortcuts' })).toBeInTheDocument()
     loading.unmount()
 
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }))
     renderAt('/today', { resultsReached: true, profile: completedProfile('Alex') })
     expect(await screen.findByText('Local conditions are unavailable right now.')).toBeInTheDocument()
-    expect(screen.getByText('Forecast for')).toHaveTextContent('Portland, Oregon, United States')
-    expect(screen.getByRole('heading', { name: 'Your guide' })).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Today shortcuts' })).toBeInTheDocument()
   })
 
   it('exports and confirms before clearing local data', async () => {
@@ -383,7 +422,8 @@ describe('limited MVP results and settings', () => {
     const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
     renderAt('/settings', { resultsReached: true, profile: completedProfile('Alex') })
-    await user.click(screen.getByRole('button', { name: 'Export local data as JSON' }))
+    await user.click(screen.getByRole('button', { name: 'Local data' }))
+    await user.click(screen.getByRole('button', { name: 'Export local data' }))
     expect(click).toHaveBeenCalled()
     expect(screen.getByText('Local data export prepared.')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Clear local data and restart' }))

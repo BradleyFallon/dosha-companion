@@ -53,22 +53,23 @@ async function reachToday(page: Page) {
   }
   await page.getByRole('link', { name: 'View complete sample' }).click()
   await page.getByRole('button', { name: 'Continue to Today' }).click()
-  await expect(page.getByText('For today')).toBeVisible()
+  await expect(page.getByRole('group', { name: 'Recommendation actions' })).toBeVisible()
 }
 
 test('discusses a Today recommendation in a persistent focused conversation', async ({ page }) => {
   await reachToday(page)
-  await page.getByRole('link', { name: 'Ask about this' }).first().click()
-  await expect(page.getByText('Discussing')).toBeVisible()
-  await expect(page.getByText('Today’s focus')).toBeVisible()
+  await page.getByRole('link', { name: 'Ask about this recommendation' }).click()
+  const contextControl = page.getByRole('button', { name: /Show context for/ })
+  await expect(contextControl).toBeVisible()
+  await expect(page.getByText('Discussing')).not.toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Primary navigation' })).not.toBeVisible()
 
-  for (const height of [844, 667]) {
-    await page.setViewportSize({ width: 390, height })
+  for (const viewport of [{ width: 390, height: 844 }, { width: 390, height: 667 }, { width: 360, height: 640 }]) {
+    await page.setViewportSize(viewport)
     const composer = page.getByRole('textbox', { name: 'Ask a follow-up' })
     const composerBox = await composer.boundingBox()
     expect(composerBox).not.toBeNull()
-    expect((composerBox?.y ?? 0) + (composerBox?.height ?? 0)).toBeLessThanOrEqual(height)
+    expect((composerBox?.y ?? 0) + (composerBox?.height ?? 0)).toBeLessThanOrEqual(viewport.height)
     expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1)).toBe(true)
   }
 
@@ -85,13 +86,41 @@ test('discusses a Today recommendation in a persistent focused conversation', as
   await expect(page.getByText(/deterministic guidance rules/)).toBeVisible()
 })
 
+test('keeps Today actions calm and usable at supported mobile sizes', async ({ page }) => {
+  await reachToday(page)
+
+  await expect(page.getByRole('button', { name: 'Show recommendation details' })).toHaveAttribute('aria-expanded', 'false')
+  await expect(page.getByRole('button', { name: 'Dismiss for today' })).not.toBeVisible()
+
+  for (const viewport of [{ width: 390, height: 844 }, { width: 390, height: 667 }, { width: 360, height: 640 }]) {
+    await page.setViewportSize(viewport)
+    const controls = [
+      page.getByRole('button', { name: 'Mark recommendation complete' }),
+      page.getByRole('button', { name: 'Show another recommendation' }),
+      page.getByRole('link', { name: 'Ask about this recommendation' }),
+    ]
+    const boxes = await Promise.all(controls.map((control) => control.boundingBox()))
+    boxes.forEach((box) => {
+      expect(box).not.toBeNull()
+      expect(box?.width ?? 0).toBeGreaterThanOrEqual(44)
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(44)
+    })
+    expect(Math.max(...boxes.map((box) => box?.y ?? 0)) - Math.min(...boxes.map((box) => box?.y ?? 0))).toBeLessThan(2)
+  }
+
+  await page.getByRole('button', { name: 'Show recommendation details' }).click()
+  await expect(page.getByRole('button', { name: 'Dismiss for today' })).toBeVisible()
+})
+
 test('starts an article conversation from Learn and uses a suggestion', async ({ page }) => {
   await reachToday(page)
-  await page.getByRole('link', { name: 'Learn' }).click()
+  await page.getByRole('link', { name: 'Learn', exact: true }).click()
+  await expect(page.getByText(/An educational overview of qualities commonly associated with Vata/i)).not.toBeVisible()
   await page.locator('a[href="/learn/vata"]').click()
   await page.getByRole('link', { name: 'Ask about this article' }).click()
   await expect(page.getByRole('heading', { name: 'Vata' })).toBeVisible()
-  await expect(page.getByText('Learning article')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Show context for Vata' })).toBeVisible()
+  await expect(page.getByText('Learning article')).not.toBeVisible()
   await page.getByRole('button', { name: 'Can you explain this more simply?' }).click()
   await expect(page.getByText(/educational organizing concepts rather than diagnoses/)).toBeVisible()
   await expect(page.getByRole('link', { name: 'Vata', exact: true })).toBeVisible()
@@ -105,8 +134,9 @@ test('anchors seasonal-food chat to the saved regional context', async ({ page }
   await expect(page.getByRole('heading', { name: 'In season near you' })).toBeVisible()
   const food = page.locator('.seasonal-food-list li').first()
   const name = (await food.locator('strong').textContent()) ?? ''
-  await food.getByRole('link', { name: 'Ask about this' }).click()
+  await food.getByRole('link', { name: `Ask about ${name}` }).click()
   await expect(page.getByRole('heading', { name })).toBeVisible()
+  await page.getByRole('button', { name: `Show context for ${name}` }).click()
   await expect(page.getByText(/Portland, Oregon, United States/)).toBeVisible()
   await page.getByRole('button', { name: 'Why is this shown as seasonal?' }).click()
   await expect(page.getByText(/currently listed as seasonal/)).toBeVisible()
@@ -121,6 +151,7 @@ test('talks through a completed check-in with recent-answer context', async ({ p
     await page.getByRole('button', { name: index === 4 ? 'Complete check-in' : 'Continue' }).click()
   }
   await page.getByRole('link', { name: 'Talk through this check-in' }).click()
+  await page.getByRole('button', { name: /Show context for/ }).click()
   await expect(page.getByText(/5 recent answers saved separately/)).toBeVisible()
   await page.getByRole('button', { name: 'What should I keep observing?' }).click()
   await expect(page.getByText(/temporary pattern to observe/)).toBeVisible()
@@ -165,23 +196,25 @@ test('completes the short mobile vertical slice', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Profile overview' })).toBeVisible()
   await expect(page.getByText('Vata–Pitta')).toBeVisible()
   await page.getByRole('button', { name: 'Continue to Today' }).click()
-  await expect(page.getByText('For today')).toBeVisible()
+  await expect(page.getByRole('group', { name: 'Recommendation actions' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'See what supports you where you live' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Local conditions' })).not.toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Local weather' })).not.toBeVisible()
   await expect(page.getByRole('heading', { name: 'In season near you' })).not.toBeVisible()
   expect(weatherRequests).toBe(0)
   await page.getByRole('link', { name: 'Add my location' }).click()
   await expect(page.getByRole('heading', { name: 'Choose your general area' })).toBeVisible()
   await page.getByRole('button', { name: 'Choose on map' }).click()
   await page.getByRole('button', { name: 'Use this regional location' }).click()
-  await expect(page.getByText('For today')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Local conditions' })).toBeVisible()
-  await expect(page.getByText(/Forecast for Portland, Oregon, United States/)).toBeVisible()
+  await expect(page.getByRole('group', { name: 'Recommendation actions' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Local weather' })).toBeVisible()
   await expect(page.getByText('72°F')).toBeVisible()
-  await expect(page.getByText('Feels like 70°F')).toBeVisible()
-  await expect(page.getByText('78°F')).toBeVisible()
-  await expect(page.getByText('58°F')).toBeVisible()
+  await expect(page.getByText('78°F / 58°F')).toBeVisible()
   await expect(page.getByText('20%')).toBeVisible()
+  await expect(page.getByText('Feels like')).not.toBeVisible()
+  await page.getByRole('button', { name: 'Show weather details' }).click()
+  await expect(page.getByText('Feels like')).toBeVisible()
+  await expect(page.getByText('70°F')).toBeVisible()
+  await expect(page.getByText('Portland, Oregon, United States')).toBeVisible()
   await expect(page.getByRole('heading', { name: 'In season near you' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'See what supports you where you live' })).not.toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Primary navigation' })).toBeVisible()
@@ -208,8 +241,7 @@ test('completes the full assessment with coverage-ready but unavailable scoring'
   await expect(page.getByRole('heading', { name: 'Dosha scoring is not available yet' })).toBeVisible()
   await expect(page.getByText('Vata–Pitta')).not.toBeVisible()
   await page.getByRole('button', { name: 'Go to Today' }).click()
-  await expect(page.getByText('Assessment coverage · ready')).toBeVisible()
-  await page.getByRole('button', { name: 'Why this was chosen' }).click()
+  await page.getByRole('button', { name: 'Show recommendation details' }).click()
   await expect(page.getByText('No dosha score was calculated or used.')).toBeVisible()
 })
 
@@ -294,33 +326,45 @@ test('edits profile settings, preserves answers, and recalculates Today', async 
   }
   await page.getByRole('link', { name: 'View complete sample' }).click()
   await page.getByRole('button', { name: 'Continue to Today' }).click()
-  await page.getByRole('link', { name: 'Open profile settings' }).click()
+  await page.getByRole('link', { name: 'Open settings' }).click()
+  const settingsRowBox = await page.getByRole('button', { name: 'Profile' }).boundingBox()
+  expect(settingsRowBox?.height ?? 0).toBeGreaterThanOrEqual(44)
 
+  await page.getByRole('button', { name: 'Profile' }).click()
   await page.getByLabel('Preferred name').fill('Jordan')
   await page.getByLabel(/Dietary pattern/).selectOption('Vegan')
-  await page.getByRole('group', { name: 'Do you have food allergies?' }).getByLabel('Yes').check()
+  await page.getByRole('group', { name: 'Food allergies?' }).getByLabel('Yes').check()
   await page.getByLabel('Food allergies').fill('Tree nuts')
-  await page.getByRole('button', { name: 'Save profile changes' }).click()
-  await expect(page.getByText('Saved on this device').first()).toBeVisible()
+  await page.getByRole('button', { name: 'Save profile' }).click()
+  await expect(page.getByText('Profile saved.')).toBeVisible()
+  await page.getByRole('button', { name: 'Location' }).click()
   await expect(page.getByRole('link', { name: 'Add regional location' })).toBeVisible()
   await expect(page.getByRole('group', { name: 'Temperature units' })).not.toBeVisible()
   await page.getByRole('link', { name: 'Add regional location' }).click()
   await page.getByRole('button', { name: 'Choose on map' }).click()
   await page.getByRole('button', { name: 'Use this regional location' }).click()
   await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible()
+  await page.getByRole('button', { name: 'Location' }).click()
   await expect(page.getByRole('link', { name: 'Change regional location' })).toBeVisible()
+  await page.getByRole('button', { name: 'Units' }).click()
   await expect(page.getByRole('group', { name: 'Temperature units' })).toBeVisible()
   await page.reload()
+  await page.getByRole('button', { name: 'Profile' }).click()
   await expect(page.getByLabel('Preferred name')).toHaveValue('Jordan')
   await page.getByRole('link', { name: 'Today' }).first().click()
   await expect(page.getByRole('heading', { name: /Good (morning|afternoon|evening), Jordan/ })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Food suggestion withheld' })).toBeVisible()
+  await page.getByRole('button', { name: 'Show recommendation details' }).click()
+  await expect(page.getByRole('heading', { name: 'Why it was chosen' })).toBeVisible()
 
-  const submittedCount = await page.evaluate(() => {
+  const savedState = await page.evaluate(() => {
     const snapshot = JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}')
-    return Object.keys(snapshot.state?.submittedAnswers ?? {}).length
+    return {
+      submittedCount: Object.keys(snapshot.state?.submittedAnswers ?? {}).length,
+      dietaryPattern: snapshot.state?.profile?.dietaryPattern,
+      allergies: snapshot.state?.profile?.allergies,
+    }
   })
-  expect(submittedCount).toBe(5)
+  expect(savedState).toEqual({ submittedCount: 5, dietaryPattern: 'Vegan', allergies: 'Tree nuts' })
 })
 
 test('uses every post-assessment destination in the mobile demo', async ({ page }) => {
@@ -342,20 +386,20 @@ test('uses every post-assessment destination in the mobile demo', async ({ page 
   await page.getByRole('link', { name: 'View complete sample' }).click()
   await page.getByRole('button', { name: 'Continue to Today' }).click()
 
-  await page.getByRole('button', { name: 'Mark complete' }).click()
-  await expect(page.getByText('Marked complete for today.')).toBeVisible()
-  await page.getByRole('button', { name: 'Show another' }).click()
+  await page.getByRole('button', { name: 'Mark recommendation complete' }).click()
+  await expect(page.getByText('Complete for today')).toBeVisible()
+  await page.getByRole('button', { name: 'Show another recommendation' }).click()
 
   await page.getByRole('link', { name: 'Questions' }).click()
   await expect(page.getByRole('heading', { name: 'Questions' })).toBeVisible()
   await page.getByRole('link', { name: 'Start current check-in' }).click()
   await expect(page.getByRole('navigation', { name: 'Primary navigation' })).not.toBeVisible()
-  for (const height of [844, 667]) {
-    await page.setViewportSize({ width: 390, height })
+  for (const viewport of [{ width: 390, height: 844 }, { width: 390, height: 667 }, { width: 360, height: 640 }]) {
+    await page.setViewportSize(viewport)
     const action = page.getByRole('button', { name: 'Continue' })
     const actionBox = await action.boundingBox()
     expect(actionBox).not.toBeNull()
-    expect((actionBox?.y ?? 0) + (actionBox?.height ?? 0)).toBeLessThanOrEqual(height)
+    expect((actionBox?.y ?? 0) + (actionBox?.height ?? 0)).toBeLessThanOrEqual(viewport.height)
     expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1)).toBe(true)
   }
   for (let index = 0; index < 5; index += 1) {
@@ -378,10 +422,12 @@ test('uses every post-assessment destination in the mobile demo', async ({ page 
   await page.getByRole('button', { name: 'What is Vata?' }).click()
   await expect(page.getByText(/closest match in the app’s learning catalog/)).toBeVisible()
 
-  await page.getByRole('link', { name: 'Today', exact: true }).click()
-  await page.getByRole('link', { name: 'Open profile settings' }).click()
-  await expect(page.getByText('Browser localStorage')).toBeVisible()
+  await page.getByRole('link', { name: 'Back to Today' }).click()
+  await page.getByRole('link', { name: 'Open settings' }).click()
+  await expect(page.getByRole('button', { name: 'Local data' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Export local data' })).not.toBeVisible()
+  await page.getByRole('button', { name: 'Local data' }).click()
   const downloadPromise = page.waitForEvent('download')
-  await page.getByRole('button', { name: 'Export local data as JSON' }).click()
+  await page.getByRole('button', { name: 'Export local data' }).click()
   expect((await downloadPromise).suggestedFilename()).toMatch(/dosha-companion-local-data/)
 })

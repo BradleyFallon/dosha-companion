@@ -4,12 +4,15 @@ import {
   ArrowClockwise,
   ArrowLeft,
   ArrowRight,
+  ArrowSquareOut,
   ArrowsClockwise,
   BookOpenText,
   Books,
   BowlFood,
   CheckCircle,
   ChatCircleDots,
+  CaretDown,
+  CaretUp,
   CirclesThree,
   Cloud,
   CloudFog,
@@ -24,6 +27,7 @@ import {
   Fire,
   FlowerLotus,
   ListChecks,
+  Info,
   Leaf,
   MagnifyingGlass,
   MapPinArea,
@@ -131,5 +135,9 @@ export const SendIcon = PaperPlaneTilt
 export const NewChatIcon = PlusCircle
 export const RetryIcon = ArrowClockwise
 export const SourceIcon = Quotes
+export const ExpandIcon = CaretDown
+export const CollapseIcon = CaretUp
+export const OpenOriginalIcon = ArrowSquareOut
+export const InfoIcon = Info
 
 export type { IconProps }

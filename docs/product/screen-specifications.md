@@ -18,7 +18,9 @@ Normal Results never display a dosha label because weights and thresholds remain
 
 ### Today
 
-Today separates a rotating daily feed from stable links to usual nature, food preferences, and local rhythms. Without location it shows one contextual benefit card and makes no weather request; with location it shows regional weather and seasonal food content. It also shows one deterministically selected focus, one practical action, an optional filtered food prompt, coverage status, and an inspectable rule explanation. The recommendation and each eligible seasonal food expose distinct contextual chat actions. Recommendation selection remains deterministic; chat can only explain it.
+Today is centered on one deterministically selected recommendation: concept icon, title, one action sentence, and compact Complete, Show another, and Ask controls. One information disclosure contains longer guidance, related actions, optional filtered food, exact rule reasons, and Dismiss. Two secondary shortcuts lead to Check in and Learn.
+
+Without location Today shows one contextual benefit card and makes no weather request. With location it shows a visual weather summary and up to four compact seasonal-food rows. The weather default contains current conditions, high/low, and precipitation; feels-like, daylight, season, and forecast area are disclosed on request. Recommendation selection remains deterministic; chat can only explain it.
 
 ### Questions and My Balance
 
@@ -26,13 +28,15 @@ Questions reports real baseline/current coverage and links to the next repair qu
 
 ### Learn and Ask Dosha Companion
 
-Published article detail screens expose Ask about this article. `/chat` provides a general question entry and recent conversations, while `/chat/:threadId` provides a focused context card, scrollable messages, suggestions, citations, retry, and a fixed composer. The current client uses scripted mock responses grounded in deterministic local retrieval. `/assistant` redirects to the chat home.
+The Learn index uses one search field, one compact category selector, and title-only article rows with semantic icons. Article detail screens retain summary, body, related reading, and Ask about this article.
+
+`/chat` presents one dominant question prompt, a compact composer, at most two initial suggestions, and recent conversations only when they exist. `/chat/:threadId` provides a compact expandable context bar, open message layout, conditional suggestions, citations, retry, and a fixed composer. The current client uses scripted mock responses grounded in deterministic local retrieval. `/assistant` redirects to the chat home.
 
 Completed check-ins expose Talk through this check-in without changing their stored answers or usual-nature assessment.
 
 ### Settings
 
-Settings edits profile fields without deleting assessment answers and links contextually to add or change the regional location. Automatic, Fahrenheit, and Celsius temperature preferences appear only after location is provided. A Conversations section reports browser-local thread count and can clear chat history independently. It displays local save status and browser-only persistence limitations.
+Settings begins with compact Profile, Location, Units, Conversations, and Local data rows. Only one section can be expanded at a time, so profile inputs, temperature controls, storage actions, and destructive actions are not exposed simultaneously. Profile edits preserve assessment answers; location links retain their return target; Units appears only after location is provided; conversation history and all local data can still be cleared independently.
 
 ## Deferred specifications
 

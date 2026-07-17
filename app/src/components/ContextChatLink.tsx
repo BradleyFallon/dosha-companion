@@ -9,16 +9,18 @@ export function ContextChatLink({
   returnTo,
   children,
   className = 'text-link icon-label',
+  ariaLabel,
 }: {
   context: Pick<ChatContextReference, 'type' | 'id'>
   returnTo: ChatReturnPath
-  children: ReactNode
+  children?: ReactNode
   className?: string
+  ariaLabel?: string
 }) {
   return (
-    <Link className={className} to={chatEntryPath(context, returnTo)}>
+    <Link aria-label={ariaLabel} className={className} to={chatEntryPath(context, returnTo)}>
       <ChatIcon aria-hidden="true" className="icon-leading" focusable="false" />
-      {children}
+      {children ? <span>{children}</span> : null}
     </Link>
   )
 }

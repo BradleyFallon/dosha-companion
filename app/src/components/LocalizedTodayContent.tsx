@@ -5,19 +5,21 @@ import { loadLocalConditions, type LocalConditions } from '../location/condition
 import { resolveTemperatureUnit } from '../location/units'
 import { weatherPresentation } from '../location/weatherPresentation'
 import type { ProfileState } from '../prototype/state'
-import { ContextChatLink } from './ContextChatLink'
 import {
-  HighTemperatureIcon,
-  LowTemperatureIcon,
+  CollapseIcon,
+  ExpandIcon,
   PrecipitationIcon,
   SeasonIcon,
   SunriseIcon,
   SunsetIcon,
+  TemperatureIcon,
 } from '../ui/icons'
+import { ContextChatLink } from './ContextChatLink'
 
 export function LocalizedTodayContent({ profile }: { profile: ProfileState }) {
   const [conditions, setConditions] = useState<LocalConditions | null>(null)
   const [conditionsError, setConditionsError] = useState('')
+  const [detailsOpen, setDetailsOpen] = useState(false)
   const location = profile.location
   const temperatureUnit = resolveTemperatureUnit(location, profile.temperatureUnitPreference)
   const seasonalProduce = getSeasonalProduce(profile).slice(0, 4)
@@ -39,37 +41,46 @@ export function LocalizedTodayContent({ profile }: { profile: ProfileState }) {
 
   return (
     <div className="localized-today-content">
-      <section className="local-conditions" aria-labelledby="local-conditions-title">
-        <p className="eyebrow">Near you</p><h2 id="local-conditions-title">Local conditions</h2>
-        <p className="forecast-location">Forecast for <strong>{location.displayName}</strong></p>
+      <section className="weather-summary" aria-labelledby="local-conditions-title">
+        <h2 className="sr-only" id="local-conditions-title">Local weather</h2>
         {conditions && presentation && WeatherIcon ? (
           <>
-            <div className="conditions-current">
+            <div className="weather-primary">
               <WeatherIcon aria-hidden="true" className="weather-current-icon" focusable="false" weight="duotone" />
-              <div><strong>{formatTemperature(conditions.temperature, conditions.temperatureUnit)}</strong><span>{presentation.label}</span><small>Feels like {formatTemperature(conditions.apparentTemperature, conditions.temperatureUnit)}</small></div>
+              <div><strong>{formatTemperature(conditions.temperature, conditions.temperatureUnit)}</strong><span>{presentation.label}</span></div>
             </div>
-            <div className="conditions-grid">
-              <WeatherMetric Icon={HighTemperatureIcon} label="High" value={formatTemperature(conditions.highTemperature, conditions.temperatureUnit)} />
-              <WeatherMetric Icon={LowTemperatureIcon} label="Low" value={formatTemperature(conditions.lowTemperature, conditions.temperatureUnit)} />
-              <WeatherMetric Icon={PrecipitationIcon} label="Precipitation" value={`${Math.round(conditions.precipitationProbability)}%`} />
-              <WeatherMetric Icon={SunriseIcon} label="Sunrise" value={formatClock(conditions.sunrise)} />
-              <WeatherMetric Icon={SunsetIcon} label="Sunset" value={formatClock(conditions.sunset)} />
-              <WeatherMetric Icon={SeasonIcon} label="General season" value={conditions.season} />
+            <div className="weather-essentials">
+              <div><strong>{formatTemperature(conditions.highTemperature, conditions.temperatureUnit)} / {formatTemperature(conditions.lowTemperature, conditions.temperatureUnit)}</strong><small>High / low</small></div>
+              <div><PrecipitationIcon aria-hidden="true" focusable="false" /><span><strong>{Math.round(conditions.precipitationProbability)}%</strong><small>Precipitation</small></span></div>
+              <button className="icon-control weather-details-control" type="button" aria-label={detailsOpen ? 'Hide weather details' : 'Show weather details'} aria-expanded={detailsOpen} onClick={() => setDetailsOpen(!detailsOpen)}>{detailsOpen ? <CollapseIcon aria-hidden="true" focusable="false" /> : <ExpandIcon aria-hidden="true" focusable="false" />}</button>
             </div>
+            {detailsOpen ? (
+              <dl className="weather-details">
+                <div><dt><TemperatureIcon aria-hidden="true" focusable="false" />Feels like</dt><dd>{formatTemperature(conditions.apparentTemperature, conditions.temperatureUnit)}</dd></div>
+                <div><dt><SunriseIcon aria-hidden="true" focusable="false" />Sunrise</dt><dd>{formatClock(conditions.sunrise)}</dd></div>
+                <div><dt><SunsetIcon aria-hidden="true" focusable="false" />Sunset</dt><dd>{formatClock(conditions.sunset)}</dd></div>
+                <div><dt><SeasonIcon aria-hidden="true" focusable="false" />Season</dt><dd>{conditions.season}</dd></div>
+                <div><dt>Forecast area</dt><dd>{location.displayName}</dd></div>
+              </dl>
+            ) : null}
           </>
-        ) : conditionsError ? <p className="supporting">{conditionsError}</p> : <p role="status" className="supporting">Loading local weather and daylight…</p>}
+        ) : conditionsError ? <p className="supporting">{conditionsError}</p> : <p role="status" className="supporting">Loading local weather…</p>}
       </section>
+
       <section className="seasonal-card" aria-labelledby="seasonal-title">
-        <p className="eyebrow">Regional food guide</p><h2 id="seasonal-title">In season near you</h2>
-        {!location.produceRegionId ? <p>Regional food guidance is not available for this area yet.</p> : seasonalProduce.length ? <ul className="seasonal-food-list">{seasonalProduce.map((item) => <li key={item.id}><strong>{item.name}</strong><span>In season near you</span><div><Link to={`/learn/${item.articleId}`}>Read more</Link><ContextChatLink context={{ type: 'seasonal-food', id: item.id }} returnTo="/today">Ask about this</ContextChatLink></div></li>)}</ul> : <p>No matching regional foods are available for your preferences this month.</p>}
-        {location.produceRegionId ? <p className="field-hint">Regional seasonality varies by source and growing conditions. These foods are not a calculated dosha recommendation.</p> : null}
+        <h2 id="seasonal-title">In season near you</h2>
+        {!location.produceRegionId ? <p>Regional food guidance is not available for this area yet.</p> : seasonalProduce.length ? (
+          <ul className="seasonal-food-list">{seasonalProduce.map((item) => (
+            <li key={item.id}>
+              <Link aria-label={`Read about ${item.name}`} className="seasonal-food-main" to={`/learn/${item.articleId}`}><SeasonIcon aria-hidden="true" focusable="false" /><strong>{item.name}</strong></Link>
+              <ContextChatLink ariaLabel={`Ask about ${item.name}`} className="icon-control" context={{ type: 'seasonal-food', id: item.id }} returnTo="/today" />
+            </li>
+          ))}</ul>
+        ) : <p>No matching regional foods are available for your preferences this month.</p>}
+        {location.produceRegionId ? <details className="compact-details"><summary>About this list</summary><p>Regional seasonality varies. These foods are not a calculated dosha recommendation.</p></details> : null}
       </section>
     </div>
   )
-}
-
-function WeatherMetric({ Icon, label, value }: { Icon: typeof HighTemperatureIcon; label: string; value: string }) {
-  return <div><Icon aria-hidden="true" className="weather-metric-icon" focusable="false" /><span><strong>{value}</strong><small>{label}</small></span></div>
 }
 
 function formatClock(value: string) {

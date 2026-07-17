@@ -25,37 +25,30 @@ export function LearnScreen() {
   }), [articles, category, query])
 
   return (
-    <Screen>
-      <p className="eyebrow">Learning library</p>
+    <Screen className="learn-screen">
       <h1 tabIndex={-1}>Learn</h1>
-      <p className="lede">Browse practical education about Ayurvedic concepts, routines, and using your check-ins.</p>
       <div className="content-filters">
-        <label className="icon-label" htmlFor="learn-search"><SearchIcon aria-hidden="true" className="icon-leading" focusable="false" />Search articles</label>
-        <input id="learn-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Try routine or Vata" />
-        <label htmlFor="learn-category">Category</label>
+        <label className="search-control" htmlFor="learn-search"><SearchIcon aria-hidden="true" focusable="false" /><span className="sr-only">Search articles</span><input id="learn-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search articles" /></label>
+        <label className="sr-only" htmlFor="learn-category">Category</label>
         <select id="learn-category" value={category} onChange={(event) => setCategory(event.target.value)}>
           <option value="all">All categories</option>
           {categories.map((value) => <option key={value} value={value}>{formatCategory(value)}</option>)}
         </select>
       </div>
-      <p role="status">{filtered.length} {filtered.length === 1 ? 'article' : 'articles'}</p>
+      <p className="sr-only" role="status">{filtered.length} {filtered.length === 1 ? 'article' : 'articles'}</p>
       <div className="learn-list">
         {filtered.map((article) => {
           const { Icon, tone } = selectArticleIcon(article)
           return (
             <Link className="content-card" key={article.id} to={`/learn/${article.id}`}>
-              <span className="content-card-header">
-                <Icon aria-hidden="true" className={`card-icon article-icon article-icon-${tone}`} focusable="false" weight="duotone" />
-              </span>
+              <Icon aria-hidden="true" className={`card-icon article-icon article-icon-${tone}`} focusable="false" weight="regular" />
               <strong>{article.title}</strong>
-              <span>{article.summary}</span>
             </Link>
           )
         })}
       </div>
       {filtered.length === 0 ? <p className="empty-state">No articles match those filters.</p> : null}
-      <Link className="button secondary icon-label" to="/learn/glossary"><GlossaryIcon aria-hidden="true" className="icon-leading" focusable="false" />Open glossary</Link>
-      <Link className="button secondary icon-label" to="/chat"><ChatIcon aria-hidden="true" className="icon-leading" focusable="false" />Ask Dosha Companion</Link>
+      <nav className="learn-secondary-links" aria-label="Learn options"><Link className="icon-label" to="/learn/glossary"><GlossaryIcon aria-hidden="true" className="icon-leading" focusable="false" />Glossary</Link><Link className="icon-label" to="/chat"><ChatIcon aria-hidden="true" className="icon-leading" focusable="false" />Ask Dosha Companion</Link></nav>
     </Screen>
   )
 }

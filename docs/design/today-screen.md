@@ -1,6 +1,6 @@
 # Today Screen
 
-> Demo update: the primary card is selected from the validated repository catalog. Mark complete, Dismiss, Show another, Why this was chosen, related reading, and linked check-in controls are functional. History is browser-local and used only to avoid immediate repetition.
+> Calm-interface update: the validated recommendation remains fully functional, but the default view now shows one concept, one short action, and three compact controls. Guidance, reasons, related content, optional food, and Dismiss are available through one information disclosure.
 
 ## Purpose
 
@@ -8,32 +8,24 @@ Today is the post-assessment home and primary retention surface. It turns the la
 
 ## Information hierarchy
 
-### Before the first scroll at approximately 390 px
+1. Local date and greeting
+2. Large recommendation icon, title, and one bounded action sentence
+3. Complete, show-another, and contextual-chat icon controls
+4. Visual weather summary and compact seasonal-food list when location exists
+5. Two quiet shortcuts: Check in and Learn
 
-1. Greeting and local date
-2. Compact current-balance summary with freshness
-3. Today’s focus headline
-4. Two or three lines of expert-authored guidance
-5. One practical action
-
-### Below the first scroll
-
-6. Optional compatible food suggestion
-7. “Why this was chosen” disclosure
-8. Stable “Your guide” links for usual nature, food preferences, and local rhythms
-9. Related learning content
-10. Available-question indicator and Ask Dosha Companion entry point
+The information control expands the full recommendation guidance, linked check-in, related article, compatible food when available, exact selection reasons, and Dismiss. Those elements do not compete with the daily focus by default.
 
 ## Content responsibility
 
 - Editorial review status stays in structured content metadata and editor tooling rather than appearing as a repeated badge in the reader experience.
 - Deterministic rules choose the underlying guidance from context, coverage, profile exclusions, and saved-time-zone time of day.
-- Local conditions use the saved representative regional coordinate for current temperature, feels-like temperature, daily high/low, precipitation chance, sunrise, sunset, and a broad hemisphere-aware season. The card displays the saved regional name and never uses raw selection coordinates.
+- Local conditions use the saved representative regional coordinate for current temperature, feels-like temperature, daily high/low, precipitation chance, sunrise, sunset, and a broad hemisphere-aware season. The default summary shows current conditions, high/low, and precipitation. Feels-like, daylight, season, and the saved regional name are disclosed on request. Raw selection coordinates are never used.
 - Temperature display defaults from the saved country and can be overridden in Settings. Weather remains informational until separate editorial rules approve its use in guidance selection.
 - “In season near you” uses the editor-owned seasonal produce catalog filtered by region, month, diet, allergies, and exclusions; it does not claim dosha compatibility.
 - Without location, one benefit card explains weather, daylight, season, and nearby-food value and links to `/profile/location?return=today`. Today makes no weather call and renders no empty localized sections in this state.
 - If a valid location has no mapped produce region, keep weather and show that regional food guidance is not available for the area yet.
-- “Why this was chosen” exposes the exact matched rule and states that no dosha score was used.
+- The recommendation information disclosure exposes the exact matched rule and states that no dosha score was used.
 - The limited MVP does not place automatically generated AI prose on Today.
 - The AI entry opens a separate grounded chat experience.
 
@@ -41,38 +33,36 @@ Today is the post-assessment home and primary retention surface. It turns the la
 
 | State | Behavior |
 | ----- | -------- |
-| Fresh profile and guidance | Show complete daily hierarchy |
+| Fresh profile and guidance | Show the compact recommendation hierarchy |
 | Location not provided yet | Show one location-benefit card in place of all localized modules |
 | Location provided | Show weather and regional-food modules |
 | Current balance aging | Show guidance with an “Update your balance” question action |
 | Current coverage insufficient | Prefer the next current check-in over stronger personalization |
 | No higher-priority rule | Show the clearly labeled provisional general fallback |
-| Loading | Preserve card heights with meaningful labels where possible |
-| Content unavailable | Keep balance summary and questions accessible; explain guidance is temporarily unavailable |
+| Loading | Keep the recommendation and shortcuts usable while local weather loads |
+| Content unavailable | Keep the recommendation, seasonal content where possible, and shortcuts usable |
 | AI unavailable | Keep the rest of Today intact and disable only the AI entry |
 | Chat response unavailable | Preserve Today guidance and offer retry; deterministic content retrieval remains available to the mock or future client |
 
 ## Interaction details
 
-- Tapping current balance opens My Balance.
-- Tapping the daily focus opens its full content or expands it in place; prototype both only if needed.
-- Tapping the practical action may mark it useful or saved later, but habit tracking is out of MVP.
-- “Why this was chosen” expands inline and never exposes raw answers or numeric scoring.
-- The question indicator opens Questions and distinguishes refinement from a current check-in.
+- Complete and Show another remain direct 44 × 44 icon actions with accessible names.
+- Ask about this opens a focused conversation anchored to the recommendation.
+- The information icon expands secondary recommendation content inline and never exposes raw answers or numeric scoring.
+- Dismiss remains functional inside the expanded details.
+- Seasonal-food rows open related learning content; their separate chat icons use item-specific accessible names.
 - Bottom navigation is visible on Today after the preliminary result.
 
 ## Content-length constraints for wireframing
 
 - Today focus headline: one or two lines
-- Introductory guidance: two or three short sentences before scroll
-- Practical action: one bounded instruction, usually one to three lines
+- Visible action: one short bounded instruction
 - Food suggestion: optional and no more prominent than the primary lifestyle action
 - Relevance explanation: two to four plain-language signals
 
 ## Open prototype questions
 
-- Does the practical action remain visible before scrolling on a small device?
-- Is current-balance freshness understandable without a score?
-- Does “Why this was chosen” build trust or add cognitive load?
+- Is the recommendation action clear enough without the full guidance initially visible?
+- Does the information control make the selection reasoning discoverable enough?
 - Does the AI entry feel optional rather than required for value?
-- Should the daily focus open a full article or remain a self-contained card?
+- Should completion feedback remain in the card or become even quieter?

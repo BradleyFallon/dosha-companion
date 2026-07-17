@@ -1,31 +1,26 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ContextChatLink } from '../components/ContextChatLink'
+import { LocalizedTodayContent } from '../components/LocalizedTodayContent'
+import { LocationBenefitCard } from '../components/LocationBenefitCard'
 import { Screen } from '../components/Layout'
+import { selectDailyRecommendation } from '../content/recommendations'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { calculateAssessmentCoverage } from '../quiz/coverage'
-import { selectDailyRecommendation } from '../content/recommendations'
-import { LocationBenefitCard } from '../components/LocationBenefitCard'
-import { LocalizedTodayContent } from '../components/LocalizedTodayContent'
-import { ContextChatLink } from '../components/ContextChatLink'
 import {
-  BalanceIcon,
   CompleteIcon,
-  ChatIcon,
+  DailyRoutineIcon,
   DismissIcon,
-  FoodIcon,
-  ForwardIcon,
+  InfoIcon,
   LearnIcon,
-  NatureIcon,
   QuestionsIcon,
   SettingsIcon,
   ShowAnotherIcon,
-  WhyIcon,
 } from '../ui/icons'
 
 export function TodayScreen() {
   const { state, dispatch } = usePrototype()
-  const [whyOpen, setWhyOpen] = useState(false)
-  const name = state.profile.preferredName || 'there'
+  const [detailsOpen, setDetailsOpen] = useState(false)
   const coverage = calculateAssessmentCoverage({
     submittedAnswers: state.submittedAnswers,
     skippedQuestionIds: state.skippedQuestionIds,
@@ -41,13 +36,15 @@ export function TodayScreen() {
     record.recommendationId === recommendation.id && record.date === recommendation.selectionDate,
   )
   const timeZone = state.profile.location?.timeZone
+  const now = new Date()
   const date = new Intl.DateTimeFormat(undefined, {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
     timeZone,
-  }).format(new Date())
-  const greeting = greetingForTime(new Date(), timeZone)
+  }).format(now)
+  const greeting = greetingForTime(now, timeZone)
+  const name = state.profile.preferredName || 'there'
 
   useEffect(() => {
     if (!currentRecord) dispatch({ type: 'show-recommendation', recommendationId: recommendation.id, date: recommendation.selectionDate })
@@ -61,79 +58,47 @@ export function TodayScreen() {
   return (
     <Screen className="today-screen">
       <header className="today-header">
-        <div><p className="eyebrow">{date}</p><h1 tabIndex={-1}>{greeting}, {name}</h1></div>
-        <Link className="settings-shortcut icon-label" to="/settings" aria-label="Open profile settings"><SettingsIcon aria-hidden="true" className="icon-leading" focusable="false" />Settings</Link>
+        <div><p className="today-date">{date}</p><h1 tabIndex={-1}>{greeting}, {name}</h1></div>
+        <Link className="icon-control" to="/settings" aria-label="Open settings"><SettingsIcon aria-hidden="true" focusable="false" /></Link>
       </header>
-      <Link className="balance-summary" to="/balance">
-        <BalanceIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" />
-        <span className="balance-summary-copy">
-          <small>Assessment coverage · {coverage.ready ? 'ready' : 'needs information'}</small>
-          <strong>{coverage.current.substantive} of {coverage.current.total} recent answers are usable</strong>
-        </span>
-        <ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" />
-      </Link>
-      <p className="eyebrow today-feed-label">For today</p>
+
       <article className="daily-focus">
-        <p className="eyebrow">Today’s focus</p>
+        <button className="icon-control recommendation-info-control" type="button" aria-label={detailsOpen ? 'Hide recommendation details' : 'Show recommendation details'} aria-expanded={detailsOpen} onClick={() => setDetailsOpen(!detailsOpen)}><InfoIcon aria-hidden="true" focusable="false" /></button>
+        <DailyRoutineIcon aria-hidden="true" className="recommendation-icon" focusable="false" weight="duotone" />
         <h2>{recommendation.title}</h2>
-        <p>{recommendation.guidance}</p>
-        <div className="practical-action">
-          <p className="eyebrow">Try this</p>
-          <strong>{recommendation.action}</strong>
-          {recommendation.checkInSetId ? <Link className="icon-label" to={`/questions/check-in/new?set=${recommendation.checkInSetId}`}><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />Start this check-in<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></Link> : null}
+        <p className="recommendation-action">{recommendation.action}</p>
+        {currentRecord?.status === 'completed' ? <p className="completion-note icon-label" role="status"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" weight="fill" />Complete for today</p> : null}
+        <div className="recommendation-icon-actions" aria-label="Recommendation actions" role="group">
+          <button className="icon-control primary-icon-control" type="button" aria-label="Mark recommendation complete" disabled={currentRecord?.status === 'completed'} onClick={() => updateRecommendation('completed')}><CompleteIcon aria-hidden="true" focusable="false" weight={currentRecord?.status === 'completed' ? 'fill' : 'regular'} /></button>
+          <button className="icon-control" type="button" aria-label="Show another recommendation" onClick={() => dispatch({ type: 'clear-active-recommendation' })}><ShowAnotherIcon aria-hidden="true" focusable="false" /></button>
+          <ContextChatLink ariaLabel="Ask about this recommendation" className="icon-control" context={{ type: 'recommendation', id: recommendation.id }} returnTo="/today" />
         </div>
-        {currentRecord?.status === 'completed' ? <p className="completion-note icon-label" role="status"><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" weight="fill" />Marked complete for today.</p> : null}
-        <div className="recommendation-actions">
-          <button className="button primary icon-label" type="button" disabled={currentRecord?.status === 'completed'} onClick={() => updateRecommendation('completed')}><CompleteIcon aria-hidden="true" className="icon-leading" focusable="false" />Mark complete</button>
-          <button className="button secondary icon-label" type="button" onClick={() => updateRecommendation('dismissed')}><DismissIcon aria-hidden="true" className="icon-leading" focusable="false" />Dismiss</button>
-          <button className="text-button icon-label" type="button" onClick={() => dispatch({ type: 'clear-active-recommendation' })}><ShowAnotherIcon aria-hidden="true" className="icon-leading" focusable="false" />Show another</button>
-          <ContextChatLink context={{ type: 'recommendation', id: recommendation.id }} returnTo="/today">Ask about this</ContextChatLink>
-        </div>
-        <Link className="text-link icon-label" to={`/learn/${recommendation.relatedArticleId}`}><LearnIcon aria-hidden="true" className="icon-leading" focusable="false" />Read related guidance<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></Link>
+        {detailsOpen ? (
+          <div className="recommendation-details">
+            <p>{recommendation.guidance}</p>
+            {recommendation.checkInSetId ? <Link className="text-link icon-label" to={`/questions/check-in/new?set=${recommendation.checkInSetId}`}><QuestionsIcon aria-hidden="true" className="icon-leading" focusable="false" />Start this check-in</Link> : null}
+            <Link className="text-link icon-label" to={`/learn/${recommendation.relatedArticleId}`}><LearnIcon aria-hidden="true" className="icon-leading" focusable="false" />Read related guidance</Link>
+            <p className={recommendation.food.status === 'withheld' ? 'recommendation-food withheld' : 'recommendation-food'}><strong>{recommendation.food.title}</strong><span>{recommendation.food.body}</span></p>
+            <h3>Why it was chosen</h3>
+            <ul>{recommendation.why.map((reason) => <li key={reason}>{reason}</li>)}</ul>
+            <button className="text-button icon-label" type="button" onClick={() => updateRecommendation('dismissed')}><DismissIcon aria-hidden="true" className="icon-leading" focusable="false" />Dismiss for today</button>
+          </div>
+        ) : null}
       </article>
+
       {state.profile.location ? <LocalizedTodayContent profile={state.profile} /> : <LocationBenefitCard returnTo="/today" />}
-      <section className={recommendation.food.status === 'withheld' ? 'today-secondary withheld' : 'today-secondary'} aria-labelledby="food-title">
-        <p className="eyebrow">Optional food prompt</p>
-        <h2 className="section-title-with-icon" id="food-title"><FoodIcon aria-hidden="true" className="icon-leading" focusable="false" weight="duotone" />{recommendation.food.title}</h2>
-        <p>{recommendation.food.body}</p>
-      </section>
-      <button className="disclosure" type="button" aria-expanded={whyOpen} onClick={() => setWhyOpen(!whyOpen)}>
-        <span className="icon-label"><WhyIcon aria-hidden="true" className="icon-leading" focusable="false" />Why this was chosen</span><span aria-hidden="true">{whyOpen ? '−' : '+'}</span>
-      </button>
-      {whyOpen ? (
-        <div className="disclosure-panel">
-          <ul>{recommendation.why.map((reason) => <li key={reason}>{reason}</li>)}</ul>
-          <p>{recommendation.food.reason}</p>
-        </div>
-      ) : null}
-      <section className="today-guide" aria-labelledby="today-guide-title">
-        <p className="eyebrow">Keep close</p>
-        <h2 id="today-guide-title">Your guide</h2>
-        <div className="today-guide-grid">
-          <Link to="/balance">
-            <NatureIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" />
-            <span><strong>Your usual nature</strong><small>Assessment and check-in history</small></span>
-            <ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" />
-          </Link>
-          <Link to="/questions">
-            <QuestionsIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" />
-            <span><strong>Latest check-in</strong><small>{latestCheckInLabel(state.checkIns)}</small></span>
-            <ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" />
-          </Link>
-        </div>
-      </section>
-      <Link className="question-count" to="/questions">
-        <span className="card-link-heading"><QuestionsIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" /><strong>{coverage.ready ? 'Review assessment coverage' : 'More information is useful'}</strong></span>
-        <span className="icon-label">{coverage.ready ? 'See answer coverage' : 'Answer the next useful question'}<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></span>
-      </Link>
-      <Link className="assistant-card" to="/chat"><span className="card-link-heading"><ChatIcon aria-hidden="true" className="card-icon" focusable="false" weight="duotone" /><strong>Ask Dosha Companion</strong></span><span className="icon-label">Start a grounded conversation<ForwardIcon aria-hidden="true" className="icon-trailing" focusable="false" /></span></Link>
+
+      <nav className="today-destinations" aria-label="Today shortcuts">
+        <Link to="/questions"><QuestionsIcon aria-hidden="true" focusable="false" /><span><strong>Check in</strong><small>{latestCheckInLabel(state.checkIns)}</small></span></Link>
+        <Link to="/learn"><LearnIcon aria-hidden="true" focusable="false" /><span><strong>Learn</strong><small>Browse the library</small></span></Link>
+      </nav>
     </Screen>
   )
 }
 
 function latestCheckInLabel(checkIns: Array<{ completedAt: string | null }>) {
   const latest = checkIns.find((item) => item.completedAt)
-  return latest?.completedAt ? `Completed ${new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(new Date(latest.completedAt))}` : 'No completed check-in yet'
+  return latest?.completedAt ? new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(new Date(latest.completedAt)) : 'Whenever you’re ready'
 }
 
 function greetingForTime(now: Date, timeZone?: string) {

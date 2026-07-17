@@ -10,10 +10,12 @@ This is a low-fidelity inventory of reusable interaction patterns. Names describ
 | --------- | ------- | ---------- |
 | App header | Product identity, back, close, or settings action | Default, focused flow, offline |
 | Bottom navigation | Today, Questions, My Balance, Learn | Hidden during onboarding/assessment; active destination; badge |
-| Page title block | Heading and concise orientation | Default, with status, with last-updated text |
+| Page title block | One dominant heading with only essential orientation | Default, with compact status |
 | Primary action | Advance or complete the main task | Default, disabled, loading, success |
 | Secondary action | Alternate path without competing with primary | Default, disabled |
 | Text action | Back, skip, learn more, or dismiss | Default, destructive where appropriate |
+| Icon control | Familiar compact action with an explicit accessible name | Default, focus, active/completed, disabled |
+| Disclosure control | Reveal secondary explanation without crowding the default view | Collapsed, expanded |
 | Inline status | Saved, saving, offline, error, last updated | Neutral, pending, error, recovered |
 
 ## Onboarding and forms
@@ -54,18 +56,20 @@ This is a low-fidelity inventory of reusable interaction patterns. Names describ
 
 | Component | Purpose | Key states |
 | --------- | ------- | ---------- |
-| Current-balance summary | Quick recent-state orientation | Fresh, stale, unavailable |
-| Daily-focus card | Approved lesson and relevance explanation | Available, loading, fallback, error |
-| Practical-action card | One bounded action | Available, alternative, not applicable |
-| Food suggestion | Optional compatible suggestion | Available, excluded, not applicable |
-| “Why chosen” disclosure | Explain deterministic selection signals | Collapsed, expanded |
-| Question availability | Show useful questions without pressure | Count, none, stale-profile prompt |
+| Daily recommendation | One large concept, short action, and three compact actions | Available, completed, rotating, fallback |
+| Recommendation details | Guidance, linked check-in/article, optional food, reasons, and dismiss | Collapsed by default, expanded |
+| Weather summary | Visual current condition, high/low, and precipitation | Loading, available, unavailable |
+| Weather details | Feels-like, sunrise, sunset, season, and forecast area | Collapsed by default, expanded |
+| Seasonal food row | Open related learning content or ask about one regional item | Filtered item, no region, no matches |
+| Today shortcut | Quiet route to Check in or Learn | Default, recent check-in |
 | Chat entry action | Start a conversation anchored to the visible item | Recommendation, article, seasonal food, completed check-in |
-| Chat context card | Identify the source and return to it | Resolved, source unavailable |
-| Chat message | Present user or grounded assistant content | Pending, complete, boundary, error/retry |
+| Chat context bar | Identify, expand, return to, or open the source | Collapsed, expanded, source unavailable |
+| Chat message | Present user or grounded assistant content in an open layout | Pending, complete, boundary, error/retry |
 | Chat citations | Link an answer to retrieved in-app sources | Article, glossary, recommendation, seasonal food |
 | Chat composer | Send a question without moving off the source context | Blank, ready, pending, character limit |
 | Conversation history | Reopen browser-local threads | Empty, recent threads, cleared |
+| Learn row | Scan and open an article by semantic icon and title | Default, filtered |
+| Settings row | Open exactly one focused settings section | Collapsed, expanded, value summary |
 
 ## Feedback and system states
 

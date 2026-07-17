@@ -23,13 +23,21 @@ import {
   type ChatReturnPath,
 } from '../chat/returnTargets'
 import { createChatMessage, createChatThread } from '../chat/thread'
-import type { ChatMessage, ChatThread } from '../chat/types'
+import type { ChatContextType, ChatMessage, ChatThread } from '../chat/types'
 import { BackLink, Screen } from '../components/Layout'
 import { usePrototype } from '../prototype/PrototypeContext'
 import {
   ChatIcon,
+  CollapseIcon,
+  DailyRoutineIcon,
+  ExpandIcon,
+  LearnIcon,
   NewChatIcon,
+  OpenOriginalIcon,
+  BackIcon,
+  QuestionsIcon,
   RetryIcon,
+  SeasonIcon,
   SendIcon,
   SourceIcon,
 } from '../ui/icons'
@@ -56,37 +64,29 @@ export function ChatHomeScreen() {
 
   return (
     <Screen className="chat-home">
-      <p className="eyebrow">Context-aware learning</p>
-      <h1 className="section-title-with-icon" tabIndex={-1}>
-        <ChatIcon aria-hidden="true" className="heading-icon" focusable="false" weight="duotone" />
-        Ask Dosha Companion
-      </h1>
-      <p className="lede">Ask about Ayurveda, your Today guidance, your check-ins, or something in the learning library.</p>
+      <ChatIcon aria-hidden="true" className="chat-home-icon" focusable="false" weight="duotone" />
+      <h1 aria-label="What would you like to understand?" tabIndex={-1}>What would you like<br />to understand?</h1>
       <form className="chat-start-form" onSubmit={submit}>
-        <label htmlFor="chat-home-question">Ask a question</label>
+        <label className="sr-only" htmlFor="chat-home-question">Ask anything</label>
         <textarea
           id="chat-home-question"
           maxLength={MAX_MESSAGE_LENGTH}
           onChange={(event) => setQuestion(event.target.value)}
-          placeholder="What would you like to understand?"
-          rows={3}
+          placeholder="Ask anything…"
+          rows={2}
           value={question}
         />
-        <button className="button primary icon-label" disabled={!question.trim()} type="submit">
-          <ChatIcon aria-hidden="true" className="icon-leading" focusable="false" />
-          Start conversation
-        </button>
+        <button aria-label="Start conversation" className="chat-home-send" disabled={!question.trim()} type="submit"><SendIcon aria-hidden="true" focusable="false" /></button>
       </form>
-      <section aria-labelledby="chat-suggestions-title">
-        <h2 id="chat-suggestions-title">Suggested questions</h2>
-        <div className="suggestion-list">
-          {general?.suggestedQuestions.map((suggestion) => (
+      <section aria-label="Suggested questions">
+        <div className="suggestion-list chat-home-suggestions">
+          {general?.suggestedQuestions.slice(0, 2).map((suggestion) => (
             <button key={suggestion} onClick={() => start(suggestion)} type="button">{suggestion}</button>
           ))}
         </div>
       </section>
-      <RecentConversations threads={state.chatThreads} />
-      <p className="boundary-note">Dosha Companion uses the app’s learning content and your saved profile context. It provides educational wellness information, not diagnosis or medical treatment.</p>
+      {state.chatThreads.length ? <RecentConversations threads={state.chatThreads} /> : null}
+      <details className="boundary-details chat-boundary"><summary>About these answers</summary><p>Dosha Companion uses app learning content and saved context for educational wellness information, not diagnosis or treatment.</p></details>
     </Screen>
   )
 }
@@ -139,6 +139,7 @@ export function ChatThreadScreen() {
   const client = useMemo(() => createChatClient(), [])
   const [draft, setDraft] = useState('')
   const [announcement, setAnnouncement] = useState('')
+  const [contextOpen, setContextOpen] = useState(false)
   const messageList = useRef<HTMLDivElement>(null)
   const initialSent = useRef(false)
   const initialQuestion = isLocationState(location.state) ? location.state.initialQuestion : ''
@@ -243,28 +244,28 @@ export function ChatThreadScreen() {
     }
   }
 
-  const latestSuggestions = [...thread.messages].reverse().find(
-    (message) => message.role === 'assistant' && message.status === 'complete' && message.suggestedFollowUps.length,
-  )?.suggestedFollowUps ?? resolved.suggestedQuestions
+  const hasUserMessage = thread.messages.some((message) => message.role === 'user')
+  const newestMessage = thread.messages.at(-1)
+  const latestSuggestions = !hasUserMessage
+    ? resolved.suggestedQuestions.slice(0, 2)
+    : newestMessage?.role === 'assistant' && newestMessage.status === 'complete'
+      ? newestMessage.suggestedFollowUps.slice(0, 2)
+      : []
+  const ContextIcon = contextIcon(resolved.reference.type)
 
   return (
     <section className="chat-screen">
-      <header className="chat-header">
-        <BackLink label={returnLabel(resolved.sourcePath)} to={resolved.sourcePath} />
-        <Link className="chat-new-link icon-label" to={chatEntryPath(undefined, returnPath(resolved.sourcePath))}>
-          <NewChatIcon aria-hidden="true" className="icon-leading" focusable="false" />
-          New conversation
-        </Link>
+      <h1 className="sr-only" tabIndex={-1}>{resolved.title}</h1>
+      <header className="chat-context-bar">
+        <Link aria-label={`Back to ${returnLabel(resolved.sourcePath)}`} className="icon-control" to={resolved.sourcePath}><BackIcon aria-hidden="true" focusable="false" /></Link>
+        <button aria-controls="chat-context-details" aria-expanded={contextOpen} aria-label={`${contextOpen ? 'Hide' : 'Show'} context for ${resolved.title}`} className="chat-context-toggle" onClick={() => setContextOpen(!contextOpen)} type="button">
+          <ContextIcon aria-hidden="true" focusable="false" weight="regular" />
+          <span>{resolved.title}</span>
+          {contextOpen ? <CollapseIcon aria-hidden="true" focusable="false" /> : <ExpandIcon aria-hidden="true" focusable="false" />}
+        </button>
+        <Link aria-label={`Open ${resolved.title}`} className="icon-control" to={resolved.sourcePath}><OpenOriginalIcon aria-hidden="true" focusable="false" /></Link>
       </header>
-      <article className="chat-context-card" aria-labelledby="chat-context-title">
-        <div>
-          <p className="eyebrow">Discussing</p>
-          <h1 id="chat-context-title" tabIndex={-1}>{resolved.title}</h1>
-          {resolved.subtitle ? <p className="chat-context-subtitle">{resolved.subtitle}</p> : null}
-          <p className="chat-context-summary">{resolved.summary}</p>
-        </div>
-        <Link to={resolved.sourcePath}>Open original</Link>
-      </article>
+      {contextOpen ? <div className="chat-context-details" id="chat-context-details"><p>{resolved.summary}</p><Link className="icon-label" to={chatEntryPath(undefined, returnPath(resolved.sourcePath))}><NewChatIcon aria-hidden="true" className="icon-leading" focusable="false" />New conversation</Link></div> : null}
       <div className="chat-message-list" aria-label="Conversation messages" ref={messageList} role="region">
         {thread.messages.map((message) => (
           <article className={`chat-message ${message.role} ${message.status}`} key={message.id}>
@@ -277,7 +278,7 @@ export function ChatThreadScreen() {
                   Retry response
                 </button>
               </div>
-            ) : <p>{message.content}</p>}
+            ) : <p className="chat-message-content">{message.content}</p>}
             {message.citations.length ? (
               <div className="chat-citations">
                 <p className="chat-citation-label"><SourceIcon aria-hidden="true" className="icon-leading" focusable="false" />Based on</p>
@@ -308,7 +309,6 @@ export function ChatThreadScreen() {
         />
         <button aria-label="Send message" className="chat-send-button" disabled={!draft.trim() || pending} type="submit">
           <SendIcon aria-hidden="true" focusable="false" />
-          <span>Send</span>
         </button>
       </form>
     </section>
@@ -318,16 +318,8 @@ export function ChatThreadScreen() {
 function RecentConversations({ threads }: { threads: ChatThread[] }) {
   return (
     <section className="chat-history" aria-labelledby="chat-history-title">
-      <div className="chat-history-heading">
-        <h2 id="chat-history-title">Recent conversations</h2>
-        <Link className="icon-label" to="/chat/new">
-          <NewChatIcon aria-hidden="true" className="icon-leading" focusable="false" />
-          New
-        </Link>
-      </div>
-      {threads.length ? (
-        <ul>{threads.map((thread) => <li key={thread.id}><Link to={`/chat/${thread.id}`}><strong>{thread.title}</strong><span>{relativeDate(thread.updatedAt)}</span></Link></li>)}</ul>
-      ) : <p className="empty-state">No saved conversations yet.</p>}
+      <h2 id="chat-history-title">Recent</h2>
+      <ul>{threads.map((thread) => <li key={thread.id}><Link to={`/chat/${thread.id}`}><strong>{thread.title}</strong><span>{relativeDate(thread.updatedAt)}</span></Link></li>)}</ul>
     </section>
   )
 }
@@ -354,6 +346,14 @@ function returnPath(path: string): ChatReturnPath {
   if (path === '/questions') return '/questions'
   if (path === '/balance') return '/balance'
   return '/today'
+}
+
+function contextIcon(type: ChatContextType) {
+  if (type === 'recommendation') return DailyRoutineIcon
+  if (type === 'article') return LearnIcon
+  if (type === 'seasonal-food') return SeasonIcon
+  if (type === 'check-in') return QuestionsIcon
+  return ChatIcon
 }
 
 function isLocationState(value: unknown): value is { initialQuestion: string } {

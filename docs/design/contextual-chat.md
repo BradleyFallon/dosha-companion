@@ -10,9 +10,9 @@ The current implementation is a functional interface prototype backed by determi
 
 | Source | Action | Anchor |
 | --- | --- | --- |
-| Today focus | Ask about this | Recommendation content, practical action, selection reasons, related article |
+| Today focus | Ask about this recommendation | Recommendation content, practical action, selection reasons, related article |
 | Learning article | Ask about this article | Article summary, body, tags, related articles |
-| Regional seasonal food | Ask about this | Food, saved region label, current month, dietary pattern, related article |
+| Regional seasonal food | Item-specific chat icon | Food, saved region label, current month, dietary pattern, related article |
 | Completed check-in | Talk through this check-in | Completion date plus selected question and answer labels |
 | Today or Learn assistant cards | Ask Dosha Companion | General catalog-grounded conversation |
 
@@ -31,11 +31,13 @@ New-chat links use semantic return keys for Today, Learn, Questions, and My Bala
 
 The bottom navigation is hidden for new and active chat routes. The chat surface uses the available viewport with:
 
-1. a source-aware back action and New conversation action;
-2. a compact context card with an Open original link;
+1. a compact context bar containing Back, semantic context, truncated title, and Open original;
+2. an optional expanded source summary and New conversation action;
 3. one independently scrollable message region;
-4. keyboard-reachable suggestions;
-5. a composer that stays above the safe-area inset.
+4. at most two keyboard-reachable suggestions before the first user message or after the newest completed response;
+5. a quiet composer that stays above the safe-area inset.
+
+“Discussing,” the source subtitle, and the full summary are not permanently displayed. Messages use spacing, typography, and subtle alignment instead of heavy speech bubbles. Assistant plain text preserves line breaks with `white-space: pre-wrap`; arbitrary HTML is not rendered.
 
 Enter sends, Shift+Enter inserts a newline, blank messages cannot be sent, and messages are limited to 2,000 characters. Pending, failure, and retry states remain in the message timeline.
 
@@ -43,8 +45,8 @@ Enter sends, Shift+Enter inserts a newline, blank messages cannot be sent, and m
 
 - The message region is labeled “Conversation messages.”
 - A separate polite live region announces pending, completed, and failed response state without rereading the entire transcript.
-- The composer and Send action have explicit accessible names.
-- Context cards have a heading and citation links use their source titles.
+- The composer and icon-only Send action have explicit accessible names.
+- The compact context toggle states whether it will show or hide the named source; Back and Open original are named icon links.
 - Icons adjacent to visible labels are decorative and unfocusable.
 - Route focus moves to the conversation context heading.
 
