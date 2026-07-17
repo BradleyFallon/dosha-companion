@@ -80,8 +80,12 @@ export function CheckInScreen() {
     return (
       <Screen className="check-in-summary-screen">
         <BackLink label="Check In" to="/questions" />
-        {justCompleted ? <CompleteIcon aria-hidden="true" className="check-in-complete-icon" focusable="false" weight="fill" /> : <CurrentBalanceIcon aria-hidden="true" className="focused-screen-icon" focusable="false" weight="duotone" />}
-        <h1 tabIndex={-1}>{justCompleted ? 'Check-in saved' : date}</h1>
+        {justCompleted ? (
+          <div aria-hidden="true" className="check-in-completion-mark">
+            <CompleteIcon className="check-in-complete-icon" focusable="false" weight="fill" />
+          </div>
+        ) : <CurrentBalanceIcon aria-hidden="true" className="focused-screen-icon" focusable="false" weight="duotone" />}
+        <h1 aria-live={justCompleted ? 'polite' : undefined} tabIndex={-1}>{justCompleted ? 'Check-in saved' : date}</h1>
         <p className="check-in-answer-count">{answers.length} answers</p>
         <div className="check-in-summary-actions">
           <Link className="button primary" to="/today">Done</Link>

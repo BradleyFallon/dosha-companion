@@ -63,13 +63,12 @@ Avoid making every item `P1`. Prefer one or two `P0` items and three to five `P1
 
 ### Active
 
-No implementation item is currently active.
+- [EXP-005 — Add joyful completion motion](active/EXP-005-joyful-completion-motion.md)
 
 ### Next
 
 - [PROD-002 — Run moderated usability sessions](backlog/PROD-002-moderated-usability-sessions.md)
 - [EXP-004 — Reduce dashboard and card styling](backlog/EXP-004-reduce-card-styling.md)
-- [EXP-005 — Add joyful completion motion](backlog/EXP-005-joyful-completion-motion.md)
 
 ### Product exploration
 

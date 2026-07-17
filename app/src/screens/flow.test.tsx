@@ -393,14 +393,16 @@ describe('limited MVP results and settings', () => {
     const set = getCheckInQuestionSet('quick-current')!
     const checkIn = { id: 'checkin-test', setId: set.id, startedAt: '2026-07-16T10:00:00.000Z', completedAt: null, answers: {} }
     const initial = { [initialAssessment.questions[0].id]: initialAssessment.questions[0].answers[0].id }
-    renderAt('/questions/check-in/checkin-test', { resultsReached: true, assessmentMode: 'full', submittedAnswers: initial, checkIns: [checkIn] })
+    const { container } = renderAt('/questions/check-in/checkin-test', { resultsReached: true, assessmentMode: 'full', submittedAnswers: initial, checkIns: [checkIn] })
     for (let index = 0; index < set.questionIds.length; index += 1) {
       await user.click(screen.getAllByRole('radio')[0])
       await user.click(screen.getByRole('button', { name: index === set.questionIds.length - 1 ? 'Complete check-in' : 'Continue' }))
     }
-    expect(screen.getByRole('heading', { name: 'Check-in saved' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Check-in saved' })).toHaveAttribute('aria-live', 'polite')
     expect(screen.getByRole('link', { name: 'Done' })).toHaveAttribute('href', '/today')
     expect(screen.getByRole('link', { name: /Talk through .* check-in/ })).toBeInTheDocument()
+    expect(container.querySelector('.check-in-completion-mark')).toHaveAttribute('aria-hidden', 'true')
+    expect(container.querySelector('.check-in-completion-mark .check-in-complete-icon')).toBeInTheDocument()
     expect(screen.getByText('About this check-in').closest('details')).not.toHaveAttribute('open')
     const snapshot = JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}')
     expect(snapshot.state.submittedAnswers).toEqual(initial)

@@ -307,6 +307,7 @@ test('anchors seasonal-food chat to the saved regional context', async ({ page }
 })
 
 test('talks through a completed check-in with recent-answer context', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   await reachToday(page)
   await page.getByRole('link', { name: 'Check In', exact: true }).click()
   await page.getByRole('link', { name: 'Start check-in' }).click()
@@ -315,6 +316,18 @@ test('talks through a completed check-in with recent-answer context', async ({ p
     await page.getByRole('button', { name: index === 4 ? 'Complete check-in' : 'Continue' }).click()
   }
   await expect(page.getByRole('heading', { name: 'Check-in saved' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Done' })).toBeVisible()
+  await expect(page.getByRole('link', { name: /Talk through .* check-in/ })).toBeVisible()
+  await expect(page.locator('.check-in-completion-mark')).toBeVisible()
+  const reducedMotion = await page.locator('.check-in-completion-mark').evaluate((mark) => ({
+    halo: getComputedStyle(mark, '::before').animationName,
+    icon: getComputedStyle(mark.querySelector('.check-in-complete-icon')!).animationName,
+  }))
+  expect(reducedMotion).toEqual({ halo: 'none', icon: 'none' })
+  for (const viewport of [{ width: 390, height: 844 }, { width: 390, height: 667 }, { width: 360, height: 640 }, { width: 320, height: 568 }]) {
+    await page.setViewportSize(viewport)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
+  }
   await expect(page.getByText('About this check-in').locator('..')).not.toHaveAttribute('open')
   await page.getByRole('link', { name: /Talk through .* check-in/ }).click()
   await page.getByRole('button', { name: /Show context for/ }).click()

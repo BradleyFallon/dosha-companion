@@ -50,6 +50,9 @@
   --space-section: 40px;
   --space-card: 24px;
   --space-item: 16px;
+  --motion-completion-duration: 320ms;
+  --motion-completion-delay: 60ms;
+  --motion-completion-easing: cubic-bezier(.22, .75, .2, 1);
 }
 
 * { box-sizing: border-box; }
@@ -647,7 +650,9 @@ html[data-daylight-phase="twilight"], html[data-daylight-phase="night"] { color-
 
 .check-in-summary-screen { text-align: center; }
 .check-in-summary-screen .back-link { width: fit-content; }
-.check-in-complete-icon { width: 74px; height: 74px; margin: 30px auto 18px; color: var(--accent); }
+.check-in-completion-mark { position: relative; display: grid; width: 74px; height: 74px; margin: 30px auto 18px; place-items: center; }
+.check-in-completion-mark::before { position: absolute; inset: -5px; opacity: .18; transform: scale(1); border: 2px solid var(--accent); border-radius: 50%; content: ""; animation: check-in-completion-halo var(--motion-completion-duration) var(--motion-completion-easing) var(--motion-completion-delay) both; }
+.check-in-complete-icon { width: 74px; height: 74px; color: var(--accent); animation: check-in-completion-settle var(--motion-completion-duration) var(--motion-completion-easing) both; }
 .check-in-summary-screen .focused-screen-icon { display: block; margin: 30px auto 18px; }
 .check-in-summary-screen h1 { margin-bottom: 8px; }
 .check-in-answer-count { color: var(--muted); font-size: 1.05rem; }
@@ -721,6 +726,16 @@ html[data-daylight-phase="twilight"], html[data-daylight-phase="night"] { color-
 @keyframes calm-reveal {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes check-in-completion-settle {
+  from { opacity: .2; transform: translateY(4px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes check-in-completion-halo {
+  from { opacity: 0; transform: scale(.78); }
+  to { opacity: .18; transform: scale(1); }
 }
 
 @keyframes gentle-pulse {
@@ -801,5 +816,7 @@ html[data-daylight-phase="twilight"], html[data-daylight-phase="night"] { color-
 }
 
 @media (prefers-reduced-motion: reduce) {
+  :root { --motion-completion-duration: 0ms; --motion-completion-delay: 0ms; }
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+  .check-in-completion-mark::before, .check-in-complete-icon { animation: none; }
 }
