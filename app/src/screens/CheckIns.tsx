@@ -2,6 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { BackLink, Screen } from '../components/Layout'
 import { ContextChatLink } from '../components/ContextChatLink'
+import {
+  AnswerChoiceList,
+  QuestionActions,
+  QuestionProgress,
+  QuestionViewport,
+} from '../components/QuestionFlow'
 import { getCheckInQuestionSet } from '../content/repository'
 import { initialAssessment } from '../generated/initialAssessment'
 import { usePrototype } from '../prototype/PrototypeContext'
@@ -107,35 +113,21 @@ export function CheckInScreen() {
   const actionLabel = lastQuestion ? 'Complete check-in' : 'Continue'
 
   return (
-    <Screen className="question-screen check-in-question-screen">
-      <div className="question-fixed-header check-in-question-header">
-        <Link aria-label="Finish later" className="icon-control" to="/questions"><CloseIcon aria-hidden="true" focusable="false" /></Link>
-        <div className="check-in-progress-dots" aria-hidden="true">
-          {questions.map((item, itemIndex) => <span className={itemIndex < index ? 'complete' : itemIndex === index ? 'active' : ''} key={item.id} />)}
+    <QuestionViewport
+      actions={<QuestionActions disabled={!selected} onPrimary={submit} primaryLabel={actionLabel} />}
+      className="check-in-question-screen"
+      header={(
+        <div className="check-in-question-header">
+          <Link aria-label="Finish later" className="icon-control" to="/questions"><CloseIcon aria-hidden="true" focusable="false" /></Link>
+          <QuestionProgress current={index + 1} total={questions.length} variant="dots" />
+          <span aria-hidden="true" className="check-in-header-spacer" />
         </div>
-        <span aria-hidden="true" className="check-in-header-spacer" />
-        <progress aria-label={`Question ${index + 1} of ${questions.length}`} className="sr-only" value={index + 1} max={questions.length} />
-      </div>
-      <div className="question-scroll-region">
-        {index === 0 ? <p className="check-in-timeframe">Past seven days</p> : null}
-        <h1 tabIndex={-1}>{question.text}</h1>
-        <fieldset className="answer-list check-in-answer-list">
-          <legend className="sr-only">Choose one answer</legend>
-          {question.answers.map((answer) => (
-            <label className={selected === answer.id ? 'answer-option check-in-answer-option selected' : 'answer-option check-in-answer-option'} key={answer.id}>
-              <input type="radio" name={question.id} checked={selected === answer.id} onChange={() => setSelected(answer.id)} />
-              <span>{answer.text}</span>
-              <span className="check-in-selection" aria-hidden="true">{selected === answer.id ? <CompleteIcon focusable="false" weight="fill" /> : null}</span>
-            </label>
-          ))}
-        </fieldset>
-      </div>
-      <div className="question-action-shell check-in-action-shell">
-        <button aria-label={actionLabel} className="icon-control primary-icon-control check-in-next-control" type="button" disabled={!selected} onClick={submit}>
-          {lastQuestion ? <CompleteIcon aria-hidden="true" focusable="false" /> : <ForwardIcon aria-hidden="true" focusable="false" />}
-        </button>
-      </div>
-    </Screen>
+      )}
+    >
+      {index === 0 ? <p className="check-in-timeframe">Past seven days</p> : null}
+      <h1 tabIndex={-1}>{question.text}</h1>
+      <AnswerChoiceList answers={question.answers} name={question.id} onSelect={setSelected} selectedId={selected} />
+    </QuestionViewport>
   )
 }
 

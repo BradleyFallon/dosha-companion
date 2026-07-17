@@ -39,7 +39,7 @@ An active check-in owns the viewport and suppresses global bottom navigation. Th
 2. an independently scrollable prompt-and-answer region;
 3. a fixed safe-area-aware action region.
 
-Only the first question quietly states the past-seven-days timeframe. Set titles, persistent save-success text, keyboard hints, and repeated methodology boundaries are absent. Answer options are large native radio rows; selection uses a soft tonal background and completion icon. Arrow keys change selection and Enter advances on keyboard-capable browsers.
+Only the first question quietly states the past-seven-days timeframe. Set titles, persistent save-success text, keyboard hints, and repeated methodology boundaries are absent. Prompt typography, answer rows, selection treatment, and the visible primary action match the initial assessment so both flows feel like one question system. Progress dots and the icon-only Finish later action keep the check-in chrome quieter. Arrow keys change selection and Enter advances on keyboard-capable browsers.
 
 ## Progressive disclosure
 

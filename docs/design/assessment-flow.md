@@ -78,14 +78,14 @@ On keyboard-capable browsers, Left/Up and Right/Down move through answers with w
 
 ### Repeat check-ins
 
-Repeat check-ins use the same persistence and keyboard behavior but quieter presentation than the initial assessment:
+Repeat check-ins use the same question viewport, answer rows, visible primary action, persistence behavior, and keyboard behavior as the initial assessment, with quieter surrounding context:
 
 - The quick past-seven-days set is the default from Check In; the detailed set is disclosed under More options.
 - An unfinished record replaces Start check-in with Continue and a simple answered-count.
 - The fixed header contains an icon-only Finish later action and progress dots with a hidden “Question n of total” equivalent.
 - Set names, permanent keyboard hints, save-success copy, and repeated methodology text are omitted.
-- Answers remain native radio controls presented as large text rows with a soft selected state.
-- The fixed action area uses an accessible icon-first Continue or Complete check-in control.
+- Answers use the same native radio rows and selected-state treatment as the initial assessment.
+- The fixed action area uses the same visible Continue treatment, changing its label to Complete check-in on the final question.
 - Completion and reopened summaries collapse full answers and the assessment/scoring explanation.
 
 ### Saving and connectivity

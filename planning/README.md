@@ -81,6 +81,7 @@ No additional item is queued while moderated usability research is active.
 
 ### Recently completed
 
+- [EXP-008 — Unify question flow presentation](done/EXP-008-unify-question-flow-presentation.md)
 - [EXP-004 — Reduce dashboard and card styling](done/EXP-004-reduce-card-styling.md)
 - [EXP-005 — Add joyful completion motion](done/EXP-005-joyful-completion-motion.md)
 - [ENG-001 — Add continuous integration](done/ENG-001-add-continuous-integration.md)

@@ -674,7 +674,32 @@ test('edits profile settings, preserves answers, and recalculates Today', async 
 test('uses every post-assessment destination in the mobile demo', async ({ page }) => {
   test.setTimeout(60_000)
   await reachAssessment(page)
-  for (let index = 0; index < 3; index += 1) {
+  const assessmentAnswerPresentation = await page.getByRole('radio').first().locator('..').evaluate((answer) => {
+    const style = getComputedStyle(answer)
+    return {
+      className: answer.className,
+      minHeight: style.minHeight,
+      padding: style.padding,
+      borderRadius: style.borderRadius,
+      borderBottomStyle: style.borderBottomStyle,
+      backgroundColor: style.backgroundColor,
+      fontSize: style.fontSize,
+    }
+  })
+  await page.getByRole('radio').first().check()
+  const assessmentActionPresentation = await page.getByRole('button', { name: 'Continue' }).evaluate((action) => {
+    const style = getComputedStyle(action)
+    return {
+      className: action.className,
+      minHeight: style.minHeight,
+      borderRadius: style.borderRadius,
+      backgroundColor: style.backgroundColor,
+      color: style.color,
+      fontWeight: style.fontWeight,
+    }
+  })
+  await page.getByRole('button', { name: 'Continue' }).click()
+  for (let index = 1; index < 3; index += 1) {
     await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 1))
     await page.getByRole('radio').first().check()
     await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled()
@@ -700,6 +725,32 @@ test('uses every post-assessment destination in the mobile demo', async ({ page 
   await expect(page.getByRole('link', { name: 'Detailed check-in' })).not.toBeVisible()
   await page.getByRole('link', { name: 'Start check-in' }).click()
   await expect(page.getByRole('navigation', { name: 'Primary navigation' })).not.toBeVisible()
+  const checkInAnswerPresentation = await page.getByRole('radio').first().locator('..').evaluate((answer) => {
+    const style = getComputedStyle(answer)
+    return {
+      className: answer.className,
+      minHeight: style.minHeight,
+      padding: style.padding,
+      borderRadius: style.borderRadius,
+      borderBottomStyle: style.borderBottomStyle,
+      backgroundColor: style.backgroundColor,
+      fontSize: style.fontSize,
+    }
+  })
+  expect(checkInAnswerPresentation).toEqual(assessmentAnswerPresentation)
+  await page.getByRole('radio').first().check()
+  const checkInActionPresentation = await page.getByRole('button', { name: 'Continue' }).evaluate((action) => {
+    const style = getComputedStyle(action)
+    return {
+      className: action.className,
+      minHeight: style.minHeight,
+      borderRadius: style.borderRadius,
+      backgroundColor: style.backgroundColor,
+      color: style.color,
+      fontWeight: style.fontWeight,
+    }
+  })
+  expect(checkInActionPresentation).toEqual(assessmentActionPresentation)
   for (const viewport of [{ width: 390, height: 844 }, { width: 390, height: 667 }, { width: 360, height: 640 }]) {
     await page.setViewportSize(viewport)
     const action = page.getByRole('button', { name: 'Continue' })

@@ -1,6 +1,12 @@
 import { useEffect } from 'react'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { BackLink, Screen, Status } from '../components/Layout'
+import {
+  AnswerChoiceList,
+  QuestionActions,
+  QuestionProgress,
+  QuestionViewport,
+} from '../components/QuestionFlow'
 import { usePrototype } from '../prototype/PrototypeContext'
 import {
   getAssessmentQuestions,
@@ -149,60 +155,54 @@ export function QuestionScreen() {
   if (!question) return <Navigate to="/assessment" replace />
 
   return (
-    <Screen className="question-screen">
-      <div className="question-fixed-header">
-        <div className="assessment-topline">
-          <Link to={assessmentReturnPath ?? '/'}>{assessmentReturnPath ? 'Back to assessment' : 'Save and exit'}</Link>
-          <Status>{state.saveStatus === 'saved' ? 'Saved on this device' : state.saveStatus}</Status>
-        </div>
-        <div className="question-progress-row">
-          <p className="eyebrow">{sectionLabel(question.assessmentType)}</p>
-          <div className="progress-copy">
-            <span>Question {index + 1} of {total}</span>
-            {question.assessmentType === 'current' ? <span>Past seven days</span> : null}
+    <QuestionViewport
+      actions={(
+        <QuestionActions
+          disabled={!selected}
+          onPrimary={() => {
+            if (selected) advance(selected)
+          }}
+          primaryLabel="Continue"
+          secondary={{ label: 'Back', onSelect: goBack }}
+          showKeyboardHint
+        />
+      )}
+      header={(
+        <>
+          <div className="assessment-topline">
+            <Link to={assessmentReturnPath ?? '/'}>{assessmentReturnPath ? 'Back to assessment' : 'Save and exit'}</Link>
+            <Status>{state.saveStatus === 'saved' ? 'Saved on this device' : state.saveStatus}</Status>
           </div>
-        </div>
-        <progress value={index + 1} max={total}>Question {index + 1} of {total}</progress>
-      </div>
-      <div className="question-scroll-region">
-        <h1 tabIndex={-1}>{question.text}</h1>
-        {question.helpText ? <p className="field-hint">{question.helpText}</p> : null}
-        {question.assessmentType === 'baseline' ? (
-          <details className="question-help">
-            <summary>What does “usual nature” mean?</summary>
-            <p>Think about most of your adult life when generally well—not only how you feel this week.</p>
-          </details>
-        ) : null}
-        <fieldset className="answer-list">
-          <legend className="sr-only">Choose one answer</legend>
-          {question.answers.map((answer) => (
-            <label className={selected === answer.id ? 'answer-option selected' : 'answer-option'} key={answer.id}>
-              <input
-                type="radio"
-                name={question.id}
-                value={answer.id}
-                checked={selected === answer.id}
-                onChange={() => dispatch({ type: 'select-answer', answerId: answer.id })}
-              />
-              <span className="radio-mark" aria-hidden="true">{selected === answer.id ? '✓' : ''}</span>
-              <span>{answer.text}</span>
-            </label>
-          ))}
-        </fieldset>
-        {question.skippable ? (
-          <button className="text-button skip-action" type="button" onClick={() => advance()}>
-            Skip for now
-          </button>
-        ) : null}
-      </div>
-      <div className="question-action-shell">
-        <p className="keyboard-hint">Arrow keys to choose · Enter to continue</p>
-        <div className="assessment-actions">
-          <button className="button secondary" type="button" onClick={goBack}>Back</button>
-          <button className="button primary" type="button" disabled={!selected} onClick={() => selected && advance(selected)}>Continue</button>
-        </div>
-      </div>
-    </Screen>
+          <QuestionProgress
+            context={question.assessmentType === 'current' ? 'Past seven days' : undefined}
+            current={index + 1}
+            label={sectionLabel(question.assessmentType)}
+            total={total}
+            variant="bar"
+          />
+        </>
+      )}
+    >
+      <h1 tabIndex={-1}>{question.text}</h1>
+      {question.helpText ? <p className="field-hint">{question.helpText}</p> : null}
+      {question.assessmentType === 'baseline' ? (
+        <details className="question-help">
+          <summary>What does “usual nature” mean?</summary>
+          <p>Think about most of your adult life when generally well—not only how you feel this week.</p>
+        </details>
+      ) : null}
+      <AnswerChoiceList
+        answers={question.answers}
+        name={question.id}
+        onSelect={(answerId) => dispatch({ type: 'select-answer', answerId })}
+        selectedId={selected}
+      />
+      {question.skippable ? (
+        <button className="text-button skip-action" type="button" onClick={() => advance()}>
+          Skip for now
+        </button>
+      ) : null}
+    </QuestionViewport>
   )
 }
 
