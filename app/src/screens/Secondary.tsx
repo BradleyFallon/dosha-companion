@@ -3,11 +3,15 @@ import { BackLink, Screen } from '../components/Layout'
 import { CheckInTimeline } from '../components/CheckInTimeline'
 import { PatternCoverageRing } from '../components/PatternCoverageRing'
 import {
-  balanceDomains,
-  informationState,
-  informationStateLabel,
   isBalanceDomain,
 } from '../balance/domains'
+import { balanceIconFor } from '../balance/domainIcons'
+import {
+  buildBalanceViewModel,
+  comparisonAccessibleLabel,
+  comparisonLabel,
+  type BalanceComparisonState,
+} from '../balance/model'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { calculateAssessmentCoverage, COVERAGE_REQUIREMENTS } from '../quiz/coverage'
 import { getCheckInQuestionSet } from '../content/repository'
@@ -132,36 +136,13 @@ export function AssessmentManagementScreen() {
 export function BalanceScreen() {
   const { domain: domainId } = useParams()
   const { state } = usePrototype()
-  const coverage = calculateAssessmentCoverage({
-    submittedAnswers: state.submittedAnswers,
-    skippedQuestionIds: state.skippedQuestionIds,
-  })
   if (domainId && !isBalanceDomain(domainId)) return <Navigate replace to="/balance" />
 
-  const completed = completedCheckIns(state.checkIns)
   const incomplete = state.checkIns.find((checkIn) => !checkIn.completedAt)
-  const latest = completed[0]
-  const recentAnswers = latest?.answers ?? state.submittedAnswers
-  const selectedDomain = domainId ? balanceDomains.find((domain) => domain.id === domainId) : null
-  const recentRepresented = initialAssessment.questions
-    .filter((question) => question.assessmentType === 'current')
-    .filter((question) => question.answers.some((answer) => answer.id === recentAnswers[question.id] && answer.kind === 'ordinary'))
-    .length
-  const domainViews = balanceDomains.map((domain) => {
-    const currentQuestion = initialAssessment.questions.find((question) => question.assessmentType === 'current' && question.category === domain.currentCategory)
-    const baselineQuestion = initialAssessment.questions.find((question) => question.assessmentType === 'baseline' && question.category === domain.baselineCategory)
-    const recentAnswer = currentQuestion?.answers.find((answer) => answer.id === recentAnswers[currentQuestion.id]) ?? null
-    const usualAnswer = baselineQuestion?.answers.find((answer) => answer.id === state.submittedAnswers[baselineQuestion.id]) ?? null
-    const skipped = !latest && currentQuestion ? state.skippedQuestionIds.includes(currentQuestion.id) : false
-    return {
-      ...domain,
-      recentAnswer,
-      usualAnswer,
-      state: informationState(recentAnswer?.kind ?? null, skipped),
-    }
-  })
-  const selected = selectedDomain ? domainViews.find((domain) => domain.id === selectedDomain.id) : null
-  const recentHref = latest ? `/questions/check-in/${latest.id}` : '/questions'
+  const view = buildBalanceViewModel(state)
+  const selected = domainId ? view.domains.find((domain) => domain.id === domainId) : null
+  const SelectedIcon = selected ? balanceIconFor(selected.iconKey) : null
+  const recentHref = view.latestCheckInId ? `/questions/check-in/${view.latestCheckInId}` : '/questions'
 
   return (
     <Screen className="balance-screen">
@@ -178,25 +159,26 @@ export function BalanceScreen() {
           href="/questions/assessment"
           icon={NatureIcon}
           label="Usual"
-          represented={coverage.baseline.categoriesCovered}
-          total={coverage.baseline.categoriesTotal}
+          represented={view.usual.represented}
+          total={view.usual.total}
         />
         <PatternCoverageRing
           href={recentHref}
           icon={CurrentBalanceIcon}
           label="Recent"
-          represented={recentRepresented}
-          total={coverage.current.categoriesTotal}
+          represented={view.recent.represented}
+          total={view.recent.total}
         />
       </div>
 
       <div aria-label="Recent balance areas" className="balance-domain-grid">
-        {domainViews.map((domain) => {
-          const Icon = domain.icon
+        {view.domains.map((domain) => {
+          const Icon = balanceIconFor(domain.iconKey)
+          const label = comparisonAccessibleLabel(domain.comparison)
           return (
             <Link
-              aria-label={`${domain.label}: ${informationStateLabel(domain.state)}`}
-              className={`balance-domain-control ${domain.state}`}
+              aria-label={`${domain.label}: ${label}`}
+              className={`balance-domain-control ${domain.comparison}`}
               key={domain.id}
               to={`/balance/${domain.id}`}
             >
@@ -208,21 +190,29 @@ export function BalanceScreen() {
       </div>
 
       {selected ? (
-        <section aria-labelledby="balance-domain-title" className={`balance-domain-detail ${selected.state}`}>
+        <section aria-labelledby="balance-domain-title" className={`balance-domain-detail ${selected.comparison}`}>
           <Link aria-label={`Close ${selected.label} details`} className="balance-detail-close" to="/balance">Close</Link>
-          <selected.icon aria-hidden="true" focusable="false" weight="duotone" />
+          {SelectedIcon ? <SelectedIcon aria-hidden="true" focusable="false" weight="duotone" /> : null}
           <h2 id="balance-domain-title">{selected.label}</h2>
           <dl>
-            <div><dt>Recent</dt><dd>{selected.recentAnswer?.text ?? 'No recent information'}</dd></div>
-            <div><dt>Usual</dt><dd>{selected.usualAnswer ? selected.usualAnswer.kind === 'ordinary' ? 'Information available' : 'Not enough information' : 'No usual information'}</dd></div>
+            <div><dt>Recent</dt><dd>{selected.recent?.shortLabel ?? 'No recent information'}</dd></div>
+            <div><dt>Usual</dt><dd>{selected.usual?.shortLabel ?? 'No usual information'}</dd></div>
           </dl>
+          <p className="balance-comparison-label"><span aria-hidden="true">{comparisonSymbol(selected.comparison)}</span>{comparisonLabel(selected.comparison)}</p>
           <ContextChatLink context={{ type: 'balance-domain', id: selected.id }} returnTo="/balance">Ask about this</ContextChatLink>
+          {(selected.recent || selected.usual) ? (
+            <details className="compact-details balance-response-details">
+              <summary>View response details</summary>
+              {selected.recent ? <p><strong>Recent:</strong> {selected.recent.fullText}</p> : null}
+              {selected.usual ? <p><strong>Usual:</strong> {selected.usual.fullText}</p> : null}
+            </details>
+          ) : null}
         </section>
       ) : null}
 
       <section aria-labelledby="balance-timeline-title" className="balance-timeline-section">
         <h2 className="sr-only" id="balance-timeline-title">Check-in timeline</h2>
-        <CheckInTimeline checkIns={state.checkIns} />
+        <CheckInTimeline items={view.timeline} />
       </section>
 
       <Link className="button primary balance-primary-action" to={incomplete ? `/questions/check-in/${incomplete.id}` : '/questions/check-in/new?set=quick-current'}>
@@ -231,6 +221,14 @@ export function BalanceScreen() {
       </Link>
     </Screen>
   )
+}
+
+function comparisonSymbol(comparison: BalanceComparisonState) {
+  if (comparison === 'close-to-usual') return '≈'
+  if (comparison === 'changed-from-usual') return '↔'
+  if (comparison === 'recent-only') return '●'
+  if (comparison === 'usual-only') return '○'
+  return '·'
 }
 
 function CheckInRow({ checkIn, showChat = false }: { checkIn: CheckIn; showChat?: boolean }) {

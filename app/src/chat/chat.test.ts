@@ -39,6 +39,10 @@ describe('chat contexts and grounding', () => {
       reference: { type: 'balance-domain' },
       title: 'Sleep',
       sourcePath: '/balance/sleep',
+      payload: {
+        comparison: 'recent-only',
+        recentShortLabel: 'Light and interrupted',
+      },
     })
     expect(resolveChatContext({ type: 'general', id: 'general', sourcePath: '/learn' }, state)).toMatchObject({
       title: 'General conversation',

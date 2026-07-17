@@ -1,82 +1,67 @@
 # Balance Visualization
 
-## Goal
+## Purpose
 
-Help users compare baseline constitution and current balance without presenting the result as a medical measurement or implying unjustified numeric precision.
+My Balance is a calm graphical reflection of information the person supplied. It is not a dosha result, clinical assessment, performance dashboard, or trend chart.
 
-## Future scored-result approach
+## Segmented rings
 
-Use two separate cards and a simple three-row relative display. Each card includes its own heading, time frame, plain-language label, and accessible text summary.
+Usual and Recent each use a segmented ring. One segment corresponds to one question category in that source:
 
-The current limited MVP does **not** render this visualization because numerical weights and label thresholds remain unapproved. My Balance reports baseline/current answer and category coverage instead. The following pattern remains a future design reference only.
+- filled means the category has an ordinary answer;
+- muted means it is missing, skipped, fallback, or uncertain.
 
-### Baseline card
+The rings have exact accessible labels such as “Usual pattern: 14 of 19 areas represented.” They do not show percentages, magnitude, overlap, or dosha colors. Usual opens assessment maintenance; Recent opens the latest completed check-in when one exists.
 
-- Heading: **Your nature**
-- Time frame: “Your usual adult tendencies when generally well”
-- Label example: **Vata–Pitta**
-- Visualization: three named horizontal tracks with qualitative emphasis
-- Supporting text: stable-pattern explanation and Preliminary/Developing stage
+## Domain map
 
-### Current-balance card
+The primary domains are sleep, energy, appetite, digestion, routine, and stress. Each maps directly to reviewed baseline/current question categories. Body qualities remains represented in the recent ring but is not forced into the six-item primary grid.
 
-- Heading: **Your current balance**
-- Time frame: “Based on answers from the past seven days”
-- Label example: **Vata is currently more prominent**
-- Visualization: the same three named tracks, visually separated from baseline
-- Supporting text: last-updated date, freshness, and next check-in action
+The application selects one recent source: the latest completed check-in, or the initial current answers when no completed check-in exists. It never silently merges multiple check-ins.
 
-## Low-fidelity pattern
+## Editorial comparison metadata
 
-```text
-Your nature
-Vata–Pitta
+Editors control three answer-option fields:
 
-Vata   [==========----]  prominent
-Pitta  [========------]  prominent
-Kapha  [====----------]  present
+- `short_label`: concise display wording while full answer text remains authoritative;
+- `icon_key`: an optional key from the controlled semantic icon vocabulary;
+- `pattern_key`: a lowercase, domain-specific neutral relationship token.
 
-Your current balance
-Vata is currently more prominent
+Ordinary current answers require a short label. Pattern keys are never inferred from order or prose. Fallback answers use `uncertain` or no key. Every label and mapping remains draft until editorial/domain review.
 
-Vata   [===========---]  more prominent
-Pitta  [======--------]  present
-Kapha  [===-----------]  less prominent
-```
+When both ordinary answers have reviewed keys, equal keys mean **Close to usual** and different keys mean **Changed recently**. A `_usual` key is permitted only when the authored current answer explicitly says it is close to the person’s usual pattern. One-sided, fallback, missing, or metadata-incomplete states remain neutral and do not imply direction.
 
-Track lengths are illustrative in wireframes. Production lengths, labels, and thresholds depend on the approved scoring model.
+## Graphical states
 
-## Accessibility requirements
+Comparison states use shape as well as restrained color:
 
-- Always name Vata, Pitta, and Kapha in text.
-- Pair every graphic with a plain-language summary.
-- Do not communicate meaning by hue alone; use labels, order, patterns, or markers.
-- Use the same dosha order in both cards.
-- Expose an accessible table or list rather than treating the graphic as a single unlabeled image.
-- Avoid animated transitions by default and respect reduced-motion settings.
-- Do not announce raw percentages unless product and expert review later approves them.
+- Close to usual: stable filled center and even halo;
+- Changed recently: offset companion ring;
+- Recent information only: single filled mark;
+- Usual information only: doubled outline;
+- Not enough information: dotted or muted outline.
 
-## Completeness and freshness
+Selecting a domain opens `/balance/:domain`, shows short usual/recent labels and the neutral comparison, and keeps full source responses in a disclosure. Invalid domain routes return to `/balance`.
 
-Keep these concepts separate from dosha display:
+## Timeline
 
-- **Profile stage:** Preliminary, Developing, or Well established
-- **Current freshness:** Updated today, Updated recently, Update recommended, or More recent answers needed
+The timeline contains at most five equal-size completed-check-in dots in chronological order. Only a few dates are printed. The newest dot receives subtle emphasis, and every point opens its dated summary. Lines indicate sequence only—never magnitude, improvement, a streak, or a reward.
 
-Do not label either measure “diagnostic confidence.” A short count such as “22 of 27 initial questions answered” may be used in a details view, but the primary result should use plain-language stages.
+## Contextual chat
 
-## Alternatives not used in the first prototype
+Ask about this passes the domain, editor labels, full authored responses, and deterministic comparison state to the existing grounded mock/API contract. It provides related approved learning sources but no invented dosha weights, medical meaning, or arbitrary interpretation.
 
-- Pie or donut charts: imply a precise whole and are difficult to compare
-- Radar charts: cognitively heavy and accessibility-poor on mobile
-- Three percentages: imply validation and precision not yet established
-- A single blended graphic: obscures baseline/current separation
-- Animated body or elemental metaphors: premature branding and potentially misleading
+## Accessibility and responsive behavior
 
-## Decisions deferred until scoring review
+- Rings, domains, timeline points, info, and close actions have explicit accessible names.
+- Decorative SVGs are hidden and unfocusable.
+- State is communicated through fill, outline, shape, and text—not color alone.
+- Domain controls remain at least 44 by 44 CSS pixels in a stable 3 × 2 grid.
+- At 390 × 844, 390 × 667, and 360 × 640, the rings remain side by side, horizontal overflow is absent, and bottom navigation does not cover the primary action.
+- Motion is limited to opening details and respects reduced-motion preferences.
 
-- Track-length calculation
-- Single-, dual-, and mixed-label thresholds
-- Whether “near baseline” compares current loads with baseline proportions
-- Minimum coverage required to render each track
-- How stale current answers change or suppress the visualization
+## Why not a radar chart or dosha wheel?
+
+Radar charts imply numeric magnitude. A three-part wheel implies dosha proportions. Neither measurement exists in the reviewed data, so both would invent precision. The current graphics describe representation and explicit answer relationships only.
+
+If expert-approved scoring is introduced later, it must use a separately versioned scoring model, thresholds, review history, and accessible explanation. It must not reinterpret these display keys as weights.

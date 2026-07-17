@@ -52,7 +52,9 @@ export type ChatContextPayload =
       label: string
       usualAnswer?: string
       recentAnswer?: string
-      comparison?: string
+      usualShortLabel?: string
+      recentShortLabel?: string
+      comparison: BalanceComparisonState
     }
   | { type: 'general' }
 
@@ -120,3 +122,4 @@ export interface SafeProfileContext {
 export interface ChatSourceExcerpt extends ChatCitation {
   excerpt: string
 }
+import type { BalanceComparisonState } from '../balance/model'

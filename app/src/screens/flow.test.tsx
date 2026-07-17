@@ -247,9 +247,12 @@ describe('graphical My Balance shell', () => {
     expect(screen.queryByText(/Coverage ready|usable answers|No dosha result calculated/)).not.toBeInTheDocument()
     expect(screen.getByText(/This view summarizes/).closest('details')).not.toHaveAttribute('open')
 
-    await user.click(screen.getByRole('link', { name: 'Sleep: information available' }))
+    await user.click(screen.getByRole('link', { name: 'Sleep: close to usual' }))
     const detail = screen.getByRole('heading', { name: 'Sleep' }).closest('section')
-    expect(detail).toHaveTextContent('Light, interrupted, irregular, or difficult to settle into.')
+    expect(detail).toHaveTextContent('Light and interrupted')
+    expect(detail).toHaveTextContent('Light and variable')
+    expect(detail).toHaveTextContent('Close to usual')
+    expect(screen.getByText('View response details').closest('details')).not.toHaveAttribute('open')
     expect(screen.getByRole('link', { name: 'Ask about this' })).toBeInTheDocument()
   })
 
@@ -260,6 +263,21 @@ describe('graphical My Balance shell', () => {
     })
     expect(screen.getByRole('link', { name: 'Continue' })).toHaveAttribute('href', '/questions/check-in/unfinished-balance')
     expect(screen.getByText('Your completed check-ins will appear here.')).toBeInTheDocument()
+  })
+
+  it('distinguishes uncertain from missing domains and rejects unknown deep links', () => {
+    const sleep = initialAssessment.questions.find((question) => question.assessmentType === 'current' && question.category === 'sleep')!
+    const fallback = sleep.answers.find((answer) => answer.kind !== 'ordinary')!
+    const { unmount } = renderAt('/balance', {
+      resultsReached: true,
+      submittedAnswers: { [sleep.id]: fallback.id },
+    })
+    expect(screen.getByRole('link', { name: 'Sleep: uncertain information' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Energy: no information available' })).toBeInTheDocument()
+
+    unmount()
+    renderAt('/balance/not-a-domain', { resultsReached: true })
+    expect(screen.getByRole('heading', { name: 'My Balance' })).toBeInTheDocument()
   })
 })
 

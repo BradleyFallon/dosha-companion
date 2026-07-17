@@ -32,7 +32,9 @@ Initial-assessment maintenance lives at `/questions/assessment`. It reports Comp
 
 Active repeat check-ins use a focused, no-document-scroll layout. A minimal exit control and progress dots remain fixed above the independently scrollable question region, while the fixed action stays visible above the safe area. Native radio semantics and arrow/Enter keyboard controls are retained.
 
-Check In owns operational tasks and dated records. My Balance is reserved for interpretation or comparison of usual nature and current state; while scoring is unavailable it remains deliberately limited and links back to Check In rather than duplicating history.
+Check In owns operational tasks and dated records. My Balance is a visual reflection rather than a coverage report: two segmented rings communicate represented categories, six domain controls compare the latest recent record with the user’s usual responses, and a five-point timeline opens dated summaries without plotting values. It uses only editor-authored display labels and neutral pattern keys. Same keys display Close to usual; different keys display Changed recently. Missing, fallback, one-sided, or unreviewed metadata never becomes an inferred result.
+
+`/balance/:domain` opens a validated focused detail within the visual composition. Full source responses and the no-score boundary are disclosed on request. My Balance has one Check In/Continue action and does not repeat Settings, location, Learn, coverage repair, or full history controls.
 
 ### Learn and Ask Dosha Companion
 
@@ -40,7 +42,7 @@ The Learn index uses one search field, one compact category selector, and title-
 
 `/chat` presents one dominant question prompt, a compact composer, at most two initial suggestions, and recent conversations only when they exist. `/chat/:threadId` provides a compact expandable context bar, open message layout, conditional suggestions, citations, retry, and a fixed composer. The current client uses scripted mock responses grounded in deterministic local retrieval. `/assistant` redirects to the chat home.
 
-Completed check-ins expose Talk through this check-in without changing their stored answers or usual-nature assessment.
+Completed check-ins expose Talk through this check-in without changing their stored answers or usual-nature assessment. Balance-domain details expose Ask about this with short and full authored response text plus the deterministic neutral comparison; chat receives no invented score or medical interpretation.
 
 ### Settings
 

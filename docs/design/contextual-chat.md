@@ -2,7 +2,7 @@
 
 ## Product principle
 
-Conversation extends an item the user is already viewing. Today guidance, learning articles, regional foods, and completed check-ins expose explicit chat actions; the app does not turn every label, metric, or sentence into an assistant entry point.
+Conversation extends an item the user is already viewing. Today guidance, learning articles, regional foods, completed check-ins, and selected My Balance domains expose explicit chat actions; the app does not turn every label, metric, or sentence into an assistant entry point.
 
 The current implementation is a functional interface prototype backed by deterministic, context-aware mock responses. It does not call an LLM. Existing catalog search remains the retrieval and fallback layer so the interface, persistence, and safety behavior can be reviewed before a paid provider is connected.
 
@@ -14,9 +14,12 @@ The current implementation is a functional interface prototype backed by determi
 | Learning article | Ask about this article | Article summary, body, tags, related articles |
 | Regional seasonal food | Item-specific chat icon | Food, saved region label, current month, dietary pattern, related article |
 | Completed check-in | Talk through this check-in | Completion date plus selected question and answer labels |
+| My Balance domain | Ask about this | Domain, short and full usual/recent responses, and neutral deterministic comparison |
 | Today or Learn assistant cards | Ask Dosha Companion | General catalog-grounded conversation |
 
 Chat does not change profile data, assessment answers, check-ins, recommendation status, or deterministic selection results.
+
+Balance-domain context may say that reviewed pattern keys match, differ, or are unavailable. It must not explain a difference as better, worse, balanced, imbalanced, diagnostic, or a dosha score. Suggested questions focus on what changed, supportive observation, and the relationship to the person’s own usual response.
 
 ## Routes and returns
 

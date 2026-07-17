@@ -2,7 +2,7 @@
 
 ## One idea at a time
 
-Each primary screen has one dominant purpose. Today centers the recommendation, Check In centers starting or continuing a recent-state check-in, Chat centers the question or conversation, Learn centers browsing, and Settings centers the selected section. Secondary destinations remain available without receiving equal visual weight.
+Each primary screen has one dominant purpose. Today centers the recommendation, Check In centers starting or continuing a recent-state check-in, My Balance centers a visual reflection of usual and recent information, Chat centers the question or conversation, Learn centers browsing, and Settings centers the selected section. Secondary destinations remain available without receiving equal visual weight.
 
 ## Reduce text before reducing meaning
 
@@ -22,7 +22,7 @@ Use visible text for less familiar actions such as Add location, Start check-in,
 
 ## Progressive disclosure
 
-The calm default shows what is necessary to understand and act. Disclosures hold recommendation reasoning, weather details, context summaries, boundary explanations, settings controls, detailed check-in choices, full answer history, and assessment coverage. Only one Settings section is open at once. Disclosures must not conceal information required for a safe choice.
+The calm default shows what is necessary to understand and act. Disclosures hold recommendation reasoning, weather details, context summaries, boundary explanations, settings controls, detailed check-in choices, full answer history, assessment coverage, full balance responses, and visualization methodology. Only one Settings section is open at once. Disclosures must not conceal information required for a safe choice.
 
 ## Space and typography
 
@@ -44,5 +44,6 @@ The same interaction model works from 360-pixel phones through desktop. At 390 Ã
 - context titles truncate safely;
 - Settings rows retain large targets;
 - Learn rows remain concise.
+- My Balance rings fit side by side, six domains retain a stable 3 Ã— 2 grid, and the fixed navigation never covers its primary action.
 
 Desktop adds breathing room and a comfortable reading width without introducing different navigation or behavior.

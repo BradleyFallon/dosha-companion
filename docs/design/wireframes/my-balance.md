@@ -2,30 +2,24 @@
 
 ```text
 +--------------------------------------+
-| COVERAGE READY                       |
-| My Balance                           |
+| My Balance                        [i]|
 |                                      |
-| This screen reports coverage only.   |
+|        ( segmented ) ( segmented )   |
+|        (   usual   ) (   recent  )   |
+|            Usual        Recent       |
 |                                      |
-| YOUR USUAL NATURE                    |
-| 19 of 19 usable answers              |
-| 19 categories covered                |
-| No dosha interpretation applied.     |
+|      [sleep] [energy] [appetite]     |
+|    [digestion] [routine] [stress]    |
 |                                      |
-| YOUR CURRENT CHECK-IN                |
-| 7 of 7 usable answers                |
-| 7 categories covered                 |
-| No dosha interpretation applied.     |
+|          ●────●────●────●             |
+|         Jun       Jul   Today         |
 |                                      |
-| NO DOSHA RESULT CALCULATED           |
-| Weights and thresholds are unapproved|
-|                                      |
-| [ Check in and review history      ] |
-| [ Edit profile settings            ] |
-| [ Change regional location         ] |
+|             [ Check In ]             |
 |                                      |
 | [Today] [Check In] [Balance] [Learn]|
 +--------------------------------------+
 ```
 
-Score tracks, percentages, and constitution/current-dosha labels are omitted until expert-approved scoring exists. Check In owns starting, resuming, and reviewing dated records plus initial-assessment maintenance. My Balance does not duplicate that operational history; it is reserved for future approved interpretation and comparison.
+The rings show represented answer categories, not scores or percentages. Domain controls open concise route-backed details with the usual and latest recent editor labels plus a neutral comparison: Close to usual, Changed recently, Recent information only, Usual information only, or Not enough information.
+
+The timeline shows up to five equal completed-check-in points and never connects them to improvement or magnitude. Check In owns operational history; My Balance reflects one latest recent record without merging multiple check-ins.

@@ -56,6 +56,25 @@ async function reachToday(page: Page) {
   await expect(page.getByRole('group', { name: 'Recommendation actions' })).toBeVisible()
 }
 
+async function reachTodayWithFullAssessment(page: Page) {
+  await reachAssessment(page, false)
+  for (let index = 0; index < 19; index += 1) {
+    await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 1))
+    await page.getByRole('radio').first().check()
+    await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled()
+    await page.getByRole('button', { name: 'Continue' }).click()
+  }
+  await page.getByRole('button', { name: 'Continue' }).click()
+  for (let index = 19; index < 27; index += 1) {
+    await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 1))
+    await page.getByRole('radio').first().check()
+    await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled()
+    await page.getByRole('button', { name: 'Continue' }).click()
+  }
+  await expect(page.getByRole('heading', { name: 'Your assessment summary' })).toBeVisible()
+  await page.getByRole('button', { name: 'Go to Today' }).click()
+}
+
 test('discusses a Today recommendation in a persistent focused conversation', async ({ page }) => {
   await reachToday(page)
   await page.getByRole('link', { name: 'Ask about this recommendation' }).click()
@@ -157,6 +176,59 @@ test('talks through a completed check-in with recent-answer context', async ({ p
   await expect(page.getByText(/5 recent answers saved separately/)).toBeVisible()
   await page.getByRole('button', { name: 'What should I keep observing?' }).click()
   await expect(page.getByText(/temporary pattern to observe/)).toBeVisible()
+})
+
+test('explores graphical My Balance patterns without implied scoring', async ({ page }) => {
+  test.setTimeout(60_000)
+  await reachTodayWithFullAssessment(page)
+  await page.getByRole('link', { name: 'Check In', exact: true }).click()
+  await page.getByRole('link', { name: 'Start check-in' }).click()
+  for (let index = 0; index < 5; index += 1) {
+    await page.getByRole('radio').first().check()
+    await page.getByRole('button', { name: index === 4 ? 'Complete check-in' : 'Continue' }).click()
+  }
+  await page.getByRole('link', { name: 'Check In' }).click()
+  await page.getByRole('link', { name: 'My Balance' }).click()
+
+  await expect(page.getByRole('link', { name: 'Usual pattern: 19 of 19 areas represented' })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Recent pattern: 5 of 7 areas represented' })).toBeVisible()
+  await expect(page.getByText('Coverage ready')).not.toBeVisible()
+  await expect(page.getByText(/usable answers/)).not.toBeVisible()
+  await expect(page.getByText('No dosha result calculated')).not.toBeVisible()
+
+  for (const viewport of [{ width: 390, height: 844 }, { width: 390, height: 667 }, { width: 360, height: 640 }]) {
+    await page.setViewportSize(viewport)
+    const domains = page.locator('.balance-domain-control')
+    await expect(domains).toHaveCount(6)
+    for (let index = 0; index < 6; index += 1) {
+      const box = await domains.nth(index).boundingBox()
+      expect(box?.width ?? 0).toBeGreaterThanOrEqual(44)
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(44)
+    }
+    const action = page.locator('.balance-primary-action')
+    await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight }))
+    const actionBox = await action.boundingBox()
+    const navigationBox = await page.getByRole('navigation', { name: 'Primary navigation' }).boundingBox()
+    expect((actionBox?.y ?? 0) + (actionBox?.height ?? 0)).toBeLessThanOrEqual(viewport.height)
+    expect((actionBox?.y ?? 0) + (actionBox?.height ?? 0)).toBeLessThanOrEqual(navigationBox?.y ?? viewport.height)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true)
+    await expect(page.getByRole('navigation', { name: 'Primary navigation' })).toBeVisible()
+  }
+
+  await page.getByRole('link', { name: 'Sleep: close to usual' }).click()
+  await expect(page.getByRole('heading', { name: 'Sleep' })).toBeVisible()
+  await expect(page.getByText('Light and interrupted')).toBeVisible()
+  await expect(page.getByText('Light and variable')).toBeVisible()
+  await expect(page.locator('.balance-comparison-label')).toContainText('Close to usual')
+  await expect(page.getByText('View response details').locator('..')).not.toHaveAttribute('open')
+  await page.getByRole('link', { name: 'Ask about this' }).click()
+  await expect(page.getByRole('button', { name: 'Show context for Sleep' })).toBeVisible()
+  await page.getByRole('link', { name: 'Back to My Balance' }).click()
+  await expect(page.getByRole('heading', { name: 'Sleep' })).toBeVisible()
+  await page.getByRole('link', { name: /Open check-in from/ }).click()
+  await expect(page.getByText('5 answers')).toBeVisible()
+  await page.goBack()
+  await expect(page.getByRole('heading', { name: 'Sleep' })).toBeVisible()
 })
 
 test('completes the short mobile vertical slice', async ({ page }) => {
@@ -425,7 +497,7 @@ test('uses every post-assessment destination in the mobile demo', async ({ page 
   await expect(page.getByRole('link', { name: /Review .* check-in/ }).first()).toBeVisible()
 
   await page.getByRole('link', { name: 'My Balance' }).click()
-  await expect(page.getByText('1 completed')).toBeVisible()
+  await expect(page.getByRole('link', { name: /Recent pattern:/ })).toBeVisible()
   await page.getByRole('link', { name: 'Learn', exact: true }).click()
   await page.getByLabel('Search articles').fill('routine')
   await page.getByRole('link', { name: /Routine and consistency/i }).click()

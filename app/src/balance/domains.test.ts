@@ -15,7 +15,7 @@ describe('balance domain definitions', () => {
       'routine',
       'stress',
     ])
-    expect(balanceDomains.every((domain) => domain.baselineCategory && domain.currentCategory && domain.icon)).toBe(true)
+    expect(balanceDomains.every((domain) => domain.baselineCategory && domain.currentCategory && domain.defaultIconKey)).toBe(true)
     expect(balanceDomains.find((domain) => domain.id === 'stress')).toMatchObject({
       baselineCategory: 'stress_response',
       currentCategory: 'stress_response',

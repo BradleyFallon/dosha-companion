@@ -3,7 +3,8 @@ import { selectDailyRecommendation } from '../content/recommendations'
 import { getSeasonalProduce } from '../content/seasonalProduce'
 import { initialAssessment } from '../generated/initialAssessment'
 import { calculateAssessmentCoverage } from '../quiz/coverage'
-import { balanceDomains, isBalanceDomain } from '../balance/domains'
+import { isBalanceDomain } from '../balance/domains'
+import { buildBalanceViewModel, comparisonLabel } from '../balance/model'
 import type { PrototypeState } from '../prototype/state'
 import type {
   ChatContextReference,
@@ -52,21 +53,13 @@ export function resolveChatContext(
 
 function resolveBalanceDomain(id: string, state: PrototypeState): ResolvedChatContext | null {
   if (!isBalanceDomain(id)) return null
-  const domain = balanceDomains.find((candidate) => candidate.id === id)
+  const domain = buildBalanceViewModel(state).domains.find((candidate) => candidate.id === id)
   if (!domain) return null
-  const latest = state.checkIns
-    .filter((checkIn) => checkIn.completedAt)
-    .sort((left, right) => new Date(right.completedAt!).getTime() - new Date(left.completedAt!).getTime())[0]
-  const recentAnswers = latest?.answers ?? state.submittedAnswers
-  const recentQuestion = initialAssessment.questions.find((question) => question.assessmentType === 'current' && question.category === domain.currentCategory)
-  const usualQuestion = initialAssessment.questions.find((question) => question.assessmentType === 'baseline' && question.category === domain.baselineCategory)
-  const recentAnswer = recentQuestion?.answers.find((answer) => answer.id === recentAnswers[recentQuestion.id])
-  const usualAnswer = usualQuestion?.answers.find((answer) => answer.id === state.submittedAnswers[usualQuestion.id])
   return {
     reference: { type: 'balance-domain', id, sourcePath: `/balance/${id}` },
     title: domain.label,
     subtitle: 'My Balance',
-    summary: recentAnswer ? `Recent ${domain.label.toLowerCase()}: ${recentAnswer.text}` : `No recent ${domain.label.toLowerCase()} information is available.`,
+    summary: `${domain.label}: ${comparisonLabel(domain.comparison).toLowerCase()}.`,
     sourcePath: `/balance/${id}`,
     suggestedQuestions: [
       'What changed here?',
@@ -78,8 +71,11 @@ function resolveBalanceDomain(id: string, state: PrototypeState): ResolvedChatCo
       type: 'balance-domain',
       domain: id,
       label: domain.label,
-      usualAnswer: usualAnswer?.text,
-      recentAnswer: recentAnswer?.text,
+      usualAnswer: domain.usual?.fullText,
+      recentAnswer: domain.recent?.fullText,
+      usualShortLabel: domain.usual?.shortLabel,
+      recentShortLabel: domain.recent?.shortLabel,
+      comparison: domain.comparison,
     },
   }
 }

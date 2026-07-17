@@ -37,6 +37,7 @@ import {
   MapPinArea,
   MoonStars,
   PaperPlaneTilt,
+  PersonSimple,
   PlusCircle,
   QuestionMark,
   Quotes,
@@ -100,6 +101,7 @@ export const AppetiteIcon = BowlFood
 export const DigestionIcon = Spiral
 export const RoutineIcon = ArrowsClockwise
 export const StressIcon = Waves
+export const BodyQualitiesIcon = PersonSimple
 
 // Weather and local context
 export const ClearWeatherIcon = Sun

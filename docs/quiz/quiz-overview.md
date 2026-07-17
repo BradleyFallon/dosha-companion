@@ -324,6 +324,12 @@ After the initial assessment, Check In should present one primary recent-state t
 
 The system should not require daily participation. Dated check-ins should feel like optional reflection rather than an endless unfinished test.
 
+## My Balance visualization
+
+My Balance visualizes only supplied information. Segmented rings count represented categories; they do not encode magnitude, confidence, dosha proportions, or percentages. Six domain controls cover sleep, energy, appetite, digestion, routine, and stress.
+
+Answer options may include editor-authored `short_label`, controlled `icon_key`, and neutral `pattern_key` fields. Comparison uses the latest completed check-in without merging records. Matching reviewed keys mean Close to usual; different reviewed keys mean Changed recently. A source answer explicitly authored as close to usual may use the domain’s `_usual` sentinel. Missing or fallback responses and absent metadata remain unclassified.
+
 ## Repetition and answer freshness
 
 Different answers require different update schedules.

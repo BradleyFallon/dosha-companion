@@ -64,8 +64,11 @@ This is a low-fidelity inventory of reusable interaction patterns. Names describ
 | Profile-stage badge | Preliminary, Developing, Well established | Current stage with plain explanation |
 | Nature card | Baseline label and explanation | Available, needs more baseline information |
 | Current-balance card | Recent label, date, and freshness | Fresh, aging, stale, needs answers |
-| Dosha comparison | Accessible three-part relative visualization | Baseline, current; data table/text fallback |
 | Completeness summary | Coverage and next useful action | Preliminary, developing, established |
+| Pattern coverage ring | Show represented usual or recent categories without percentages | Represented and unrepresented segments |
+| Balance domain control | Open one usual/recent domain comparison | Close to usual, changed, recent only, usual only, uncertain, missing |
+| Domain detail | Show concise editor labels, neutral relationship, response disclosure, and chat entry | Route-selected, invalid route fallback |
+| Check-in timeline | Open one of the five latest completed records without implying a trend | Empty, one to five records, latest |
 
 ## Today and content
 

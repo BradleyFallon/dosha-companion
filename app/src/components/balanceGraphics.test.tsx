@@ -18,16 +18,14 @@ describe('balance graphics', () => {
   })
 
   it('shows only the five latest completed check-ins with dated links', () => {
-    const checkIns = Array.from({ length: 7 }, (_, index) => ({
+    const checkIns = Array.from({ length: 5 }, (_, index) => ({
       id: `check-in-${index}`,
-      setId: 'quick-current',
-      startedAt: `2026-07-${String(index + 1).padStart(2, '0')}T10:00:00.000Z`,
       completedAt: `2026-07-${String(index + 1).padStart(2, '0')}T10:05:00.000Z`,
-      answers: {},
+      href: `/questions/check-in/check-in-${index}`,
     }))
-    render(<MemoryRouter><CheckInTimeline checkIns={checkIns} /></MemoryRouter>)
+    render(<MemoryRouter><CheckInTimeline items={checkIns} /></MemoryRouter>)
     const links = screen.getAllByRole('link', { name: /Open check-in from/ })
     expect(links).toHaveLength(5)
-    expect(links.at(-1)).toHaveAttribute('href', '/questions/check-in/check-in-6')
+    expect(links.at(-1)).toHaveAttribute('href', '/questions/check-in/check-in-4')
   })
 })

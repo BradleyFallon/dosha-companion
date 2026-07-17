@@ -50,11 +50,11 @@ export class MockChatClient implements ChatClient {
         }
       case 'balance-domain':
         return {
-          answer: anchor.recentAnswer
-            ? `Your recent ${anchor.label.toLowerCase()} response records “${anchor.recentAnswer}”${anchor.usualAnswer ? ` alongside the usual pattern you supplied` : ''}. The app can describe that information, but it does not calculate a dosha score or diagnosis from it.`
+          answer: anchor.recentShortLabel
+            ? `Your recent ${anchor.label.toLowerCase()} response, “${anchor.recentShortLabel},” ${anchor.comparison === 'close-to-usual' ? 'matches the neutral pattern key on your usual response' : anchor.comparison === 'changed-from-usual' ? 'uses a different neutral pattern key from your usual response' : 'is recorded without enough reviewed information for a direct comparison'}. The app records this relationship but does not interpret it as a diagnosis, improvement, or dosha score.`
             : `There is not enough recent ${anchor.label.toLowerCase()} information to compare yet. The app does not fill that gap with an inferred score or interpretation.`,
           citations,
-          suggestedFollowUps: ['What should I keep observing?', 'How is recent information kept separate?', 'Where can I review my responses?'],
+          suggestedFollowUps: ['What changed here?', 'How might I support this area?', 'How does this relate to my usual pattern?'],
           boundary: null,
         }
       case 'general':

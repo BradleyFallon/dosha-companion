@@ -1,13 +1,4 @@
-import type { ComponentType } from 'react'
-import {
-  AppetiteIcon,
-  DigestionIcon,
-  EnergyIcon,
-  RoutineIcon,
-  SleepIcon,
-  StressIcon,
-  type IconProps,
-} from '../ui/icons'
+import type { BalanceIconKey } from '../generated/initialAssessment'
 
 export type BalanceDomain =
   | 'sleep'
@@ -22,18 +13,18 @@ export type DomainInformationState = 'available' | 'uncertain' | 'missing'
 export interface BalanceDomainDefinition {
   id: BalanceDomain
   label: string
-  icon: ComponentType<IconProps>
+  defaultIconKey: BalanceIconKey
   baselineCategory: string
   currentCategory: string
 }
 
 export const balanceDomains: readonly BalanceDomainDefinition[] = [
-  { id: 'sleep', label: 'Sleep', icon: SleepIcon, baselineCategory: 'sleep', currentCategory: 'sleep' },
-  { id: 'energy', label: 'Energy', icon: EnergyIcon, baselineCategory: 'energy', currentCategory: 'energy' },
-  { id: 'appetite', label: 'Appetite', icon: AppetiteIcon, baselineCategory: 'appetite', currentCategory: 'appetite' },
-  { id: 'digestion', label: 'Digestion', icon: DigestionIcon, baselineCategory: 'digestion', currentCategory: 'digestion' },
-  { id: 'routine', label: 'Routine', icon: RoutineIcon, baselineCategory: 'routine', currentCategory: 'routine' },
-  { id: 'stress', label: 'Stress', icon: StressIcon, baselineCategory: 'stress_response', currentCategory: 'stress_response' },
+  { id: 'sleep', label: 'Sleep', defaultIconKey: 'moon-stars', baselineCategory: 'sleep', currentCategory: 'sleep' },
+  { id: 'energy', label: 'Energy', defaultIconKey: 'lightning', baselineCategory: 'energy', currentCategory: 'energy' },
+  { id: 'appetite', label: 'Appetite', defaultIconKey: 'bowl-food', baselineCategory: 'appetite', currentCategory: 'appetite' },
+  { id: 'digestion', label: 'Digestion', defaultIconKey: 'spiral', baselineCategory: 'digestion', currentCategory: 'digestion' },
+  { id: 'routine', label: 'Routine', defaultIconKey: 'arrows-clockwise', baselineCategory: 'routine', currentCategory: 'routine' },
+  { id: 'stress', label: 'Stress', defaultIconKey: 'waves', baselineCategory: 'stress_response', currentCategory: 'stress_response' },
 ] as const
 
 export function isBalanceDomain(value: string | undefined): value is BalanceDomain {
