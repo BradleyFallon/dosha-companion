@@ -14,4 +14,4 @@ Do not treat this file as a specification or durable decision record.
 
 ## Inbox
 
--
+- Explore organizing Learn into topical horizontal rows, such as dosha foundations and nutrition.
