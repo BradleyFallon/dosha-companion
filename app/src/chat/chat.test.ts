@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { getCheckInQuestionSet } from '../content/repository'
 import { getSeasonalProduce } from '../content/seasonalProduce'
 import { initialAssessment } from '../generated/initialAssessment'
 import { createTestState, type PrototypeState } from '../prototype/state'
 import { validateChatApiResponse, type ChatApiRequest } from './api'
-import { MockChatClient } from './client'
+import { ApiChatClient, createChatClient, MockChatClient } from './client'
 import { resolveChatContext } from './context'
 import { buildSafeProfileContext } from './profile'
 import { retrieveChatSources } from './retrieval'
@@ -130,6 +130,42 @@ describe('mock chat client and API contract', () => {
       suggestedFollowUps: [],
       boundary: null,
     })).toThrow(/invalid response/)
+  })
+})
+
+describe('API chat client', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
+  })
+
+  it('selects API mode and posts the existing contract to the local endpoint', async () => {
+    const state = completedState()
+    const context = resolveChatContext({ type: 'general', id: 'general', sourcePath: '/today' }, state)!
+    const request = requestFor(context, state)
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        answer: 'Grounded local API answer',
+        citations: [],
+        suggestedFollowUps: ['Tell me more'],
+        boundary: null,
+      }),
+    })
+    vi.stubEnv('VITE_CHAT_MODE', 'api')
+    vi.stubGlobal('fetch', fetchMock)
+
+    const client = createChatClient()
+    expect(client).toBeInstanceOf(ApiChatClient)
+    await expect(client.send(request)).resolves.toMatchObject({
+      answer: 'Grounded local API answer',
+      boundary: null,
+    })
+    expect(fetchMock).toHaveBeenCalledWith('/api/chat', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(request),
+    })
   })
 })
 

@@ -3,6 +3,7 @@ import {
   type ChatApiRequest,
   type ChatApiResponse,
 } from './api'
+import { deterministicBoundaryResponse } from './boundaries'
 
 export interface ChatClient {
   send(request: ChatApiRequest): Promise<ChatApiResponse>
@@ -14,7 +15,7 @@ export class MockChatClient implements ChatClient {
     if (/simulate mock failure/i.test(request.message)) {
       throw new Error('Dosha Companion could not respond right now.')
     }
-    const boundary = detectBoundary(request.message)
+    const boundary = deterministicBoundaryResponse(request.message)
     if (boundary) return boundary
 
     const anchor = request.context.anchors[0] ?? { type: 'general' as const }
@@ -90,32 +91,4 @@ function generalAnswer(request: ChatApiRequest) {
   const first = request.context.sources[0]
   if (!first) return 'I could not find enough approved learning content to answer that. Try asking about Vata, current balance, routines, check-ins, or Today guidance.'
   return `${first.title} is the closest match in the app’s learning catalog. ${first.excerpt} This answer is grounded in the linked app content and does not change any assessment or recommendation result.`
-}
-
-function detectBoundary(message: string): ChatApiResponse | null {
-  if (/(suicid|kill myself|can['’]?t breathe|chest pain|medical emergency)/i.test(message)) {
-    return {
-      answer: 'This may need immediate, real-world help. Contact local emergency services or a qualified crisis service now; this educational app cannot respond to emergencies.',
-      citations: [],
-      suggestedFollowUps: [],
-      boundary: 'emergency',
-    }
-  }
-  if (/(stop|start|change|skip).{0,30}(medication|medicine|prescription)|medication.{0,30}(stop|change)/i.test(message)) {
-    return {
-      answer: 'Do not start, stop, or change medication based on this app. A prescribing clinician or pharmacist can help you make that decision safely.',
-      citations: [],
-      suggestedFollowUps: [],
-      boundary: 'medication',
-    }
-  }
-  if (/(do i have|diagnos|treat|cure).{0,40}(disorder|infection|disease|anxiety|condition)|treat an infection/i.test(message)) {
-    return {
-      answer: 'Dosha Companion cannot diagnose or treat a medical or mental-health condition. Please ask a qualified clinician for an assessment or treatment advice.',
-      citations: [],
-      suggestedFollowUps: ['What educational wellness topics can you explain?'],
-      boundary: 'medical',
-    }
-  }
-  return null
 }

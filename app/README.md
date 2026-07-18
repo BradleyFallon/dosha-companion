@@ -4,7 +4,7 @@ This directory contains a low-fidelity mobile-first prototype of the first produ
 
 > Welcome → required profile setup → assessment → coverage → interactive Today → check-ins → Learn and guided content search
 
-It is a content-driven browser-local demo, not a production application. Coverage, repeatable current check-ins, recommendation rotation/history, Learn, deterministic content search, Settings export/reset, and a development demo seed are functional. Authentication, dosha scoring, expert approval, subscriptions, AI, and synchronization remain unavailable or simulated.
+It is a content-driven browser-local demo, not a production application. Coverage, repeatable current check-ins, recommendation rotation/history, Learn, deterministic content search, Settings export/reset, and a development demo seed are functional. Local development can optionally use OpenAI for grounded chat; authentication, dosha scoring, expert approval, subscriptions, production chat infrastructure, and synchronization remain unavailable.
 
 ## Stack
 
@@ -15,6 +15,7 @@ It is a content-driven browser-local demo, not a production application. Coverag
 - Typed reducer/context state with versioned `localStorage`
 - Papa Parse for build-time canonical CSV ingestion
 - MapLibre GL JS for optional map-based location selection
+- Optional server-side OpenAI Responses API integration during local Vite development
 - Vitest, React Testing Library, and Playwright
 
 The prototype stack decision is recorded in [`../decisions/0002-web-prototype-stack.md`](../decisions/0002-web-prototype-stack.md).
@@ -55,6 +56,33 @@ npm run preview
 ```
 
 `dev`, `test`, `test:e2e`, and `build` automatically run quiz and content generation first. Editor-owned content lives in `../content/`; see [`../content/editor-guide.md`](../content/editor-guide.md). In a development session, Settings → **Load seeded demo** creates representative coverage and check-in history for fast review. The helper is excluded from production builds.
+
+## Local OpenAI chat
+
+`npm run dev` automatically enables real grounded chat when either `OPENAI_API_KEY` is already in the process environment or an ignored `apikey.txt` containing the raw key exists at the repository root. If neither source is present, development falls back to deterministic mock replies.
+
+The repository-local setup is:
+
+```sh
+cd app
+npm install
+# Place the raw project key in ../apikey.txt using a text editor.
+npm run dev
+```
+
+Do not commit `apikey.txt`. It is ignored at the repository root, read only by the local development launcher, and passed to Vite’s Node process without entering browser code.
+
+The standard environment-file setup remains available:
+
+```sh
+cd app
+cp .env.example .env.local
+npm run dev
+```
+
+The optional `OPENAI_CHAT_MODEL` defaults to `gpt-5-mini`. The key is loaded only by Vite’s Node process and is never copied into browser environment variables. The browser sends the current question, up to 12 recent thread messages, selected safe profile context, context anchors, and retrieved app source excerpts to the local `/api/chat` route. The route uses strict structured output and discards citations that do not exactly match a supplied app source.
+
+Use `npm run dev:mock` to force mock chat even when a local key exists. Playwright always uses this explicit mock path, so tests and CI never make paid model calls. The `/api/chat` middleware exists only during `npm run dev`; it is not a production deployment architecture and does not provide authentication, rate limiting, durable storage, or operational monitoring.
 
 ## Full and short-demo assessment modes
 
@@ -113,7 +141,7 @@ Users can mark the daily focus complete, dismiss it, show another, open related 
 
 ## Learn, Guided help, and check-ins
 
-Learn lists nine editable Markdown articles, category/search filters, article detail routes, related reading, and an eight-term glossary. Guided help searches article titles, summaries, tags, bodies, glossary terms, and recommendation rationales. It is explicitly deterministic content search, not an LLM or chat simulation.
+Learn lists nine editable Markdown articles, category/search filters, article detail routes, related reading, and an eight-term glossary. Guided help searches article titles, summaries, tags, bodies, glossary terms, and recommendation rationales. Ask Dosha Companion uses either deterministic mock replies or the optional grounded local OpenAI mode described above.
 
 Questions can repair initial coverage or start a five- or seven-question repeatable current check-in. Check-ins reference canonical current questions, have their own start/completion dates and answers, and never overwrite baseline or initial current answers. My Balance summarizes both initial coverage and dated check-in history without dosha interpretation.
 
@@ -196,6 +224,6 @@ The plain Vite `Network` URL remains useful for checking layout on the same trus
 - Profile and assessment progress are stored only in the current browser with a validated, versioned allow-list. They are not secure account records and do not sync across devices.
 - Dosha scoring remains unavailable because numerical weights and thresholds are blank and unapproved. Vata–Pitta labels exist only in the explicit development fixture adapter.
 - Today guidance is deterministically selected provisional catalog copy. Completion history is a demo interaction, not adherence or outcome evidence.
-- Guided help is literal catalog search, not a conversational assistant. There are no LLM, payment, or entitlement calls.
+- Real model chat is a local-development integration only. The static build has no production API host, authentication, rate limiting, entitlement checks, or secret management.
 - There is no backend, database, CMS, analytics SDK, weather API, reverse-geocoding service, recipe system, notification system, or medical logic.
 - Error, offline, account recovery, and production privacy behavior need dedicated implementation after product validation.

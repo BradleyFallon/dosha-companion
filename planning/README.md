@@ -81,6 +81,7 @@ No additional item is queued while moderated usability research is active.
 
 ### Recently completed
 
+- [ENG-002 — Connect chat to the OpenAI API](done/ENG-002-connect-chat-to-openai.md)
 - [EXP-008 — Unify question flow presentation](done/EXP-008-unify-question-flow-presentation.md)
 - [EXP-004 — Reduce dashboard and card styling](done/EXP-004-reduce-card-styling.md)
 - [EXP-005 — Add joyful completion motion](done/EXP-005-joyful-completion-motion.md)

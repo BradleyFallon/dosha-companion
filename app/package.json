@@ -11,7 +11,8 @@
     "generate:content": "node scripts/generate-content.mjs",
     "generate": "npm run generate:quiz && npm run generate:content",
     "predev": "npm run generate",
-    "dev": "vite --host 0.0.0.0",
+    "dev": "node scripts/dev.mjs",
+    "dev:mock": "node scripts/dev.mjs --mock-chat",
     "typecheck": "tsc -b",
     "lint": "oxlint .",
     "pretest": "npm run generate",
@@ -26,6 +27,7 @@
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
     "maplibre-gl": "^5.24.0",
+    "openai": "^6.48.0",
     "papaparse": "^5.5.4",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

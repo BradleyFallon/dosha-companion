@@ -12,7 +12,7 @@ User question
 → render answer, known in-app citations, and follow-ups
 ```
 
-The active `MockChatClient` returns scripted context-aware responses. `ApiChatClient` defines the future `POST /api/chat` behavior but is inactive unless `VITE_CHAT_MODE=api` is explicitly selected. No provider key or provider-specific request is present in browser code.
+`MockChatClient` remains the default and returns scripted context-aware responses. When local development explicitly selects `VITE_CHAT_MODE=api`, `ApiChatClient` posts the same provider-independent contract to Vite’s development-only `POST /api/chat` middleware. The middleware owns the OpenAI SDK, model configuration, grounding instructions, and API key; none of those provider details are included in browser code.
 
 ## Modules
 
@@ -23,9 +23,12 @@ The active `MockChatClient` returns scripted context-aware responses. `ApiChatCl
 | `chat/retrieval.ts` | Reuse deterministic catalog search and add anchored sources |
 | `chat/profile.ts` | Select only profile fields relevant to the active anchor |
 | `chat/api.ts` | Provider-independent request/response contracts and runtime response validation |
-| `chat/client.ts` | Mock client, future fetch client, and environment-based factory |
+| `chat/client.ts` | Mock client, thin API transport, and environment-based factory |
+| `chat/boundaries.ts` | Shared deterministic emergency, medication-change, and medical boundaries |
+| `chat/request.ts` | Bounded runtime request validation and history normalization |
 | `chat/returnTargets.ts` | Allowlisted source returns and safe contextual entry URLs |
 | `prototype/state.ts` | Browser-local bounded thread persistence and sanitization |
+| `server/chatApi.ts` | Local Vite middleware, OpenAI Responses request, strict output, and server-side citation filtering |
 
 Screens never build provider prompts. They resolve a known anchor, retrieve sources, build the safe summary, and submit the typed contract.
 
@@ -39,7 +42,7 @@ Safe profile context may include a preferred name, dietary pattern, parsed food 
 
 The existing deterministic content search remains intact. Retrieval prioritizes the anchor’s known recommendation, article, seasonal-food, or check-in source IDs, then adds scored article, glossary, and recommendation matches. It returns at most five excerpts.
 
-The mock client can cite only sources included in the request. The UI performs a second exact ID/type/href comparison before persisting a citation. Persisted citations are sanitized against current local catalogs. External web citations are not supported.
+The mock client can cite only sources included in the request. In API mode, the server replaces model citations with the matching supplied source record and removes unknown or duplicate citations. The UI performs a second exact ID/type/href comparison before persisting a citation. Persisted citations are sanitized against current local catalogs. External web citations are not supported.
 
 ## Persistence
 
@@ -57,16 +60,22 @@ The newest 20 threads and newest 40 messages per thread are retained. A pending 
 
 Chat explains product results but does not select or modify them. Assessment coverage, future scoring, recommendation eligibility and selection, food safety filtering, readiness, weather, regional seasonality, and check-in completion remain deterministic application logic.
 
-## Connecting a real server later
+## Local model boundary
 
-Before enabling API mode:
+The current real-model path exists only inside `npm run dev`. The development launcher loads an existing `OPENAI_API_KEY` or the raw value from the ignored repository-root `apikey.txt`, then selects API chat automatically. Without a key it falls back to mock chat; `npm run dev:mock` always forces mock behavior and is the Playwright/CI startup path.
 
-1. implement a server-owned `/api/chat` endpoint;
-2. keep provider credentials only on the server;
-3. validate the request again and independently rebuild or verify authorized context;
-4. enforce authentication, rate limits, abuse controls, retention, observability, and provider timeouts;
-5. ground the model only in approved retrieved sources;
-6. return the existing provider-independent response contract;
-7. complete medical-safety and editorial review.
+The API path uses the OpenAI Responses API with response storage disabled, low reasoning effort, no tools or web search, and strict structured output matching `ChatApiResponse`. Deterministic emergency, medication-change, and clear diagnosis/treatment messages return before any model call.
+
+The route limits body size, context collections, history, messages, and excerpts. Browser-local messages remain the conversation source of record; no OpenAI conversation is created or retained by the app.
+
+## Production server later
+
+Before deploying real chat:
+
+1. replace development middleware with a deployed server-owned endpoint;
+2. independently rebuild or verify authorized context rather than trusting browser-supplied content;
+3. enforce authentication, rate limits, abuse controls, retention, observability, and provider timeouts;
+4. define operational secret management and provider data controls;
+5. complete medical-safety, privacy, and editorial review.
 
 The browser-side `ApiChatClient` should remain a thin transport. Provider selection, model names, API keys, prompts, and sampling controls do not belong in normal Settings.
