@@ -12,6 +12,7 @@ export type ProfileRequirement =
 
 export interface ProfileReadiness {
   coreReady: boolean
+  onboardingReady: boolean
   foodReady: boolean
   nameReady: boolean
   locationReady: boolean
@@ -35,6 +36,7 @@ export function getProfileReadiness(profile: ProfileState): ProfileReadiness {
 
   return {
     coreReady: missingCore.length === 0,
+    onboardingReady: missingCore.length === 0 && locationReady,
     foodReady: missingFood.length === 0,
     nameReady: missingName.length === 0,
     locationReady,

@@ -6,9 +6,9 @@
 
 ### Sign up and profile setup
 
-The demo begins directly with a two-step core profile: preferred name and adult year of birth, followed by dietary pattern and explicit allergy/exclusion status. Allergy or exclusion details are required after Yes. Location is not required for core participation; it is requested contextually only when the user chooses localized weather, daylight, season, or food features.
+The demo begins directly with a three-step profile: preferred name and adult year of birth, regional location, then dietary pattern and explicit allergy/exclusion status. Allergy or exclusion details are required after Yes. The location step offers device, map, and city-search paths and persists only a coarse region.
 
-Readiness distinguishes `coreReady` from `localizedContentReady`. Assessment and application routes require the core profile, while a regional location moves localized content from “not provided yet” to available.
+Readiness distinguishes identity-and-food `coreReady`, `locationReady`, combined `onboardingReady`, and `localizedContentReady`. Assessment and application routes require the combined onboarding state. Location remains editable or removable later through allowlisted return paths without altering assessment answers.
 
 ### Initial questions and Results
 
@@ -20,7 +20,7 @@ Normal Results never display a dosha label because weights and thresholds remain
 
 Today is centered on one deterministically selected recommendation: concept icon, title, one action sentence, and compact Complete, Show another, and Ask controls. One information disclosure contains longer guidance, related actions, optional filtered food, exact rule reasons, and Dismiss. Two secondary shortcuts lead to Check in and Learn.
 
-Without location Today shows one contextual benefit card and makes no weather request. With location it shows a visual weather summary and up to four compact seasonal-food rows. The weather default contains current conditions, high/low, and precipitation; feels-like, daylight, season, and forecast area are disclosed on request. Recommendation selection remains deterministic; chat can only explain it.
+With the onboarding location, Today shows a visual weather summary and up to four compact seasonal-food rows. The weather default contains current conditions, high/low, and precipitation; feels-like, daylight, season, and forecast area are disclosed on request. If a safely restored legacy state has no location, Today shows one benefit card and makes no weather request. Recommendation selection remains deterministic; chat can only explain it.
 
 ### Check In and My Balance
 

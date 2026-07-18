@@ -40,10 +40,10 @@ function PrototypeRoutes() {
         <Route path="/create-account" element={<Navigate to="/profile/name" replace />} />
         <Route path="/profile/name" element={<NameProfileScreen />} />
         <Route path="/profile/location" element={<Guard allowed={readiness.nameReady} redirect={resumePath}><Suspense fallback={<section className="screen"><p role="status">Loading location options…</p></section>}><LocationProfileScreen /></Suspense></Guard>} />
-        <Route path="/profile/food" element={<Guard allowed={readiness.nameReady} redirect={resumePath}><FoodProfileScreen /></Guard>} />
-        <Route path="/assessment" element={<Guard allowed={readiness.coreReady && state.profileCompleted} redirect={resumePath}><AssessmentIntroScreen /></Guard>} />
-        <Route path="/assessment/question/:id" element={<Guard allowed={readiness.coreReady && state.assessmentStarted} redirect={resumePath}><QuestionScreen /></Guard>} />
-        <Route path="/assessment/transition" element={<Guard allowed={readiness.coreReady && state.assessmentStarted} redirect={resumePath}><TransitionScreen /></Guard>} />
+        <Route path="/profile/food" element={<Guard allowed={readiness.nameReady && readiness.locationReady} redirect={resumePath}><FoodProfileScreen /></Guard>} />
+        <Route path="/assessment" element={<Guard allowed={readiness.onboardingReady && state.profileCompleted} redirect={resumePath}><AssessmentIntroScreen /></Guard>} />
+        <Route path="/assessment/question/:id" element={<Guard allowed={readiness.onboardingReady && state.assessmentStarted} redirect={resumePath}><QuestionScreen /></Guard>} />
+        <Route path="/assessment/transition" element={<Guard allowed={readiness.onboardingReady && state.assessmentStarted} redirect={resumePath}><TransitionScreen /></Guard>} />
         <Route path="/results" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><ResultScreen /></Guard>} />
         <Route path="/today" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><TodayScreen /></Guard>} />
         <Route path="/questions" element={<Guard allowed={readiness.coreReady && state.resultsReached} redirect={resumePath}><QuestionsScreen /></Guard>} />

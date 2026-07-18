@@ -54,12 +54,12 @@ Low-fidelity mobile layouts for welcome, account entry, profile setup, and the h
 +--------------------------------------+
 ```
 
-## Profile setup — 1 of 2
+## Profile setup — 1 of 3
 
 ```text
 +--------------------------------------+
-| < Back                    Step 1 of 2 |
-| [=================-----------------] |
+| < Back                    Step 1 of 3 |
+| [===========-----------------------] |
 |                                      |
 | Let’s personalize the experience     |
 |                                      |
@@ -76,11 +76,31 @@ Low-fidelity mobile layouts for welcome, account entry, profile setup, and the h
 +--------------------------------------+
 ```
 
-## Profile setup — 2 of 2
+## Profile setup — 2 of 3
 
 ```text
 +--------------------------------------+
-| < Back                    Step 2 of 2 |
+| < Back                    Step 2 of 3 |
+| [======================------------] |
+|                                      |
+| Choose your general area             |
+|                                      |
+| [ Use my current location          ] |
+| [ Choose on map                    ] |
+|                                      |
+| Search for your city                 |
+| [ City or region                  ] |
+|                                      |
+| Only a roughly 10 km region is       |
+| saved.                               |
++--------------------------------------+
+```
+
+## Profile setup — 3 of 3
+
+```text
++--------------------------------------+
+| < Back                    Step 3 of 3 |
 | [==================================] |
 |                                      |
 | Food preferences and exclusions     |
@@ -99,9 +119,9 @@ Low-fidelity mobile layouts for welcome, account entry, profile setup, and the h
 +--------------------------------------+
 ```
 
-## Contextual location setup
+## Later location editing
 
-Localized surfaces first explain the benefit and link here with an allowlisted return destination.
+After onboarding, Settings or a localized surface can link back to the same location controls with an allowlisted return destination.
 
 ```text
 +--------------------------------------+
@@ -123,7 +143,8 @@ Localized surfaces first explain the benefit and link here with an allowlisted r
 ## Notes and states
 
 - Profile progress is saved between steps.
-- Core onboarding does not ask for location; localized surfaces explain the benefit before linking to the contextual flow.
+- Normal onboarding requires a regional location before the food-safety step and assessment.
+- Later location edits reuse the same controls and return to the requesting surface.
 - Validation appears below the relevant field without clearing other values.
 - Device location is requested only after an explicit action and uses a single lookup, not continuous tracking.
 - Exact coordinates may position the live pin, but persistence and downstream context use only a coarse area.

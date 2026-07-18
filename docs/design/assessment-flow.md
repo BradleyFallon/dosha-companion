@@ -40,7 +40,8 @@ flowchart TD
 | ----- | --------- | -------------- | ----------------- |
 | Welcome | Product category, tagline, brief value, boundary link | Get started | Wellness disclaimer |
 | Profile 1 | Preferred name and adult year of birth | Continue | Back |
-| Profile 2 | Dietary pattern and explicit allergy/exclusion status | Save and continue | Back |
+| Profile 2 | Regional location choices and coarse-location privacy boundary | Use selected region | Back; device location; map; city search |
+| Profile 3 | Dietary pattern and explicit allergy/exclusion status | Save and continue | Back |
 | Assessment intro | Time, two sections, saving, skip, educational boundary | Begin assessment | Exit |
 | Baseline question | “Your usual nature,” progress, prompt, answers | Continue after selection | Not sure; skip; back; save and exit |
 | Transition | Explicit shift from lifetime to past-seven-days frame | Continue | Save and exit |
@@ -49,7 +50,7 @@ flowchart TD
 | Coverage result | Separate baseline/current coverage and scoring boundary | Go to Today | Repair coverage |
 | Today | Daily focus and practical action | View action or guidance | Check In; why chosen; AI entry |
 
-Location is collected contextually after core onboarding. The location route requires only completed name and birth-year fields and safely returns to Today, Settings, Learn, or My Balance through an allowlisted return key.
+The normal onboarding path collects a regional location between identity and food-safety fields. Device, map, and city-search choices all persist only a coarse region. After onboarding, the same route safely returns to Today, Settings, Learn, or My Balance through an allowlisted return key when the user edits or removes location.
 
 ## Question-screen behavior
 

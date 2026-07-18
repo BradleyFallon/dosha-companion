@@ -13,20 +13,25 @@ async function reachLocation(page: Page) {
   await page.getByLabel('Preferred name').fill('Alex')
   await page.getByLabel('Year of birth').fill('1990')
   await page.getByRole('button', { name: 'Continue' }).click()
-  await expect(page.getByRole('heading', { name: 'Food preferences and exclusions' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Choose your general area' })).toBeVisible()
+  await expect(page.getByRole('progressbar')).toHaveAttribute('max', '3')
+  await expect(page.getByRole('progressbar')).toHaveAttribute('value', '2')
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}').state?.profile?.preferredName)).toBe('Alex')
-  await page.goto('/profile/location')
+}
+
+async function choosePortlandByCity(page: Page) {
+  await page.getByLabel('Search for your city').fill('Portland')
+  await page.getByRole('button', { name: 'Search cities' }).click()
+  await page.getByRole('button', { name: /Portland.*Oregon/i }).click()
+  await page.getByRole('button', { name: 'Use this regional location' }).click()
+  await expect(page.getByRole('heading', { name: 'Food preferences and exclusions' })).toBeVisible()
 }
 
 async function reachAssessment(page: Page, short = true) {
-  await mockLocationServices(page)
-  await page.goto('/')
-  await page.getByRole('link', { name: 'Get started' }).click()
-  await page.getByLabel('Preferred name').fill('Alex')
-  await page.getByLabel('Year of birth').fill('1990')
-  await page.getByRole('button', { name: 'Continue' }).click()
-  await expect(page.getByRole('heading', { name: 'Food preferences and exclusions' })).toBeVisible()
-  await expect(page.getByRole('progressbar')).toHaveAttribute('max', '2')
+  await reachLocation(page)
+  await choosePortlandByCity(page)
+  await expect(page.getByRole('progressbar')).toHaveAttribute('max', '3')
+  await expect(page.getByRole('progressbar')).toHaveAttribute('value', '3')
   await page.getByLabel('Dietary pattern').selectOption('Omnivore')
   await page.getByRole('group', { name: 'Do you have food allergies?' }).getByLabel('No').check()
   await page.getByRole('group', { name: 'Do you avoid any foods for other reasons?' }).getByLabel('No').check()
@@ -302,7 +307,7 @@ test('keeps supporting surfaces quiet and interactive', async ({ page }) => {
   await reachToday(page)
   await loadExampleProfile(page)
 
-  const todayRoles = await page.evaluate(() => {
+  await expect.poll(() => page.evaluate(() => {
     const frame = document.querySelector<HTMLElement>('.app-frame')!
     const feature = document.querySelector<HTMLElement>('.daily-focus')!
     const weather = document.querySelector<HTMLElement>('.weather-summary')!
@@ -318,8 +323,7 @@ test('keeps supporting surfaces quiet and interactive', async ({ page }) => {
         return style.backgroundColor === transparent && style.borderRadius === '0px' && style.borderTopStyle === 'solid' && shortcut.getBoundingClientRect().height >= 44
       }),
     }
-  })
-  expect(todayRoles).toEqual({
+  })).toEqual({
     primaryIsFilled: true,
     weatherMatchesPage: true,
     seasonalIsOpen: true,
@@ -364,9 +368,6 @@ test('starts an article conversation from Learn and uses a suggestion', async ({
 
 test('anchors seasonal-food chat to the saved regional context', async ({ page }) => {
   await reachToday(page)
-  await page.getByRole('link', { name: 'Add my location' }).click()
-  await page.getByRole('button', { name: 'Choose on map' }).click()
-  await page.getByRole('button', { name: 'Use this regional location' }).click()
   await expect(page.getByRole('heading', { name: 'In season near you' })).toBeVisible()
   const food = page.locator('.seasonal-food-list li').first()
   const name = (await food.locator('strong').textContent()) ?? ''
@@ -501,16 +502,10 @@ test('completes the short mobile vertical slice', async ({ page }) => {
   await expect(page.getByText('Vata–Pitta')).toBeVisible()
   await page.getByRole('button', { name: 'Continue to Today' }).click()
   await expect(page.getByRole('group', { name: 'Recommendation actions' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'See what supports you where you live' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Local weather' })).not.toBeVisible()
-  await expect(page.getByRole('heading', { name: 'In season near you' })).not.toBeVisible()
-  expect(weatherRequests).toBe(0)
-  await page.getByRole('link', { name: 'Add my location' }).click()
-  await expect(page.getByRole('heading', { name: 'Choose your general area' })).toBeVisible()
-  await page.getByRole('button', { name: 'Choose on map' }).click()
-  await page.getByRole('button', { name: 'Use this regional location' }).click()
-  await expect(page.getByRole('group', { name: 'Recommendation actions' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Local weather' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'In season near you' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'See what supports you where you live' })).not.toBeVisible()
+  await expect.poll(() => weatherRequests).toBeGreaterThan(0)
   await expect(page.getByText('72°F')).toBeVisible()
   await expect(page.getByText('78°F / 58°F')).toBeVisible()
   await expect(page.getByText('20%')).toBeVisible()
@@ -519,16 +514,28 @@ test('completes the short mobile vertical slice', async ({ page }) => {
   await expect(page.getByText('Feels like')).toBeVisible()
   await expect(page.getByText('70°F')).toBeVisible()
   await expect(page.getByText('Portland, Oregon, United States')).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'In season near you' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'See what supports you where you live' })).not.toBeVisible()
   await expect(page.getByRole('navigation', { name: 'Primary navigation' })).toBeVisible()
 })
 
 test('completes the full assessment with coverage-ready but unavailable scoring', async ({ page }) => {
+  test.setTimeout(90_000)
   await reachAssessment(page, false)
 
-  for (let index = 0; index < 19; index += 1) {
+  await page.setViewportSize({ width: 320, height: 700 })
+  await expect(page.getByRole('progressbar')).toHaveAttribute('value', '1')
+  await page.getByRole('radio').first().check()
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await page.setViewportSize({ width: 360, height: 760 })
+  await expect(page.getByRole('progressbar')).toHaveAttribute('value', '2')
+  await page.getByRole('button', { name: 'Back' }).click()
+  await expect(page.getByRole('progressbar')).toHaveAttribute('value', '1')
+  await expect(page.getByRole('radio').first()).toBeChecked()
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await page.setViewportSize({ width: 390, height: 844 })
+
+  for (let index = 1; index < 19; index += 1) {
     await expect(page.getByRole('progressbar')).toHaveAttribute('value', String(index + 1))
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
     await page.getByRole('radio').first().check()
     await page.getByRole('button', { name: 'Continue' }).click()
   }
@@ -604,11 +611,7 @@ test('uses a one-shot device location and persists only a coarse position', asyn
 
 test('resolves a city search to a normalized regional location', async ({ page }) => {
   await reachLocation(page)
-  await page.getByLabel('Search for your city').fill('Portland')
-  await page.getByRole('button', { name: 'Search cities' }).click()
-  await page.getByRole('button', { name: /Portland.*Oregon/i }).click()
-  await page.getByRole('button', { name: 'Use this regional location' }).click()
-  await expect(page.getByRole('heading', { name: 'Food preferences and exclusions' })).toBeVisible()
+  await choosePortlandByCity(page)
   const location = await page.evaluate(() => JSON.parse(localStorage.getItem('dosha-companion-prototype-state') ?? '{}').state?.profile?.location)
   expect(location).toMatchObject({ source: 'city', areaId: 'grid-v1:45.5:-122.7', countryCode: 'US', produceRegionId: 'us-pacific-northwest' })
 })
@@ -642,9 +645,9 @@ test('edits profile settings, preserves answers, and recalculates Today', async 
   await page.getByRole('button', { name: 'Save profile' }).click()
   await expect(page.getByText('Profile saved.')).toBeVisible()
   await page.getByRole('button', { name: 'Location' }).click()
-  await expect(page.getByRole('link', { name: 'Add regional location' })).toBeVisible()
-  await expect(page.getByRole('group', { name: 'Temperature units' })).not.toBeVisible()
-  await page.getByRole('link', { name: 'Add regional location' }).click()
+  await expect(page.getByRole('link', { name: 'Change regional location' })).toBeVisible()
+  await page.getByRole('link', { name: 'Change regional location' }).click()
+  await page.getByRole('button', { name: 'Choose again' }).click()
   await page.getByRole('button', { name: 'Choose on map' }).click()
   await page.getByRole('button', { name: 'Use this regional location' }).click()
   await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible()

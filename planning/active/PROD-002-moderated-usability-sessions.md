@@ -29,13 +29,12 @@ Run five short moderated sessions and identify the highest-impact comprehension,
 
 ## Core tasks for participants
 
-1. Complete onboarding and the short assessment.
-2. Interpret the assessment summary.
-3. Use the Today recommendation.
-4. Add a regional location.
-5. Complete a check-in.
-6. Ask about a recommendation.
-7. Explore My Balance without explanation.
+1. Complete the normal production onboarding and full 27-question initial assessment, including regional location, and continue to Today.
+2. Use the Today recommendation.
+3. Complete a check-in.
+4. Ask about a recommendation.
+5. Explore My Balance without explanation.
+6. Optionally compare daylight phases when time allows.
 
 ## Observe
 
@@ -68,3 +67,6 @@ Run five short moderated sessions and identify the highest-impact comprehension,
 
 - 2026-07-17: Added a repository-ready moderator protocol and session-notes template. The protocol includes neutral task prompts, consent and recording choices, participant-data minimization, daylight-phase questions, and a consistent observation taxonomy.
 - 2026-07-17: Keep this item active until five participants are recruited, sessions are completed, and repeated findings are synthesized. Do not treat the protocol itself as completion of the research.
+- 2026-07-17: Full production onboarding is the only research path. Sessions intentionally include all 27 initial-assessment questions so assessment pace, engagement, scanning, and abandonment behavior can be observed rather than hidden by a research-only shortcut.
+- 2026-07-17: Regional location is evaluated inside onboarding, not as a standalone task. The first session is a pacing pilot and may run for up to 60 minutes. Shorten moderator follow-ups before removing any product step; the optional daylight comparison may be omitted when time is limited.
+- 2026-07-17: Development short mode, seeded profiles, and fixture results remain developer tools and must not be shown or mentioned to participants.

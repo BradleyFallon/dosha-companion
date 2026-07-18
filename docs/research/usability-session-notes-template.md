@@ -13,6 +13,7 @@
 - Browser:
 - Prototype commit:
 - Daylight phase order:
+- First-session pacing pilot: yes / no
 
 ## Consent
 
@@ -51,14 +52,31 @@ Do not record diagnoses, exact address, birth date, or unrelated personal inform
 
 For each task, mark the outcome and record behavior before interpretation.
 
-### 1. Setup and short assessment
+### 1. Complete onboarding and the initial assessment
 
 - Outcome:
+- Welcome to first assessment question:
+- Assessment question time:
+- Welcome to Today:
 - Observed:
 - Said:
 - Help requested or given:
+- Assessment length reaction:
+- Question where attention visibly declined:
+- Questions or sections with visible slowdown:
+- Answer-choice scanning:
+- Progress reaction: motivating / neutral / discouraging / unclear
+- Any rushing or repetitive-answer behavior:
+- Any attempt to abandon:
+- Skip or Back behavior:
 - Usual versus recent interpretation:
 - Assessment-summary interpretation:
+- Location entry method selected:
+- Believed saved location precision:
+- Location explanation private enough:
+- Value understood from weather or seasonal food:
+- Did later localized content justify the request:
+- Location privacy concern:
 - Inferred:
 - Opportunity:
 
@@ -74,19 +92,7 @@ For each task, mark the outcome and record behavior before interpretation.
 - Inferred:
 - Opportunity:
 
-### 3. Regional location
-
-- Outcome:
-- Entry method selected:
-- Observed:
-- Said:
-- Believed saved precision:
-- Value understood from weather or seasonal food:
-- Privacy concern:
-- Inferred:
-- Opportunity:
-
-### 4. Check In
+### 3. Check In
 
 - Outcome:
 - Observed:
@@ -98,7 +104,7 @@ For each task, mark the outcome and record behavior before interpretation.
 - Inferred:
 - Opportunity:
 
-### 5. Contextual Ask
+### 4. Contextual Ask
 
 - Outcome:
 - Observed:
@@ -109,7 +115,7 @@ For each task, mark the outcome and record behavior before interpretation.
 - Inferred:
 - Opportunity:
 
-### 6. My Balance
+### 5. My Balance
 
 - Outcome:
 - First interpretation:
@@ -162,6 +168,7 @@ Impact is provisional until compared across sessions.
 - Moment where moderation may have influenced behavior:
 - Findings that need another session:
 - Accessibility, safety, or privacy concern requiring immediate review:
+- Pilot only — Which moderator questions or tasks should be shortened before the remaining sessions?
 
 ## Sanitization before synthesis
 

@@ -5,6 +5,7 @@ import { getProfileReadiness } from '../profile/readiness'
 export function nextResumePath(state: PrototypeState) {
   const readiness = getProfileReadiness(state.profile)
   if (!readiness.nameReady) return '/profile/name'
+  if (!readiness.locationReady) return '/profile/location'
   if (!readiness.foodReady || !state.profileCompleted) return '/profile/food'
   if (!state.assessmentStarted) return '/assessment'
   if (state.resultsReached) return state.todayVisited ? '/today' : '/results'

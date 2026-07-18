@@ -2,16 +2,16 @@
 
 ## Status and purpose
 
-This protocol supports five short formative sessions with the current Dosha Companion prototype. The study is intended to identify comprehension, trust, navigation, and daily-value problems. It is not a clinical study, an assessment of the participant, or a test of Ayurvedic efficacy.
+This protocol supports five formative sessions with the real Dosha Companion production onboarding and full initial assessment. The study is intended to identify comprehension, trust, navigation, pacing, and daily-value problems. It is not a clinical study, an assessment of the participant, or a test of Ayurvedic efficacy.
 
 The interface is being tested, not the participant. Findings should describe observed behavior separately from participant opinion and researcher interpretation.
 
 ## Research questions
 
-1. Can a new user complete setup and distinguish usual patterns from recent patterns?
+1. Can a new user complete the full setup and 27-question assessment while distinguishing usual patterns from recent patterns?
 2. Does Today provide an understandable and worthwhile action without explanation?
 3. Does Check In feel lightweight, and is completion satisfying without pressure?
-4. Does adding a broad regional location feel relevant and appropriately private?
+4. Does requesting a broad regional location during onboarding feel relevant and appropriately private once Today shows localized value?
 5. Can participants explain what My Balance represents without assuming scores, diagnosis, or improvement?
 6. Does contextual chat feel connected to the selected content?
 7. Do the four daylight phases feel distinct, comfortable, and useful enough to retain?
@@ -32,10 +32,11 @@ Participants do not need to disclose real health information. They may answer us
 
 ## Session setup
 
-- Duration: 35–45 minutes.
+- Duration: approximately 45 minutes; allow up to 60 minutes for the first pilot.
 - Device: participant’s phone when practical, otherwise a mobile viewport at approximately 390 pixels wide.
 - Build: latest validated `main` build.
-- Starting state: clean browser-local profile at Welcome.
+- Starting state: cleared browser-local data at Welcome, with no seeded profile, fixture result, or saved progress.
+- Product path: normal production onboarding followed by the complete 27-question initial assessment.
 - Recording: optional and separately consented; notes are sufficient.
 - Observation: one moderator and, when available, one silent note-taker.
 - Reset: clear the browser-local profile after each session.
@@ -46,9 +47,9 @@ Prepare:
 - this protocol;
 - a fresh copy of the [session notes template](usability-session-notes-template.md);
 - a timer;
-- the four reviewed daylight phase views for the final comparison.
+- the four reviewed daylight phase views for an optional final comparison.
 
-Do not expose query parameters, implementation notes, expected paths, or test assertions to the participant.
+Do not expose query parameters, development short mode, seeded data, fixture results, implementation notes, expected paths, or test assertions to the participant. Do not tell participants the expected onboarding or assessment duration before Task 1.
 
 ## Consent and privacy process
 
@@ -92,26 +93,45 @@ Ask:
 
 Do not explain Dosha Companion beyond: “This is an early prototype for personalized, educational Ayurvedic guidance.”
 
-## Core tasks — 25 minutes
+## Core tasks — approximately 30–35 minutes
 
 Give one task at a time. Read only the task prompt initially.
 
-### Task 1: Start and complete the short setup
+Do not shorten the product flow to keep the session on schedule. Reduce or omit moderator follow-up questions before removing a product step.
+
+### Task 1: Complete onboarding and the initial assessment
 
 Prompt:
 
-> Imagine you have just found this app and want to see what it offers. Start from here and continue until you reach the main daily experience.
+> Imagine you have just found this app and want to see what it offers. Set it up for yourself and continue until you reach the main daily experience.
+
+This task includes Welcome, the account/setup simulation, required profile information, regional location, food-safety information, all 27 initial-assessment questions, the honest assessment completion or coverage result, and arrival at Today. Do not coach a separate location task later.
 
 Observe:
 
 - whether the product boundary is understood;
-- whether year of birth and food-safety questions feel proportionate;
+- time from Welcome to the first assessment question;
+- time spent on all 27 assessment questions;
+- total time from Welcome to Today;
+- questions or sections where the participant slows down;
+- whether the number of questions feels reasonable;
+- whether answer choices are easy to scan;
 - understanding of usual versus recent questions;
-- use of Back, Skip, keyboard, and progress cues;
+- whether progress feels motivating, neutral, or discouraging;
+- whether the participant attempts to abandon, skip, rush, or repeat the same answer pattern;
+- use of Back, keyboard, and progress cues;
+- which location entry method they choose;
+- what location precision they believe is stored;
+- whether the location explanation feels private enough;
+- whether weather and seasonal content later justify the location request;
 - hesitation at the assessment summary;
 - whether the participant can explain what is and is not calculated.
 
-Neutral follow-up:
+After the participant reaches Today, ask:
+
+> How did the length of that setup feel?
+
+Then ask:
 
 > In your own words, what did the app learn, and what did it not determine?
 
@@ -135,25 +155,7 @@ Neutral follow-ups:
 
 > What would you expect Another to do?
 
-### Task 3: Add regional location
-
-Prompt:
-
-> You would like the app to reflect where you live, but you do not want to share an exact address. Show me what you would do.
-
-Observe:
-
-- discovery of location setup;
-- preference for device, city, or map entry;
-- reaction to the general-area explanation;
-- whether the saved forecast area feels appropriately broad;
-- whether weather and seasonal foods make the request feel worthwhile.
-
-Neutral follow-up:
-
-> What location information do you think the app saved?
-
-### Task 4: Complete a check-in
+### Task 3: Complete a Check In
 
 Prompt:
 
@@ -172,7 +174,7 @@ Neutral follow-up:
 
 > What do you expect this check-in to change?
 
-### Task 5: Ask about a recommendation
+### Task 4: Ask about a recommendation
 
 Prompt:
 
@@ -189,7 +191,7 @@ Neutral follow-up:
 
 > What information do you think the assistant used for that answer?
 
-### Task 6: Explore My Balance
+### Task 5: Explore My Balance
 
 Prompt:
 
@@ -214,9 +216,9 @@ Neutral follow-ups:
 
 > Is there anything here that looks like a score or judgment?
 
-## Daylight-phase evaluation — 5 minutes
+## Task 6: Optional daylight comparison — up to 5 minutes
 
-Run this after the core tasks so atmospheric comparisons do not prime the main study.
+Run this only after the primary tasks so atmospheric comparisons do not prime the main study. It may be omitted when the session is running long, especially during the first pilot.
 
 Show midday, sunset, twilight, and night in a rotated order across sessions. Keep content identical.
 
@@ -244,6 +246,8 @@ Record observed readability issues separately from stated preference.
 5. If you could change one thing, what would it be?
 
 Then disclose any help withheld during tasks and thank the participant.
+
+After the first pilot only, the moderator should record which moderator questions or tasks should be shortened before the remaining sessions. Refine pacing without replacing or shortening the production onboarding or 27-question assessment.
 
 ## Note-taking taxonomy
 

@@ -7,8 +7,8 @@ import { normalizeCity, normalizeCoordinates, searchCities, type CityResult } fr
 import { usePrototype } from '../prototype/PrototypeContext'
 import type { RegionalLocation } from '../prototype/state'
 import { LocationIcon, PrivacyIcon, SearchIcon } from '../ui/icons'
-import { getProfileReadiness } from '../profile/readiness'
 import { locationReturnPath } from '../location/returnTargets'
+import { StepHeader } from './Onboarding'
 
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright'
 const DEFAULT_MAP_LOCATION = { latitude: 45.5, longitude: -122.7 }
@@ -23,9 +23,10 @@ export function LocationProfileScreen() {
   const { state, dispatch } = usePrototype()
   const navigate = useNavigate()
   const routeLocation = useLocation()
-  const readiness = getProfileReadiness(state.profile)
-  const fallbackPath = state.resultsReached ? '/balance' : readiness.coreReady ? '/assessment' : '/profile/food'
+  const onboarding = !state.resultsReached && !new URLSearchParams(routeLocation.search).get('return')
+  const fallbackPath = state.resultsReached ? '/balance' : '/profile/food'
   const returnPath = locationReturnPath(routeLocation.search, fallbackPath)
+  const backPath = onboarding ? '/profile/name' : returnPath
   const backLabel = returnPath === '/settings' ? 'Settings' : returnPath === '/today' ? 'Today' : returnPath === '/learn' ? 'Learn' : returnPath === '/balance' ? 'My Balance' : 'Profile'
   const [selection, setSelection] = useState<LocationDraft | RegionalLocation | null>(state.profile.location)
   const [status, setStatus] = useState('')
@@ -98,7 +99,8 @@ export function LocationProfileScreen() {
 
   return (
     <Screen className="location-screen">
-      <BackLink to={returnPath} label={backLabel} />
+      <BackLink to={backPath} label={onboarding ? 'Back' : backLabel} />
+      {onboarding ? <StepHeader step={2} /> : null}
       {selection ? (
         <>
           <p className="eyebrow">Regional location</p>

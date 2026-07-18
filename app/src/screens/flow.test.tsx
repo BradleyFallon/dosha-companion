@@ -33,9 +33,10 @@ function renderAt(path: string, values = {}) {
 }
 
 describe('assessment interaction', () => {
-  it('allows the assessment without a location when the core profile is complete', () => {
+  it('routes the assessment to location setup when onboarding has no location', async () => {
     renderAt('/assessment', { profile: coreProfileWithoutLocation('Alex'), profileCompleted: true, assessmentStarted: false })
-    expect(screen.getByRole('heading', { name: 'Before the assessment' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Choose your general area' })).toBeInTheDocument()
+    expect(screen.getByRole('progressbar')).toHaveAttribute('max', '3')
   })
 
   it('selecting an answer does not advance automatically', async () => {

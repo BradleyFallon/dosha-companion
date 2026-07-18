@@ -102,7 +102,7 @@ Collecting it without a defined use adds sensitivity and privacy risk without im
 
 ### Location fields
 
-Location is not required for core onboarding, assessment, or application participation. It remains “not provided yet” until the user chooses a contextual benefit action for regional weather, daylight, season, or food content. The location flow should prioritize a single permission-gated device lookup, then map selection and manual locality search as alternatives. It must not request permission automatically or require typing country, region, and city fields.
+The normal MVP onboarding requires a regional location before assessment so the complete production flow can exercise localized weather, daylight, season, and food content. The location flow should prioritize a single permission-gated device lookup, then map selection and manual locality search as alternatives. It must not request permission automatically or require typing country, region, and city fields.
 
 The client may use exact coordinates briefly to position an adjustable map pin, but persistent records should retain only the coarse location or locality needed to derive:
 
@@ -364,11 +364,12 @@ Collect immediately after account creation:
 
 1. Preferred name
 2. Year of birth
-3. Dietary pattern
-4. Food allergies
-5. Food intolerances or exclusions
+3. Regional location through device lookup, map, or city search
+4. Dietary pattern
+5. Food allergies
+6. Food intolerances or exclusions
 
-Request a regional location contextually when the user reaches localized weather, daylight, seasonal, or food features. Once a location is saved, infer temperature units automatically and expose an optional override in Settings.
+Persist only the coarse regional location required by localized features. Once it is saved, infer temperature units automatically and expose an optional override and removal control in Settings.
 
 Do not collect sex assigned at birth, weight, height, medical conditions, medication use, or detailed symptoms during MVP onboarding.
 

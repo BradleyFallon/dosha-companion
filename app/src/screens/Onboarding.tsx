@@ -35,8 +35,8 @@ export function StepHeader({ step }: { step: number }) {
   return (
     <div className="step-header">
       <span>Profile setup</span>
-      <span>Step {step} of 2</span>
-      <progress value={step} max={2}>Step {step} of 2</progress>
+      <span>Step {step} of 3</span>
+      <progress value={step} max={3}>Step {step} of 3</progress>
     </div>
   )
 }
@@ -63,7 +63,7 @@ export function NameProfileScreen() {
     }
     setYearError('')
     dispatch({ type: 'update-profile', values: { preferredName: name.trim(), birthYear } })
-    navigate('/profile/food')
+    navigate('/profile/location')
   }
 
   return (
@@ -116,8 +116,8 @@ export function FoodProfileScreen() {
 
   return (
     <Screen>
-      <BackLink to="/profile/name" />
-      <StepHeader step={2} />
+      <BackLink to="/profile/location" />
+      <StepHeader step={3} />
       <h1 tabIndex={-1}>Food preferences and exclusions</h1>
       <form onSubmit={submit}>
         <label htmlFor="diet">Dietary pattern</label>

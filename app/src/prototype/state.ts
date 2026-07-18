@@ -162,7 +162,7 @@ export function prototypeReducer(
         saveStatus: 'saving',
       }
     case 'complete-profile':
-      return { ...state, profileCompleted: getProfileReadiness(state.profile).coreReady, saveStatus: 'saving' }
+      return { ...state, profileCompleted: getProfileReadiness(state.profile).onboardingReady, saveStatus: 'saving' }
     case 'start-assessment':
       return {
         ...state,
