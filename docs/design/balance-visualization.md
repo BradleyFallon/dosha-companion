@@ -2,7 +2,9 @@
 
 ## Purpose
 
-My Balance is a calm graphical reflection of information the person supplied. It is not a dosha result, clinical assessment, performance dashboard, or trend chart.
+My Balance is a calm graphical reflection of information the person supplied. It includes a clearly labeled prototype dosha estimate, but it is not a clinical assessment, performance dashboard, or trend chart.
+
+The top of the composition makes dosha identity explicit. Coverage-ready assessment data shows an answer-derived usual-nature and recent-pattern estimate using the draft unit-weight model. When coverage is insufficient, the same location asks for more information. Development builds can still show a controlled sample profile for reviewing the incomplete-assessment path. This identity summary remains visually and semantically separate from the coverage rings below it.
 
 ## Segmented rings
 
@@ -49,7 +51,7 @@ The timeline contains at most five equal-size completed-check-in dots in chronol
 
 ## Contextual chat
 
-Ask about this passes the domain, editor labels, full authored responses, and deterministic comparison state to the existing grounded mock/API contract. It provides related approved learning sources but no invented dosha weights, medical meaning, or arbitrary interpretation.
+Ask about this passes the domain, editor labels, full authored responses, and deterministic comparison state to the existing grounded mock/API contract. It provides related approved learning sources but does not invent dosha weights, medical meaning, or arbitrary interpretation.
 
 ## Accessibility and responsive behavior
 
@@ -64,4 +66,4 @@ Ask about this passes the domain, editor labels, full authored responses, and de
 
 Radar charts imply numeric magnitude. A three-part wheel implies dosha proportions. Neither measurement exists in the reviewed data, so both would invent precision. The current graphics describe representation and explicit answer relationships only.
 
-If expert-approved scoring is introduced later, it must use a separately versioned scoring model, thresholds, review history, and accessible explanation. It must not reinterpret these display keys as weights.
+The prototype estimate uses separately versioned answer weights and thresholds. It does not reinterpret these display keys as weights. Expert review and validation are still required before production use.

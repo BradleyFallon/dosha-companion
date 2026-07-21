@@ -58,6 +58,7 @@ async function reachToday(page: Page) {
   }
   await page.getByRole('link', { name: 'View complete sample' }).click()
   await page.getByRole('button', { name: 'Continue to Today' }).click()
+  await expect(page.getByRole('link', { name: /Sample dosha profile/ })).toContainText('Vata–Pitta')
   await expect(page.getByRole('group', { name: 'Recommendation actions' })).toBeVisible()
 }
 
@@ -67,6 +68,7 @@ async function loadExampleProfile(page: Page) {
   page.once('dialog', (dialog) => dialog.accept())
   await page.getByRole('button', { name: 'Load example profile' }).click()
   await page.goto('/today')
+  await expect(page.getByRole('link', { name: /Prototype dosha estimate/ })).toContainText('Vata–Pitta')
   await expect(page.locator('.weather-essentials')).toBeVisible()
 }
 
@@ -85,7 +87,7 @@ async function reachTodayWithFullAssessment(page: Page) {
     await expect(page.getByRole('button', { name: 'Continue' })).toBeEnabled()
     await page.getByRole('button', { name: 'Continue' }).click()
   }
-  await expect(page.getByRole('heading', { name: 'Your assessment summary' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Your dosha profile' })).toBeVisible()
   await page.getByRole('button', { name: 'Go to Today' }).click()
 }
 
@@ -200,6 +202,9 @@ test('keeps Today actions calm and usable at supported mobile sizes', async ({ p
 
   await page.getByRole('button', { name: 'Show recommendation details' }).click()
   await expect(page.getByRole('button', { name: 'Dismiss for today' })).toBeVisible()
+  await page.getByRole('link', { name: /Prototype dosha estimate/ }).click()
+  await expect(page.getByRole('region', { name: /Prototype dosha estimate/ })).toContainText('Vata–Pitta')
+  await expect(page.getByText('Vata is currently more prominent')).toBeVisible()
 })
 
 test('keeps representative daylight-theme contrast above WCAG thresholds', async ({ page }) => {
@@ -409,7 +414,7 @@ test('talks through a completed check-in with recent-answer context', async ({ p
   await expect(page.getByText(/temporary pattern to observe/)).toBeVisible()
 })
 
-test('explores graphical My Balance patterns without implied scoring', async ({ page }) => {
+test('explores graphical My Balance patterns with a visible prototype estimate', async ({ page }) => {
   test.setTimeout(60_000)
   await reachTodayWithFullAssessment(page)
   await page.getByRole('link', { name: 'Check In', exact: true }).click()
@@ -421,6 +426,7 @@ test('explores graphical My Balance patterns without implied scoring', async ({ 
   await page.getByRole('link', { name: 'Check In' }).click()
   await page.getByRole('link', { name: 'My Balance' }).click()
 
+  await expect(page.getByRole('region', { name: /Prototype dosha estimate/ })).toContainText('Vata')
   await expect(page.getByRole('link', { name: 'Usual pattern: 19 of 19 areas represented' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Recent pattern: 5 of 7 areas represented' })).toBeVisible()
   await expect(page.getByText('Coverage ready')).not.toBeVisible()
@@ -517,7 +523,7 @@ test('completes the short mobile vertical slice', async ({ page }) => {
   await expect(page.getByRole('navigation', { name: 'Primary navigation' })).toBeVisible()
 })
 
-test('completes the full assessment with coverage-ready but unavailable scoring', async ({ page }) => {
+test('completes the full assessment with a coverage-ready prototype estimate', async ({ page }) => {
   test.setTimeout(90_000)
   await reachAssessment(page, false)
 
@@ -548,12 +554,12 @@ test('completes the full assessment with coverage-ready but unavailable scoring'
     await page.getByRole('button', { name: 'Continue' }).click()
   }
 
-  await expect(page.getByRole('heading', { name: 'Your assessment summary' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Dosha scoring is not available yet' })).toBeVisible()
-  await expect(page.getByText('Vata–Pitta')).not.toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Your dosha profile' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Vata', exact: true }).first()).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Vata is currently more prominent' })).toBeVisible()
   await page.getByRole('button', { name: 'Go to Today' }).click()
   await page.getByRole('button', { name: 'Show recommendation details' }).click()
-  await expect(page.getByText('No dosha score was calculated or used.')).toBeVisible()
+  await expect(page.getByText('The prototype dosha estimate was not used to select this recommendation.')).toBeVisible()
 })
 
 test('reloads and resumes submitted assessment progress', async ({ page }) => {

@@ -245,6 +245,18 @@ progress::-moz-progress-bar { background: var(--accent); }
 .today-screen { padding-top: 60px; }
 .today-header { display: flex; margin-bottom: 18px; align-items: center; justify-content: space-between; gap: 15px; }
 .today-header h1 { margin: 0; font-size: 1.7rem; }
+.dosha-profile-summary { display: grid; min-height: 88px; margin: 0 0 18px; padding: 14px 16px; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink); background: color-mix(in srgb, var(--surface-raised) 88%, var(--vata) 12%); text-decoration: none; }
+.dosha-profile-summary.prominent { max-width: 500px; min-height: 116px; margin: 22px auto 0; padding: 18px 20px; }
+.dosha-profile-symbols { display: flex; align-items: center; }
+.dosha-profile-symbols svg { width: 34px; height: 34px; padding: 5px; border-radius: 50%; background: var(--surface-raised); }
+.dosha-profile-symbols svg + svg { margin-left: -7px; }
+.dosha-profile-symbols.muted { color: var(--muted); opacity: .62; }
+.dosha-profile-copy { display: flex; min-width: 0; flex-direction: column; }
+.dosha-profile-copy .eyebrow { margin-bottom: 2px; }
+.dosha-profile-copy strong { font-family: var(--font-display); font-size: 1.35rem; font-weight: 650; letter-spacing: -.015em; }
+.dosha-profile-copy span { margin-top: 2px; color: var(--ink); font-size: .9rem; }
+.dosha-profile-copy small { margin-top: 3px; color: var(--muted); font-size: .73rem; line-height: 1.25; }
+.dosha-profile-forward { width: 20px; height: 20px; color: var(--accent); }
 .ai-shortcut { display: grid; width: 48px; height: 48px; flex: 0 0 auto; place-items: center; border: 1px solid var(--accent); border-radius: 50%; font-weight: 800; text-decoration: none; }
 .settings-shortcut { display: inline-flex; min-height: 44px; padding: 8px 10px; flex: 0 0 auto; align-items: center; border: 1px solid var(--accent); border-radius: 8px; font-size: .82rem; font-weight: 800; text-decoration: none; }
 .balance-summary { display: flex; min-height: 66px; margin: 0 0 16px; padding: 12px 14px; align-items: center; justify-content: space-between; gap: 10px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background: var(--current); text-decoration: none; }
@@ -676,7 +688,7 @@ html[data-daylight-phase="twilight"], html[data-daylight-phase="night"] { color-
 .balance-info summary::-webkit-details-marker { display: none; }
 .balance-info summary svg { width: 23px; height: 23px; }
 .balance-info p { position: absolute; z-index: 3; top: 48px; right: 0; width: min(78vw, 320px); padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: white; box-shadow: var(--shadow); font-size: .88rem; }
-.pattern-rings { display: grid; max-width: 380px; margin: clamp(28px, 7vh, 58px) auto 32px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 6vw, 42px); }
+.pattern-rings { display: grid; max-width: 380px; margin: clamp(22px, 5vh, 42px) auto 32px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(14px, 6vw, 42px); }
 .pattern-ring-link { display: flex; min-width: 0; align-items: center; flex-direction: column; gap: 8px; color: var(--ink); font-weight: 750; text-decoration: none; }
 .pattern-ring-graphic { position: relative; display: grid; width: clamp(116px, 32vw, 148px); aspect-ratio: 1; place-items: center; }
 .pattern-ring-graphic > svg:first-child { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }

@@ -10,4 +10,4 @@ The app reports whether enough substantive answers were submitted for the covera
 
 ## Check-ins are separate records
 
-Repeatable current check-ins are saved with their own date and answers. They do not overwrite your long-term baseline answers. No dosha interpretation is applied to check-ins in this milestone.
+Repeatable current check-ins are saved with their own date and answers. They do not overwrite your long-term baseline answers. The latest completed check-in can update the prototype recent-pattern estimate without changing usual nature.

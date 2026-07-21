@@ -1,6 +1,6 @@
 /* eslint-disable */
 // GENERATED FILE — DO NOT EDIT. Run `npm run generate:quiz` from app/.
-// Source: ../data/quiz/{questions,answer-options,question-sets,question-set-items,controlled-values}.csv
+// Source: ../data/quiz/{questions,answer-options,answer-scores,question-sets,question-set-items,controlled-values}.csv
 
 export const balanceIconKeys = ["moon-stars","lightning","bowl-food","spiral","arrows-clockwise","waves","person-simple"] as const
 export type BalanceIconKey = typeof balanceIconKeys[number]
@@ -12,6 +12,7 @@ export const initialAssessment = {
   "description": "First-run baseline and current-balance assessment.",
   "estimatedMinutes": 10,
   "status": "draft",
+  "scoringModelVersion": "0.1-draft",
   "questions": [
     {
       "id": "q_baseline_natural_pace_001",
@@ -43,7 +44,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_natural_pace_001_purposeful_efficient_move_clear",
@@ -55,7 +66,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_natural_pace_001_steady_unhurried_prefer_move",
@@ -67,7 +88,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_natural_pace_001_unsure_or_none_fit",
@@ -79,7 +110,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -113,7 +154,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_energy_pattern_001_energy_strong_focused_but",
@@ -125,7 +176,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_energy_pattern_001_energy_builds_gradually_last",
@@ -137,7 +198,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_energy_pattern_001_unsure_or_none_fit",
@@ -149,7 +220,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -183,7 +264,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_routine_preference_001_like_organized_routines_help",
@@ -195,7 +286,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_routine_preference_001_prefer_familiar_dependable_routines",
@@ -207,7 +308,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_routine_preference_001_unsure_or_none_fit",
@@ -219,7 +330,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -253,7 +374,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_decision_style_001_evaluate_options_make_firm",
@@ -265,7 +396,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_decision_style_001_take_time_prefer_feel",
@@ -277,7 +418,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_decision_style_001_unsure_or_none_fit",
@@ -289,7 +440,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -323,7 +484,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_learning_style_001_learn_best_through_logic",
@@ -335,7 +506,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_learning_style_001_take_longer_learn_but",
@@ -347,7 +528,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_learning_style_001_unsure_or_none_fit",
@@ -359,7 +550,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -393,7 +594,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_long_term_memory_001_remember_information_useful_important",
@@ -405,7 +616,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_long_term_memory_001_once_learn_something_thoroughly",
@@ -417,7 +638,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_long_term_memory_001_unsure_or_none_fit",
@@ -429,7 +660,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -463,7 +704,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_physical_endurance_001_sustain_intense_effort_especially",
@@ -475,7 +726,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_physical_endurance_001_warm_up_slowly_but",
@@ -487,7 +748,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_physical_endurance_001_unsure_or_none_fit",
@@ -499,7 +770,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -533,7 +814,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_body_frame_001_naturally_medium_proportionate_moderately",
@@ -545,7 +836,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_body_frame_001_naturally_broad_solid_substantial",
@@ -557,7 +858,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_body_frame_001_unsure_or_changed",
@@ -569,7 +880,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "not_sure",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -603,7 +924,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_weight_tendency_001_weight_responds_fairly_quickly",
@@ -615,7 +946,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_weight_tendency_001_gain_weight_easily_lose",
@@ -627,7 +968,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_weight_tendency_001_unsure_or_changed",
@@ -639,7 +990,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "not_sure",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -673,7 +1034,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_skin_tendency_001_warm_sensitive_flushed_easily",
@@ -685,7 +1056,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_skin_tendency_001_soft_smooth_thicker_naturally",
@@ -697,7 +1078,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_skin_tendency_001_unsure_or_none_fit",
@@ -709,7 +1100,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -743,7 +1144,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_temperature_tolerance_001_hot_weather_strong_direct",
@@ -755,7 +1166,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_temperature_tolerance_001_cold_damp_heavy_weather",
@@ -767,7 +1188,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_temperature_tolerance_001_unsure_or_none_fit",
@@ -779,7 +1210,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -813,7 +1254,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_sweating_tendency_001_easily_noticeably",
@@ -825,7 +1276,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_sweating_tendency_001_moderately_some_moisture_clamminess",
@@ -837,7 +1298,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_sweating_tendency_001_unsure",
@@ -849,7 +1320,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "not_sure",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -883,7 +1364,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_appetite_001_strong_arrives_predictably",
@@ -895,7 +1386,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_appetite_001_steady_but_not_urgent",
@@ -907,7 +1408,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_appetite_001_unsure_or_none_fit",
@@ -919,7 +1430,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -953,7 +1474,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_delayed_meals_001_become_intensely_hungry_impatient",
@@ -965,7 +1496,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_delayed_meals_001_notice_hunger_but_wait",
@@ -977,7 +1518,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_delayed_meals_001_unsure_or_none_fit",
@@ -989,7 +1540,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1023,7 +1584,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_digestion_001_fast_intense_digestion_sometimes",
@@ -1035,7 +1606,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_digestion_001_slow_heavy_digestion_especially",
@@ -1047,7 +1628,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_digestion_001_unsure_or_none_fit",
@@ -1059,7 +1650,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1093,7 +1694,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_bowel_pattern_001_frequent_urgent_movements_tendency",
@@ -1105,7 +1716,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_bowel_pattern_001_regular_but_slower_movements",
@@ -1117,7 +1738,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_bowel_pattern_001_unsure_or_prefer_not",
@@ -1129,7 +1760,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "prefer_not",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1163,7 +1804,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_sleep_pattern_001_moderate_fairly_regular_though",
@@ -1175,7 +1826,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_sleep_pattern_001_deep_long_find_difficult",
@@ -1187,7 +1848,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_sleep_pattern_001_unsure_or_none_fit",
@@ -1199,7 +1870,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1233,7 +1914,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_speaking_style_001_clear_direct_precise_sometimes",
@@ -1245,7 +1936,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_speaking_style_001_calm_measured_sometimes_slow",
@@ -1257,7 +1958,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_speaking_style_001_unsure_or_none_fit",
@@ -1269,7 +1980,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1303,7 +2024,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_stress_response_001_become_impatient_critical_frustrated",
@@ -1315,7 +2046,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_stress_response_001_withdraw_resist_change_hold",
@@ -1327,7 +2068,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "baseline",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_baseline_stress_response_001_unsure_or_none_fit",
@@ -1339,7 +2090,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "none_fit",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1373,7 +2134,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_sleep_001_shortened_disturbed_by_feeling",
@@ -1385,7 +2156,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_sleep_001_heavy_prolonged_difficulty_waking",
@@ -1397,7 +2178,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_sleep_001_comfortable_close_normal_sleep",
@@ -1409,7 +2200,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_sleep_001_unsure",
@@ -1421,7 +2222,17 @@ export const initialAssessment = {
           "defaultOrder": 5,
           "kind": "not_sure",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1455,7 +2266,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_appetite_001_more_intense_urgent_than",
@@ -1467,7 +2288,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_appetite_001_weaker_slower_less_interested",
@@ -1479,7 +2310,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_appetite_001_close_usual_pattern",
@@ -1491,7 +2332,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_appetite_001_unsure",
@@ -1503,7 +2354,17 @@ export const initialAssessment = {
           "defaultOrder": 5,
           "kind": "not_sure",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1537,7 +2398,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_digestion_001_heat_burning_discomfort_urgency",
@@ -1549,7 +2420,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_digestion_001_heaviness_sluggishness_feeling_full",
@@ -1561,7 +2442,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_digestion_001_digestion_felt_comfortable_close",
@@ -1573,7 +2464,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_digestion_001_unsure_or_prefer_not",
@@ -1585,7 +2486,17 @@ export const initialAssessment = {
           "defaultOrder": 5,
           "kind": "prefer_not",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1619,7 +2530,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_energy_001_intense_driven_restless_difficult",
@@ -1631,7 +2552,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_energy_001_heavy_slow_sleepy_difficult",
@@ -1643,7 +2574,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_energy_001_stable_close_normal_energy",
@@ -1655,7 +2596,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_energy_001_unsure",
@@ -1667,7 +2618,17 @@ export const initialAssessment = {
           "defaultOrder": 5,
           "kind": "not_sure",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1701,7 +2662,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_stress_response_001_irritation_impatience_frustration_feeling",
@@ -1713,7 +2684,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_stress_response_001_withdrawal_heaviness_resistance_low",
@@ -1725,7 +2706,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_stress_response_001_response_felt_manageable_close",
@@ -1737,7 +2728,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_stress_response_001_unsure_or_prefer_not",
@@ -1749,7 +2750,17 @@ export const initialAssessment = {
           "defaultOrder": 5,
           "kind": "prefer_not",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1783,7 +2794,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_routine_001_overly_scheduled_demanding_focused",
@@ -1795,7 +2816,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_routine_001_inactive_repetitive_difficult_get",
@@ -1807,7 +2838,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_routine_001_consistent_supportive",
@@ -1819,7 +2860,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_routine_001_unsure",
@@ -1831,7 +2882,17 @@ export const initialAssessment = {
           "defaultOrder": 5,
           "kind": "not_sure",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1865,7 +2926,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 1,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_body_qualities_001_heat_redness_sensitivity_sharpness",
@@ -1877,7 +2948,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 1,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_body_qualities_001_heaviness_dampness_congestion_sluggishness",
@@ -1889,7 +2970,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 1
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_body_qualities_001_none_particularly_noticeable",
@@ -1901,7 +2992,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "current",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 1
+          }
         },
         {
           "id": "a_current_body_qualities_001_unsure",
@@ -1913,7 +3014,17 @@ export const initialAssessment = {
           "defaultOrder": 5,
           "kind": "not_sure",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     },
@@ -1947,7 +3058,17 @@ export const initialAssessment = {
           "defaultOrder": 1,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         },
         {
           "id": "a_context_major_change_001_recent_travel_major_schedule",
@@ -1959,7 +3080,17 @@ export const initialAssessment = {
           "defaultOrder": 2,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         },
         {
           "id": "a_context_major_change_001_significant_stress_major_life",
@@ -1971,7 +3102,17 @@ export const initialAssessment = {
           "defaultOrder": 3,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         },
         {
           "id": "a_context_major_change_001_recent_illness_injury_medication",
@@ -1983,7 +3124,17 @@ export const initialAssessment = {
           "defaultOrder": 4,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         },
         {
           "id": "a_context_major_change_001_another_reason",
@@ -1995,7 +3146,17 @@ export const initialAssessment = {
           "defaultOrder": 5,
           "kind": "ordinary",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         },
         {
           "id": "a_context_major_change_001_prefer_not",
@@ -2007,7 +3168,17 @@ export const initialAssessment = {
           "defaultOrder": 6,
           "kind": "prefer_not",
           "exclusive": true,
-          "status": "draft"
+          "status": "draft",
+          "score": {
+            "modelVersion": "0.1-draft",
+            "target": "none",
+            "weights": {
+              "vata": 0,
+              "pitta": 0,
+              "kapha": 0
+            },
+            "reliability": 0
+          }
         }
       ]
     }

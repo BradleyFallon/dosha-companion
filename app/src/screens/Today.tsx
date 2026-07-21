@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom'
 import { ContextChatLink } from '../components/ContextChatLink'
 import { LocalizedTodayContent } from '../components/LocalizedTodayContent'
 import { LocationBenefitCard } from '../components/LocationBenefitCard'
+import { DoshaProfileSummary } from '../components/DoshaProfileSummary'
 import { Screen } from '../components/Layout'
 import { selectDailyRecommendation } from '../content/recommendations'
 import { usePrototype } from '../prototype/PrototypeContext'
 import { calculateAssessmentCoverage } from '../quiz/coverage'
+import { calculatePrototypeDoshaResult } from '../quiz/result'
 import {
   CompleteIcon,
   DailyRoutineIcon,
@@ -25,6 +27,14 @@ export function TodayScreen() {
   const coverage = calculateAssessmentCoverage({
     submittedAnswers: state.submittedAnswers,
     skippedQuestionIds: state.skippedQuestionIds,
+  })
+  const latestCheckIn = [...state.checkIns]
+    .filter((checkIn) => checkIn.completedAt)
+    .sort((left, right) => Date.parse(right.completedAt ?? '') - Date.parse(left.completedAt ?? ''))[0]
+  const doshaResult = calculatePrototypeDoshaResult({
+    submittedAnswers: state.submittedAnswers,
+    skippedQuestionIds: state.skippedQuestionIds,
+    currentAnswers: latestCheckIn?.answers,
   })
   const recommendation = selectDailyRecommendation({
     coverage,
@@ -73,6 +83,8 @@ export function TodayScreen() {
         <div><p className="today-date">{date}</p><h1 tabIndex={-1}>{greeting}, {name}</h1></div>
         <Link className="icon-control" to="/settings" aria-label="Open settings"><SettingsIcon aria-hidden="true" focusable="false" /></Link>
       </header>
+
+      <DoshaProfileSummary fixtureId={state.doshaFixtureId} href="/balance" result={doshaResult} />
 
       <article className={focusClassName}>
         <button className="icon-control recommendation-info-control" type="button" aria-label={detailsOpen ? 'Hide recommendation details' : 'Show recommendation details'} aria-expanded={detailsOpen} onClick={() => setDetailsOpen(!detailsOpen)}><InfoIcon aria-hidden="true" focusable="false" /></button>

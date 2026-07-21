@@ -4,15 +4,16 @@
 
 ## Purpose
 
-Today is the post-assessment home and primary retention surface. It turns the latest approved profile state into one understandable focus and one practical action without requiring the user to interpret scores.
+Today is the post-assessment home and primary retention surface. It makes the prototype dosha estimate easy to find, then presents one understandable focus and one practical action without requiring the user to interpret raw scores.
 
 ## Information hierarchy
 
 1. Local date and greeting
-2. Large recommendation icon, title, and one bounded action sentence
-3. Complete, show-another, and contextual-chat icon controls
-4. Visual weather summary and compact seasonal-food list when location exists
-5. Two quiet shortcuts: Check in and Learn
+2. Compact usual-nature and recent-pattern prototype estimate
+3. Large recommendation icon, title, and one bounded action sentence
+4. Complete, show-another, and contextual-chat icon controls
+5. Visual weather summary and compact seasonal-food list when location exists
+6. Two quiet shortcuts: Check in and Learn
 
 The information control expands the full recommendation guidance, linked check-in, related article, compatible food when available, exact selection reasons, and Dismiss. Those elements do not compete with the daily focus by default.
 
@@ -25,7 +26,7 @@ The information control expands the full recommendation guidance, linked check-i
 - “In season near you” uses the editor-owned seasonal produce catalog filtered by region, month, diet, allergies, and exclusions; it does not claim dosha compatibility.
 - Without location, one benefit card explains weather, daylight, season, and nearby-food value and links to `/profile/location?return=today`. Today makes no weather call and renders no empty localized sections in this state.
 - If a valid location has no mapped produce region, keep weather and show that regional food guidance is not available for the area yet.
-- The recommendation information disclosure exposes the exact matched rule and states that no dosha score was used.
+- The recommendation information disclosure exposes the exact matched rule and states that the visible prototype estimate was not used for selection.
 - The limited MVP does not place automatically generated AI prose on Today.
 - The AI entry opens a separate grounded chat experience.
 

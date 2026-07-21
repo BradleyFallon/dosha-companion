@@ -65,7 +65,7 @@ export function selectDailyRecommendation(input: RecommendationInput): DailyReco
   } else if (!active && recentIds.size > 0) {
     why.push('Recently shown items were deprioritized when an eligible alternative was available.')
   }
-  why.push('No dosha score was calculated or used.')
+  why.push('The prototype dosha estimate was not used to select this recommendation.')
 
   return {
     ...selected,

@@ -11,6 +11,7 @@ import { getCheckInQuestionSet } from '../content/repository'
 import { resolveChatContext } from '../chat/context'
 import { createChatMessage, createChatThread } from '../chat/thread'
 import { localDateKey } from '../daylight/model'
+import { DEVELOPMENT_DOSHA_FIXTURE } from '../quiz/result'
 
 afterEach(() => vi.unstubAllGlobals())
 
@@ -151,6 +152,44 @@ describe('navigation visibility', () => {
   })
 })
 
+describe('dosha profile visibility', () => {
+  it('makes the sample dosha identity clear on Today and My Balance', () => {
+    const values = {
+      resultsReached: true,
+      doshaFixtureId: DEVELOPMENT_DOSHA_FIXTURE.fixtureId,
+      submittedAnswers: allOrdinaryAnswers(),
+    }
+    const today = renderAt('/today', values)
+    expect(screen.getByRole('link', {
+      name: 'Sample dosha profile. Usual nature: Vata and Pitta. Current pattern: Vata is more prominent.',
+    })).toHaveAttribute('href', '/balance')
+    expect(screen.getByText('Vata–Pitta')).toBeInTheDocument()
+    expect(screen.getByText('Vata is currently more prominent')).toBeInTheDocument()
+
+    today.unmount()
+    renderAt('/balance', values)
+    expect(screen.getByRole('region', {
+      name: 'Sample dosha profile. Usual nature: Vata and Pitta. Current pattern: Vata is more prominent.',
+    })).toBeInTheDocument()
+    expect(screen.getByText('Controlled example for interface review')).toBeInTheDocument()
+  })
+
+  it('clearly says when there is not enough information for an estimate', () => {
+    renderAt('/balance', { resultsReached: true, doshaFixtureId: null })
+    expect(screen.getByRole('region', { name: 'Dosha profile: not enough information for a prototype estimate.' })).toBeInTheDocument()
+    expect(screen.getByText('Not enough information')).toBeInTheDocument()
+    expect(screen.getByText(/Complete more assessment questions/)).toBeInTheDocument()
+  })
+
+  it('carries the selected sample profile from Results into Today', async () => {
+    const user = userEvent.setup()
+    renderAt('/results?fixture=profile', { resultsReached: true })
+    await user.click(screen.getByRole('button', { name: 'Continue to Today' }))
+    expect(screen.getByRole('link', { name: /Sample dosha profile/ })).toHaveAttribute('href', '/balance')
+    expect(screen.getByText('Vata–Pitta')).toBeInTheDocument()
+  })
+})
+
 describe('calm Check In experience', () => {
   it('centers the default screen on one quick check-in action', async () => {
     const user = userEvent.setup()
@@ -250,7 +289,7 @@ describe('graphical My Balance shell', () => {
     expect(screen.getAllByRole('link', { name: /^(Sleep|Energy|Appetite|Digestion|Routine|Stress):/ })).toHaveLength(6)
     expect(screen.getAllByRole('link', { name: /Open check-in from/ })).toHaveLength(5)
     expect(screen.queryByText(/Coverage ready|usable answers|No dosha result calculated/)).not.toBeInTheDocument()
-    expect(screen.getByText(/This view summarizes/).closest('details')).not.toHaveAttribute('open')
+    expect(screen.getByText(/This view includes an answer-derived prototype/).closest('details')).not.toHaveAttribute('open')
 
     await user.click(screen.getByRole('link', { name: 'Sleep: close to usual' }))
     const detail = screen.getByRole('heading', { name: 'Sleep' }).closest('section')
@@ -294,15 +333,16 @@ describe('limited MVP results and settings', () => {
     expect(screen.getByRole('link', { name: 'Answer next useful question' })).toBeInTheDocument()
   })
 
-  it('shows coverage-ready and unavailable-scoring states', () => {
+  it('shows an answer-derived prototype result when coverage is ready', () => {
     renderAt('/results', {
       resultsReached: true,
       assessmentMode: 'full',
       submittedAnswers: allOrdinaryAnswers(),
     })
-    expect(screen.getByRole('heading', { name: 'Your assessment summary' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Dosha scoring is not available yet' })).toBeInTheDocument()
-    expect(screen.queryByText('Vata–Pitta')).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Your dosha profile' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /^Vata$/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Vata is currently more prominent' })).toBeInTheDocument()
+    expect(screen.getByText('How this prototype estimate works').closest('details')).not.toHaveAttribute('open')
   })
 
   it('returns directly to Results after a coverage-repair answer', async () => {

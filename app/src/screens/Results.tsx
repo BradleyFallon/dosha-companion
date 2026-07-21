@@ -24,6 +24,10 @@ export function ResultScreen() {
   )
 
   function goToToday() {
+    dispatch({
+      type: 'set-dosha-fixture',
+      fixtureId: outcome.kind === 'development-fixture' ? outcome.fixture.fixtureId : null,
+    })
     dispatch({ type: 'visit-today' })
     navigate('/today')
   }
@@ -37,16 +41,16 @@ export function ResultScreen() {
       <Screen className="results-screen">
         <p className="stage-badge">Sample profile</p>
         <h1 tabIndex={-1}>Profile overview</h1>
-        <p className="supporting">This sample shows the post-assessment layout. Its labels are not based on your answers.</p>
+        <p className="supporting">This controlled sample shows the post-assessment layout before enough answers are available for an estimate.</p>
         <article className="result-card nature-card">
           <p className="eyebrow">Your nature</p>
           <h2>{outcome.fixture.baselineLabel}</h2>
-          <p>Sample label for reviewing the profile layout.</p>
+          <p>Controlled example for reviewing the profile layout.</p>
         </article>
         <article className="result-card current-card">
           <p className="eyebrow">Your current balance</p>
           <h2>{outcome.fixture.currentLabel}</h2>
-          <p>Sample label for reviewing the current-balance layout.</p>
+          <p>Controlled example for reviewing the current-balance layout.</p>
         </article>
         <CoverageDetail coverage={outcome.coverage} />
         <button className="button primary" type="button" onClick={goToToday}>Continue to Today</button>
@@ -57,27 +61,28 @@ export function ResultScreen() {
 
   return (
     <Screen className="results-screen">
-      <p className="stage-badge">Coverage ready</p>
-      <h1 tabIndex={-1}>Your assessment summary</h1>
-      <p className="supporting">You provided enough usable information for the assessment. This summary keeps your usual nature separate from your recent check-in.</p>
+      <p className="stage-badge">Prototype estimate</p>
+      <h1 tabIndex={-1}>Your dosha profile</h1>
+      <p className="supporting">This answer-derived estimate uses simple draft weights so you can evaluate the experience. It keeps your usual nature separate from your recent pattern.</p>
       <article className="result-card nature-card">
         <p className="eyebrow">Your usual nature</p>
         <p className="time-context">Usual adult tendencies when generally well</p>
-        <h2>{outcome.coverage.baseline.substantive} of {outcome.coverage.baseline.total} usable answers</h2>
-        <p>{outcome.coverage.baseline.categoriesCovered} baseline categories have substantive coverage. No constitution label has been inferred.</p>
+        <h2>{outcome.scoring.baselineLabel}</h2>
+        <p>{outcome.coverage.baseline.substantive} substantive answers contributed to this prototype estimate.</p>
       </article>
       <article className="result-card current-card">
-        <p className="eyebrow">Your current check-in</p>
+        <p className="eyebrow">Your recent pattern</p>
         <p className="time-context">Based on the past seven days</p>
-        <h2>{outcome.coverage.current.substantive} of {outcome.coverage.current.total} usable answers</h2>
-        <p>{outcome.coverage.current.categoriesCovered} recent categories have substantive coverage. No current dosha label has been inferred.</p>
+        <h2>{outcome.scoring.currentLabel}</h2>
+        <p>{outcome.coverage.current.substantive} recent answers contributed to this prototype estimate.</p>
       </article>
-      <div className="scoring-boundary">
-        <h2>Dosha scoring is not available yet</h2>
-        <p>{outcome.scoring.reason}</p>
-      </div>
+      <details className="coverage-detail profile-detail">
+        <summary>How this prototype estimate works</summary>
+        <p>Each directional answer adds one draft point to Vata, Pitta, or Kapha. A second dosha is included when its total is at least 75% of the leading total. Recent “close to usual” answers add no elevation.</p>
+        <p>Model {outcome.scoring.scoringModelVersion}; rule {outcome.scoring.ruleIds.join(', ')}.</p>
+      </details>
       <CoverageDetail coverage={outcome.coverage} />
-      <p className="boundary-note">Based on self-reported information. Educational, not a medical diagnosis.</p>
+      <p className="boundary-note">Prototype estimate based on self-reported information. Educational, not a medical diagnosis.</p>
       <button className="button primary" type="button" onClick={goToToday}>Go to Today</button>
       <Link className="button secondary" to="/questions/assessment">Manage initial assessment</Link>
       {shortModeAllowed() ? (
@@ -135,7 +140,7 @@ export function CoverageDetail({ coverage }: { coverage: AssessmentCoverage }) {
         <div><dt>Skipped</dt><dd>{coverage.skippedQuestionIds.length}</dd></div>
         <div><dt>Unanswered</dt><dd>{coverage.unansweredQuestionIds.length}</dd></div>
       </dl>
-      <p>No answer weights or dosha rules were applied.</p>
+      <p>Coverage is calculated separately from the prototype dosha estimate.</p>
     </details>
   )
 }

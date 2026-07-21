@@ -244,7 +244,7 @@ A preliminary result should be available when all of the following are true:
 * Every required high-priority baseline domain has reasonable coverage
 * No scoring error prevents calculation
 
-The limited browser-local MVP implements these thresholds as `coverage-policy-0.1`. They remain product-testing thresholds and should be adjusted after expert review and user testing. They do not unlock a dosha label while scoring weights remain unapproved.
+The browser-local prototype implements these thresholds as `coverage-policy-0.1`. They remain product-testing thresholds and should be adjusted after expert review and user testing. Meeting them unlocks the separately labeled `0.1-draft` prototype estimate; it does not establish clinical confidence.
 
 A user who skips too many required domains should receive a message such as:
 

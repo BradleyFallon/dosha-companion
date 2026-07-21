@@ -1,4 +1,4 @@
 [
-  {"id":"quick-current","title":"Current balance check-in","summary":"Five questions about the past seven days. No dosha score is calculated.","questionIds":["q_current_sleep_001","q_current_appetite_001","q_current_energy_001","q_current_stress_response_001","q_current_routine_001"],"status":"provisional","publicationStatus":"published"},
+  {"id":"quick-current","title":"Current balance check-in","summary":"Five questions about the past seven days that can update your prototype recent-pattern estimate.","questionIds":["q_current_sleep_001","q_current_appetite_001","q_current_energy_001","q_current_stress_response_001","q_current_routine_001"],"status":"provisional","publicationStatus":"published"},
   {"id":"full-current","title":"Extended current check-in","summary":"All seven current-balance questions from the draft assessment.","questionIds":["q_current_sleep_001","q_current_appetite_001","q_current_digestion_001","q_current_energy_001","q_current_stress_response_001","q_current_routine_001","q_current_body_qualities_001"],"status":"provisional","publicationStatus":"published"}
 ]

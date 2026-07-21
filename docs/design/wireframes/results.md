@@ -1,28 +1,28 @@
 # Results Wireframes
 
-## Coverage ready; scoring unavailable
+## Coverage ready; prototype estimate available
 
 ```text
 +--------------------------------------+
-| COVERAGE READY                       |
-| Your assessment summary              |
+| PROTOTYPE ESTIMATE                   |
+| Your dosha profile                   |
 |                                      |
-| Enough usable information is present |
-| for the draft workflow. Dosha scoring|
-| awaits approved weights/thresholds.  |
+| Answer-derived using simple draft    |
+| weights; usual and recent stay apart.|
 |                                      |
 | YOUR USUAL NATURE                    |
-| 19 of 19 usable answers              |
-| No constitution label inferred.      |
+| Vata–Pitta                           |
+| 19 substantive answers contributed. |
 |                                      |
-| YOUR CURRENT CHECK-IN                |
-| 7 of 7 usable answers                |
-| No current dosha label inferred.     |
+| YOUR RECENT PATTERN                  |
+| Vata is currently more prominent     |
+| 7 recent answers contributed.        |
 |                                      |
+| [ How this estimate works          ] |
 | [ How coverage was determined      ] |
 |                                      |
 | [ Go to Today                      ] |
-| [ Review coverage                  ] |
+| [ Manage initial assessment        ] |
 +--------------------------------------+
 ```
 
@@ -46,10 +46,11 @@
 
 ## Development fixture
 
-Development builds may display the old Vata–Pitta hierarchy only after the user chooses an explicit fixture preview. A persistent banner states that it was not calculated from answers. The fixture is never stored as a result.
+Development builds may display a controlled Vata–Pitta hierarchy after the user chooses an explicit fixture preview from the insufficient-coverage route. It is labeled as an interface-review example and persisted only as a fixture ID.
 
 ## Notes
 
 - Baseline and current coverage remain separate.
-- Normal screens never show percentages, score tracks, or dosha labels.
+- Normal screens show plain-language dosha labels, not percentages or score tracks.
 - The coverage disclosure names the policy, counts, fallback answers, skips, and unanswered questions.
+- The estimate disclosure names the model, unit-weight rule, and 75% mixed-profile threshold.

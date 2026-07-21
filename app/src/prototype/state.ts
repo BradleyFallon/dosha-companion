@@ -8,6 +8,7 @@ import {
 import type { AssessmentMode } from '../quiz/assessment'
 import { getAssessmentQuestions } from '../quiz/assessment'
 import { getProfileReadiness } from '../profile/readiness'
+import { DEVELOPMENT_DOSHA_FIXTURE, type DevelopmentFixture } from '../quiz/result'
 import { isKnownCitation } from '../chat/retrieval'
 import type {
   ChatCitation,
@@ -17,7 +18,7 @@ import type {
 } from '../chat/types'
 
 export const STORAGE_KEY = 'dosha-companion-prototype-state'
-export const STORAGE_VERSION = 9
+export const STORAGE_VERSION = 10
 
 export type SaveStatus = 'saved' | 'saving' | 'not-saved'
 
@@ -78,6 +79,7 @@ export interface PrototypeState {
   transitionSeen: boolean
   resultsReached: boolean
   todayVisited: boolean
+  doshaFixtureId: DevelopmentFixture['fixtureId'] | null
   recommendationHistory: RecommendationHistoryRecord[]
   todayRecommendationId: string | null
   checkIns: CheckIn[]
@@ -98,6 +100,7 @@ export type PrototypeAction =
   | { type: 'complete-transition' }
   | { type: 'reach-results' }
   | { type: 'visit-today' }
+  | { type: 'set-dosha-fixture'; fixtureId: DevelopmentFixture['fixtureId'] | null }
   | { type: 'show-recommendation'; recommendationId: string; date: string }
   | { type: 'recommendation-status'; recommendationId: string; date: string; status: RecommendationHistoryStatus }
   | { type: 'clear-active-recommendation' }
@@ -140,6 +143,7 @@ export const defaultState: PrototypeState = {
   transitionSeen: false,
   resultsReached: false,
   todayVisited: false,
+  doshaFixtureId: null,
   recommendationHistory: [],
   todayRecommendationId: null,
   checkIns: [],
@@ -169,6 +173,7 @@ export function prototypeReducer(
         introSeen: true,
         assessmentStarted: true,
         assessmentMode: action.mode,
+        doshaFixtureId: null,
         saveStatus: 'saving',
       }
     case 'select-answer':
@@ -183,6 +188,7 @@ export function prototypeReducer(
           ...state.submittedAnswers,
           [action.questionId]: action.answerId,
         },
+        doshaFixtureId: null,
         skippedQuestionIds,
         selectedAnswerId: null,
         currentIndex: action.nextIndex,
@@ -195,6 +201,7 @@ export function prototypeReducer(
       return {
         ...state,
         submittedAnswers,
+        doshaFixtureId: null,
         skippedQuestionIds: state.skippedQuestionIds.includes(action.questionId)
           ? state.skippedQuestionIds
           : [...state.skippedQuestionIds, action.questionId],
@@ -221,6 +228,8 @@ export function prototypeReducer(
       }
     case 'visit-today':
       return { ...state, todayVisited: true, saveStatus: 'saving' }
+    case 'set-dosha-fixture':
+      return { ...state, doshaFixtureId: action.fixtureId, saveStatus: 'saving' }
     case 'show-recommendation': {
       const existing = state.recommendationHistory.some(
         (record) => record.recommendationId === action.recommendationId && record.date === action.date,
@@ -387,6 +396,7 @@ export function serializeState(state: PrototypeState): string {
       transitionSeen: state.transitionSeen,
       resultsReached: state.resultsReached,
       todayVisited: state.todayVisited,
+      doshaFixtureId: state.doshaFixtureId,
       recommendationHistory: state.recommendationHistory,
       todayRecommendationId: state.todayRecommendationId,
       checkIns: state.checkIns,
@@ -547,6 +557,9 @@ function sanitizeState(raw: Record<string, unknown>): PrototypeState {
   const maxIndex = Math.max(getAssessmentQuestions(assessmentMode, true).length - 1, 0)
   const currentIndex = clampInteger(raw.currentIndex, 0, maxIndex)
   const resultsReached = raw.resultsReached === true && assessmentStarted
+  const doshaFixtureId = raw.doshaFixtureId === DEVELOPMENT_DOSHA_FIXTURE.fixtureId
+    ? DEVELOPMENT_DOSHA_FIXTURE.fixtureId
+    : null
   const recommendationIds = new Set(recommendationCatalog.map((item) => item.id))
   const recommendationHistory = sanitizeRecommendationHistory(raw.recommendationHistory, recommendationIds)
   const todayRecommendationId = typeof raw.todayRecommendationId === 'string' && recommendationIds.has(raw.todayRecommendationId)
@@ -569,6 +582,7 @@ function sanitizeState(raw: Record<string, unknown>): PrototypeState {
     transitionSeen: raw.transitionSeen === true && assessmentStarted,
     resultsReached,
     todayVisited: raw.todayVisited === true && resultsReached,
+    doshaFixtureId,
     recommendationHistory,
     todayRecommendationId,
     checkIns,
@@ -815,14 +829,17 @@ export function createTestState(
 }
 
 export function createDemoState(now = new Date()): PrototypeState {
-  const submittedAnswers = Object.fromEntries(initialAssessment.questions.map((question) => [
-    question.id,
-    question.answers.find((answer) => answer.kind === 'ordinary')?.id ?? question.answers[0]?.id ?? '',
-  ]))
+  const submittedAnswers = Object.fromEntries(initialAssessment.questions.map((question) => {
+    const direction = question.assessmentType === 'baseline' && question.defaultOrder % 2 === 0
+      ? 'pitta'
+      : 'vata'
+    const directional = question.answers.find((answer) => answer.score.weights[direction] === 1)
+    return [question.id, directional?.id ?? question.answers.find((answer) => answer.kind === 'ordinary')?.id ?? question.answers[0]?.id ?? '']
+  }))
   const quickSet = checkInQuestionSets.find((set) => set.id === 'quick-current')
   const answers = Object.fromEntries((quickSet?.questionIds ?? []).map((questionId) => {
     const question = initialAssessment.questions.find((candidate) => candidate.id === questionId)
-    return [questionId, question?.answers.find((answer) => answer.kind === 'ordinary')?.id ?? '']
+    return [questionId, question?.answers.find((answer) => answer.score.weights.vata === 1)?.id ?? '']
   }))
   return {
     ...defaultState,
@@ -847,6 +864,7 @@ export function createDemoState(now = new Date()): PrototypeState {
     transitionSeen: true,
     resultsReached: true,
     todayVisited: true,
+    doshaFixtureId: null,
     checkIns: quickSet ? [{ id: `demo-${now.getTime()}`, setId: quickSet.id, startedAt: now.toISOString(), completedAt: now.toISOString(), answers }] : [],
   }
 }

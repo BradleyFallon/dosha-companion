@@ -27,7 +27,7 @@ export const learningArticles: LearningArticle[] = [
       "doshas-as-concepts",
       "nature-and-current-balance"
     ],
-    "body": "Ayurveda is a traditional system of knowledge that developed in South Asia. It includes many ways of thinking about daily routine, food, environment, and individual patterns.\n\nThis app uses a narrow educational subset of those ideas. It helps you notice self-reported patterns and offers conservative wellness prompts. It does not reproduce the full tradition or provide clinical Ayurvedic care.\n\n## What this app can do\n\n- Explain basic terms in plain language.\n- Keep your usual tendencies separate from recent experience.\n- Offer small, general actions from an editable content catalog.\n- Show why a recommendation was selected.\n\n## What it cannot do\n\nThe app does not diagnose a condition, calculate a dosha result, recommend treatment, or replace medical care."
+    "body": "Ayurveda is a traditional system of knowledge that developed in South Asia. It includes many ways of thinking about daily routine, food, environment, and individual patterns.\n\nThis app uses a narrow educational subset of those ideas. It helps you notice self-reported patterns and offers conservative wellness prompts. It does not reproduce the full tradition or provide clinical Ayurvedic care.\n\n## What this app can do\n\n- Explain basic terms in plain language.\n- Keep your usual tendencies separate from recent experience.\n- Show a clearly labeled prototype dosha estimate from your answers.\n- Offer small, general actions from an editable content catalog.\n- Show why a recommendation was selected.\n\n## What it cannot do\n\nThe prototype estimate is not a diagnosis or clinical Ayurvedic assessment. The app does not diagnose a condition, recommend treatment, or replace medical care."
   },
   {
     "id": "doshas-as-concepts",
@@ -121,7 +121,7 @@ export const learningArticles: LearningArticle[] = [
       "routine-and-consistency",
       "self-assessment"
     ],
-    "body": "Today presents one clear focus selected from the published content catalog.\n\n## How selection works\n\nThe app filters the local catalog for published, eligible content. It considers a small set of explicit inputs such as a major-change answer, current check-in coverage, local time, and recent recommendation history. The same inputs produce an understandable result.\n\nNo dosha score, diagnosis, symptom analysis, or AI model is used. You can complete, dismiss, or replace a recommendation, and the browser stores that small history locally."
+    "body": "Today presents one clear focus selected from the published content catalog.\n\n## How selection works\n\nThe app filters the local catalog for published, eligible content. It considers a small set of explicit inputs such as a major-change answer, current check-in coverage, local time, and recent recommendation history. The same inputs produce an understandable result.\n\nThe prototype dosha estimate is not used to select Today guidance. No diagnosis, symptom analysis, or AI model is used. You can complete, dismiss, or replace a recommendation, and the browser stores that small history locally."
   },
   {
     "id": "routine-and-consistency",
@@ -159,7 +159,7 @@ export const learningArticles: LearningArticle[] = [
       "nature-and-current-balance",
       "provisional-guidance"
     ],
-    "body": "Self-assessment can help you notice patterns, but it has limits. Answers may change with memory, interpretation, environment, illness, or a recent event.\n\n## Coverage is not certainty\n\nThe app reports whether enough substantive answers were submitted for the coverage gate. “Not sure” is a valid submitted response, while a skipped question remains open. Coverage does not mean the app is clinically confident.\n\n## Check-ins are separate records\n\nRepeatable current check-ins are saved with their own date and answers. They do not overwrite your long-term baseline answers. No dosha interpretation is applied to check-ins in this milestone."
+    "body": "Self-assessment can help you notice patterns, but it has limits. Answers may change with memory, interpretation, environment, illness, or a recent event.\n\n## Coverage is not certainty\n\nThe app reports whether enough substantive answers were submitted for the coverage gate. “Not sure” is a valid submitted response, while a skipped question remains open. Coverage does not mean the app is clinically confident.\n\n## Check-ins are separate records\n\nRepeatable current check-ins are saved with their own date and answers. They do not overwrite your long-term baseline answers. The latest completed check-in can update the prototype recent-pattern estimate without changing usual nature."
   },
   {
     "id": "vata",
@@ -687,7 +687,7 @@ export const checkInQuestionSets: CheckInQuestionSet[] = [
   {
     "id": "quick-current",
     "title": "Current balance check-in",
-    "summary": "Five questions about the past seven days. No dosha score is calculated.",
+    "summary": "Five questions about the past seven days that can update your prototype recent-pattern estimate.",
     "questionIds": [
       "q_current_sleep_001",
       "q_current_appetite_001",

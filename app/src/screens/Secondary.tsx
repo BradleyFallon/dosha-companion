@@ -16,6 +16,7 @@ import { usePrototype } from '../prototype/PrototypeContext'
 import { calculateAssessmentCoverage, COVERAGE_REQUIREMENTS } from '../quiz/coverage'
 import { getCheckInQuestionSet } from '../content/repository'
 import { initialAssessment } from '../generated/initialAssessment'
+import { calculatePrototypeDoshaResult } from '../quiz/result'
 import type { CheckIn } from '../prototype/state'
 import {
   AssessmentIcon,
@@ -28,6 +29,7 @@ import {
   InfoIcon,
 } from '../ui/icons'
 import { ContextChatLink } from '../components/ContextChatLink'
+import { DoshaProfileSummary } from '../components/DoshaProfileSummary'
 
 export function QuestionsScreen() {
   const { state } = usePrototype()
@@ -140,6 +142,12 @@ export function BalanceScreen() {
 
   const incomplete = state.checkIns.find((checkIn) => !checkIn.completedAt)
   const view = buildBalanceViewModel(state)
+  const latestCheckIn = state.checkIns.find((checkIn) => checkIn.id === view.latestCheckInId)
+  const doshaResult = calculatePrototypeDoshaResult({
+    submittedAnswers: state.submittedAnswers,
+    skippedQuestionIds: state.skippedQuestionIds,
+    currentAnswers: latestCheckIn?.answers,
+  })
   const selected = domainId ? view.domains.find((domain) => domain.id === domainId) : null
   const SelectedIcon = selected ? balanceIconFor(selected.iconKey) : null
   const recentHref = view.latestCheckInId ? `/questions/check-in/${view.latestCheckInId}` : '/questions'
@@ -150,9 +158,11 @@ export function BalanceScreen() {
         <h1 tabIndex={-1}>My Balance</h1>
         <details className="balance-info">
           <summary aria-label="About My Balance"><InfoIcon aria-hidden="true" focusable="false" /></summary>
-          <p>This view summarizes information you supplied. It does not calculate a dosha score or diagnosis.</p>
+          <p>This view includes an answer-derived prototype dosha estimate. It uses draft unit weights for interface testing and is not a diagnosis.</p>
         </details>
       </div>
+
+      <DoshaProfileSummary fixtureId={state.doshaFixtureId} prominent result={doshaResult} />
 
       <div aria-label="Pattern information" className="pattern-rings">
         <PatternCoverageRing

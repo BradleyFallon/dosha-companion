@@ -10,9 +10,10 @@ This app uses a narrow educational subset of those ideas. It helps you notice se
 
 - Explain basic terms in plain language.
 - Keep your usual tendencies separate from recent experience.
+- Show a clearly labeled prototype dosha estimate from your answers.
 - Offer small, general actions from an editable content catalog.
 - Show why a recommendation was selected.
 
 ## What it cannot do
 
-The app does not diagnose a condition, calculate a dosha result, recommend treatment, or replace medical care.
+The prototype estimate is not a diagnosis or clinical Ayurvedic assessment. The app does not diagnose a condition, recommend treatment, or replace medical care.

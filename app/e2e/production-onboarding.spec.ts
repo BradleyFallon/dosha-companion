@@ -108,10 +108,10 @@ test('uses the clean production onboarding and all 27 questions without developm
     await page.getByRole('button', { name: 'Continue' }).click()
   }
 
-  await expect(page.getByRole('heading', { name: 'Your assessment summary' })).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Dosha scoring is not available yet' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Your dosha profile' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Vata', exact: true }).first()).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Vata is currently more prominent' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'View complete sample' })).toHaveCount(0)
-  await expect(page.getByText('Vata–Pitta')).toHaveCount(0)
   await page.getByRole('button', { name: 'Go to Today' }).click()
   await expect(page.getByRole('group', { name: 'Recommendation actions' })).toBeVisible()
 })

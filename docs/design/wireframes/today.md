@@ -5,8 +5,9 @@
 | Thursday, July 16       [ Settings ] |
 | Good morning, Alex                   |
 |                                      |
-| ASSESSMENT COVERAGE                  |
-| 7 of 7 recent answers are usable [>] |
+| PROTOTYPE DOSHA ESTIMATE          [>]|
+| Vata–Pitta                           |
+| Vata is currently more prominent    |
 |                                      |
 | PROVISIONAL · NOT EXPERT-APPROVED    |
 | TODAY’S FOCUS                        |
@@ -24,7 +25,7 @@
 | [shown or withheld by exclusions]    |
 |                                      |
 | [ Why this was chosen              ] |
-| No dosha score was used.             |
+| Estimate not used for this choice.   |
 |                                      |
 | [Today] [Check In] [Balance] [Learn]|
 +--------------------------------------+

@@ -45,4 +45,26 @@ describe('generated initial assessment', () => {
     expect(ordinary.every((answer) => answer.iconKey && knownIcons.has(answer.iconKey))).toBe(true)
     expect(fallback.every((answer) => !answer.patternKey || answer.patternKey === 'uncertain')).toBe(true)
   })
+
+  it('includes explicit versioned prototype weights for every answer', () => {
+    expect(initialAssessment.scoringModelVersion).toBe('0.1-draft')
+    const answers: Array<{
+      kind: string
+      score: {
+        modelVersion: string
+        target: string
+        weights: { vata: number; pitta: number; kapha: number }
+        reliability: number
+      }
+    }> = []
+    for (const question of initialAssessment.questions) answers.push(...question.answers)
+    expect(answers).toHaveLength(117)
+    expect(answers.every((answer) => answer.score.modelVersion === initialAssessment.scoringModelVersion)).toBe(true)
+    expect(answers.every((answer) => {
+      const total = answer.score.weights.vata + answer.score.weights.pitta + answer.score.weights.kapha
+      return total === 0 || total === 1
+    })).toBe(true)
+    expect(answers.filter((answer) => answer.kind !== 'ordinary').every((answer) =>
+      answer.score.target === 'none' && answer.score.reliability === 0)).toBe(true)
+  })
 })

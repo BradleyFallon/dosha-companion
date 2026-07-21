@@ -19,10 +19,10 @@ function select(values: Partial<Parameters<typeof selectDailyRecommendation>[0]>
 }
 
 describe('catalog recommendation selector', () => {
-  it('uses context precedence and explains the no-scoring boundary', () => {
+  it('uses context precedence and explains the recommendation-scoring boundary', () => {
     const item = select({ submittedAnswers: { ...fullAnswers, q_context_major_change_001: 'a_context_major_change_001_recent_travel_major_schedule' } })
     expect(item.contexts).toContain('travel')
-    expect(item.why).toContain('No dosha score was calculated or used.')
+    expect(item.why).toContain('The prototype dosha estimate was not used to select this recommendation.')
   })
 
   it('uses current coverage before time of day', () => {

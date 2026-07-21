@@ -8,4 +8,4 @@ Today presents one clear focus selected from the published content catalog.
 
 The app filters the local catalog for published, eligible content. It considers a small set of explicit inputs such as a major-change answer, current check-in coverage, local time, and recent recommendation history. The same inputs produce an understandable result.
 
-No dosha score, diagnosis, symptom analysis, or AI model is used. You can complete, dismiss, or replace a recommendation, and the browser stores that small history locally.
+The prototype dosha estimate is not used to select Today guidance. No diagnosis, symptom analysis, or AI model is used. You can complete, dismiss, or replace a recommendation, and the browser stores that small history locally.

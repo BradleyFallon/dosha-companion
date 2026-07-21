@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { initialAssessment } from '../generated/initialAssessment'
 import { createChatMessage, createChatThread } from '../chat/thread'
 import { resolveChatContext } from '../chat/context'
+import { DEVELOPMENT_DOSHA_FIXTURE } from '../quiz/result'
 import {
   defaultState,
   coarsenLocationForStorage,
@@ -72,6 +73,30 @@ describe('prototype state and persistence', () => {
     expect(restored.state.submittedAnswers.unknown_question).toBeUndefined()
     expect(restored.state.skippedQuestionIds).not.toContain(firstQuestion.id)
     expect(restored.state.selectedAnswerId).toBeNull()
+  })
+
+  it('persists only the known demo dosha fixture', () => {
+    const sample = completedState({ doshaFixtureId: DEVELOPMENT_DOSHA_FIXTURE.fixtureId })
+    expect(restoreState({ getItem: () => serializeState(sample) }).state.doshaFixtureId).toBe(
+      DEVELOPMENT_DOSHA_FIXTURE.fixtureId,
+    )
+
+    const invalid = JSON.stringify({
+      version: STORAGE_VERSION,
+      state: { ...persistableState(sample), doshaFixtureId: 'invented-result' },
+    })
+    expect(restoreState({ getItem: () => invalid }).state.doshaFixtureId).toBeNull()
+  })
+
+  it('clears the sample dosha fixture when assessment answers change', () => {
+    const sample = completedState({ doshaFixtureId: DEVELOPMENT_DOSHA_FIXTURE.fixtureId })
+    const updated = prototypeReducer(sample, {
+      type: 'submit-answer',
+      questionId: firstQuestion.id,
+      answerId: firstAnswer.id,
+      nextIndex: 1,
+    })
+    expect(updated.doshaFixtureId).toBeNull()
   })
 
   it('clamps an invalid current index and drops an answer attached to the wrong question', () => {

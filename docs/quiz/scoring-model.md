@@ -1,61 +1,51 @@
-# Scoring Model
+# Prototype Scoring Model
 
-> Status: Unapproved placeholder. No dosha scoring logic is implemented or approved.
+> Status: Implemented prototype for product evaluation. The result is educational and has not received clinical or expert validation.
 
-## Limited-MVP implementation boundary
+## Implemented model
 
-The application deliberately does not read `data/quiz/answer-scores.csv` because all numerical weight and reliability fields remain blank. It does not infer weights from the directional rationale text.
+The application reads the explicit numerical metadata in `data/quiz/answer-scores.csv`. Runtime code never infers a direction from answer wording or rationale text.
 
-The limited MVP implements `coverage-policy-0.1` around this future scoring boundary:
+Model `0.1-draft` uses these deliberately simple rules:
+
+- An ordinary directional answer contributes one point to exactly one of Vata, Pitta, or Kapha.
+- A current answer that explicitly means “close to usual” contributes zero elevation points but still counts as a scored recent response.
+- Fallback, uncertain, and context-only answers contribute zero points and have zero scoring reliability.
+- Baseline answers contribute only to usual nature; current answers contribute only to the recent pattern.
+- Each scored point is multiplied by its explicit reliability. The prototype uses reliability `1` for scored ordinary answers and `0` for non-scoring answers.
+
+## Coverage gate
+
+The estimate is shown only after `coverage-policy-0.1` is ready:
 
 - 22 submitted answers overall, where explicit fallback answers count as submitted and skips do not
 - 14 substantive baseline answers
 - 4 substantive current-balance answers
-- Descriptive category coverage, with no category acting as a gate because canonical set items mark none as required
 
-Coverage readiness means enough self-reported information is present for the draft workflow. It is not a dosha result, expert confidence, or clinical certainty. Normal result screens return an explicit unavailable-scoring state until this document, numerical weights, and thresholds are approved.
+Coverage remains separate from the estimate. It describes how much usable self-reported information is present, not diagnostic confidence.
 
-## Goals
+## Labels and mixed profiles
 
-- Estimate baseline constitution separately from current balance.
-- Make results reproducible, explainable, and versioned.
-- Express uncertainty rather than forcing a definitive type.
-- Allow recent signals to expire without rewriting stable history.
+Baseline and current totals are ranked independently. The leading dosha is included, and another dosha is included when its total is at least 75% of the leader. Ties use the stable Vata, Pitta, Kapha order only for deterministic presentation; all tied directions still appear.
 
-## Answer weights
+If scored current answers all indicate “close to usual,” the recent label is **No recent dosha elevation detected**. If a supplied recent record contains no scored answers, the label is **Not enough recent information**.
 
-Each scored answer will define explicit Vata, Pitta, and Kapha weights. Context-only and feedback questions must be marked as non-scoring.
+## Repeat check-ins
 
-TODO: Define the weight scale, expert review method, and rules for multi-select answers.
+My Balance uses one recent source: the latest completed check-in when one exists, otherwise the current section of the initial assessment. Records are never merged. No time decay is implemented in this prototype.
 
-## Score normalization
+## Recommendation boundary
 
-TODO: Define normalization across unequal category coverage, skipped answers, and questions with different weight ranges.
-
-## Baseline and current-balance separation
-
-Baseline answers contribute only to baseline scores. Time-bounded recent answers contribute only to current-balance scores. Recommendation context must not silently change either score.
-
-## Confidence calculation
-
-TODO: Define how completeness, category coverage, answer consistency, question reliability, and recency contribute to confidence.
-
-## Time decay and expiration
-
-TODO: Define which answers decay, their time windows, repeat intervals, and the behavior when current-balance data becomes stale. Baseline answers should not decay unless the expert-approved model explicitly requires it.
-
-## Conflicting answers
-
-TODO: Define whether conflicts lower confidence, trigger clarification questions, or are retained as valid mixed tendencies.
+The estimate is visible on Results, Today, and My Balance, but it is not used to select Today recommendations. Those continue to use the documented deterministic context and safety rules.
 
 ## Versioning and auditability
 
-Every result must reference a scoring algorithm version and the versions of contributing questions. Model changes must be testable against approved example profiles and must not silently overwrite historical results.
+Every calculated result reports scoring model `0.1-draft` and rule `prototype-unit-dominance-0.1`. Generated quiz data retains each answer’s target, weights, reliability, and model version. Generation fails for missing rows, invalid ranges, multi-direction weights, section-target mismatches, or scoring fallback/context answers.
 
-## Validation before launch
+## Before production use
 
-- Expert review and sign-off
-- Test cases for single, mixed, balanced, conflicting, sparse, and stale profiles
-- Sensitivity analysis for individual answers
-- Plain-language review of result claims
-- Safety and bias review
+- Ayurvedic domain-expert review of every answer direction and the 75% mixed threshold
+- Sensitivity and bias analysis
+- Test profiles for single, mixed, balanced, conflicting, sparse, and stale cases
+- A reviewed approach to confidence, time decay, and answer changes
+- Plain-language safety review and validation of all result claims

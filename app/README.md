@@ -110,9 +110,9 @@ Run:
 npm run generate:quiz
 ```
 
-The generator validates unique identifiers, controlled values, references, question versions, the 27 active ordered `initial_assessment` v1 items, boolean/integer fields, and answer associations. It writes `src/generated/initialAssessment.ts`, which has a generated-file notice and should not be edited manually.
+The generator validates unique identifiers, controlled values, references, question versions, the 27 active ordered `initial_assessment` v1 items, boolean/integer fields, answer associations, and every row in `../data/quiz/answer-scores.csv`. It writes `src/generated/initialAssessment.ts`, which has a generated-file notice and should not be edited manually.
 
-The generator deliberately never reads `../data/quiz/answer-scores.csv`. No scoring weights are approved or included in the application bundle.
+The generated bundle includes explicit prototype score targets, unit weights, reliability, and model version. Generation fails for missing or invalid score metadata; runtime code never infers a weight from answer prose.
 
 ## Coverage and result behavior
 
@@ -124,7 +124,7 @@ The application implements `coverage-policy-0.1`:
 
 Every canonical question is classified as substantive, fallback, skipped, or unanswered. Baseline, current, context, and category coverage remain separate. When coverage is insufficient, the application chooses the next useful repair question in canonical order, prioritizing baseline and then current requirements.
 
-Coverage readiness is not a dosha result or medical confidence. The application does not read `answer-scores.csv`, calculate Vata/Pitta/Kapha weights, or assign a constitution/current-balance label. The typed outcome retains contributing IDs for audit tests; user-facing Results and My Balance expose the policy, counts, missing information, and the unapproved-scoring reason.
+Coverage readiness is not medical confidence. Once it is ready, the application separately calculates a clearly labeled prototype estimate using `0.1-draft` unit weights. It keeps baseline and current totals separate, includes another dosha at 75% of the leading total, and retains contributing answer IDs for audit tests. Results, Today, and My Balance distinguish calculated, insufficient-information, and controlled-sample states.
 
 ## Today recommendation selector
 
@@ -222,7 +222,7 @@ The plain Vite `Network` URL remains useful for checking layout on the same trus
 
 - Account creation and sign-in are visual simulations. Email and password fields are transient; passwords are never persisted.
 - Profile and assessment progress are stored only in the current browser with a validated, versioned allow-list. They are not secure account records and do not sync across devices.
-- Dosha scoring remains unavailable because numerical weights and thresholds are blank and unapproved. Vata–Pitta labels exist only in the explicit development fixture adapter.
+- Dosha scoring is a deliberately simple product prototype, not an expert-validated or clinical model. The controlled development fixture remains available only for reviewing incomplete-assessment screens.
 - Today guidance is deterministically selected provisional catalog copy. Completion history is a demo interaction, not adherence or outcome evidence.
 - Real model chat is a local-development integration only. The static build has no production API host, authentication, rate limiting, entitlement checks, or secret management.
 - There is no backend, database, CMS, analytics SDK, weather API, reverse-geocoding service, recipe system, notification system, or medical logic.

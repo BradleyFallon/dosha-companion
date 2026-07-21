@@ -326,18 +326,18 @@ The import process must reject records when:
 1. Create the six canonical files under `data/quiz/`.
 2. Transfer the 27 draft questions into `questions.csv`.
 3. Transfer each answer choice into `answer-options.csv`.
-4. Add provisional rows to `answer-scores.csv`, leaving unapproved weights blank.
+4. Add explicit prototype rows to `answer-scores.csv`, using versioned unit weights and zero weights for non-scoring answers.
 5. Define `initial_assessment` version 1 in `question-sets.csv`.
 6. Add all 27 questions to `question-set-items.csv`.
 7. Validate IDs, versions, categories, and relationships.
 8. Review the resulting spreadsheet with the Ayurvedic expert.
-9. Approve wording before approving numerical scoring.
+9. Review wording and the prototype scoring directions independently before production approval.
 10. Generate or update `initial-question-bank.md` from the canonical records.
 
 # Decisions still requiring approval
 
-* The numerical weight scale
-* Relative reliability weights by domain
+* Whether the prototype unit-weight scale is suitable for production
+* Whether reliability should vary by domain
 * Whether an answer may contribute to more than one dosha
 * Result-label thresholds
 * Required categories for preliminary-result unlock

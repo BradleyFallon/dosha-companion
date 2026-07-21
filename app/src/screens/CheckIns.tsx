@@ -103,7 +103,7 @@ export function CheckInScreen() {
         </details>
         <details className="compact-details check-in-about">
           <summary>About this check-in</summary>
-          <p>This dated record stays separate from your initial assessment. No dosha score was calculated.</p>
+          <p>This dated record stays separate from your initial assessment and can update your prototype recent-pattern estimate.</p>
         </details>
       </Screen>
     )

@@ -46,6 +46,14 @@ function integer(value, label) {
   return parsed
 }
 
+function number(value, label) {
+  const parsed = Number(value)
+  if (value?.trim() === '' || !Number.isFinite(parsed)) {
+    throw new Error(`Quiz generation failed: ${label} must be a number, received "${value}"`)
+  }
+  return parsed
+}
+
 function boolean(value, label) {
   if (value === 'true') return true
   if (value === 'false') return false
@@ -89,15 +97,54 @@ export function validateAnswerMetadata(answer, question, checkControlled) {
   return { shortLabel, iconKey, patternKey }
 }
 
+export function validateScoreRow(score, answer, question, checkControlled) {
+  const source = `score for answer ${answer.answer_id}`
+  const modelVersion = required(score, 'scoring_model_version', 'answer-scores.csv')
+  const target = required(score, 'score_target', 'answer-scores.csv')
+  checkControlled('score_target', target, source)
+  const weights = {
+    vata: number(score.vata_weight, `${source} vata_weight`),
+    pitta: number(score.pitta_weight, `${source} pitta_weight`),
+    kapha: number(score.kapha_weight, `${source} kapha_weight`),
+  }
+  const reliability = number(score.reliability_weight, `${source} reliability_weight`)
+  const values = [...Object.values(weights), reliability]
+  if (values.some((value) => value < 0 || value > 1)) {
+    throw new Error(`Quiz generation failed: ${source} weights must be between 0 and 1`)
+  }
+  const weightTotal = weights.vata + weights.pitta + weights.kapha
+  if (weightTotal > 1) {
+    throw new Error(`Quiz generation failed: ${source} assigns more than one prototype direction`)
+  }
+  if (target === 'none' && (weightTotal !== 0 || reliability !== 0)) {
+    throw new Error(`Quiz generation failed: non-scoring ${source} must use zero weights and reliability`)
+  }
+  if (target !== 'none') {
+    if (answer.answer_kind !== 'ordinary') {
+      throw new Error(`Quiz generation failed: fallback ${source} cannot contribute to scoring`)
+    }
+    if (target !== question.assessment_type) {
+      throw new Error(`Quiz generation failed: ${source} target ${target} does not match ${question.assessment_type} question`)
+    }
+    if (reliability === 0) {
+      throw new Error(`Quiz generation failed: scoring ${source} must have positive reliability`)
+    }
+  }
+
+  return { modelVersion, target, weights, reliability }
+}
+
 export function generate() {
   const questions = readCsv('questions.csv')
   const answerOptions = readCsv('answer-options.csv')
+  const answerScores = readCsv('answer-scores.csv')
   const questionSets = readCsv('question-sets.csv')
   const setItems = readCsv('question-set-items.csv')
   const controlledValues = readCsv('controlled-values.csv')
 
   assertUnique(questions, 'question_id', 'questions.csv')
   assertUnique(answerOptions, 'answer_id', 'answer-options.csv')
+  assertUnique(answerScores, 'answer_id', 'answer-scores.csv')
 
   const initialSet = questionSets.find(
     (row) => row.question_set_id === 'initial_assessment' && row.set_version === '1',
@@ -144,6 +191,7 @@ export function generate() {
   }
 
   const questionById = new Map(questions.map((question) => [question.question_id, question]))
+  const scoreByAnswerId = new Map(answerScores.map((score) => [score.answer_id, score]))
   const answersByQuestion = new Map()
 
   for (const answer of answerOptions) {
@@ -183,6 +231,11 @@ export function generate() {
       )
       .map((answer) => {
         const metadata = validateAnswerMetadata(answer, question, checkControlled)
+        const scoreRow = scoreByAnswerId.get(answer.answer_id)
+        if (!scoreRow) {
+          throw new Error(`Quiz generation failed: answer ${answer.answer_id} has no answer-scores.csv row`)
+        }
+        const score = validateScoreRow(scoreRow, answer, question, checkControlled)
         return {
           id: required(answer, 'answer_id', 'answer-options.csv'),
           version: integer(answer.answer_version, `answer version for ${answer.answer_id}`),
@@ -194,6 +247,7 @@ export function generate() {
           kind: required(answer, 'answer_kind', `answer ${answer.answer_id}`),
           exclusive: boolean(answer.exclusive, `exclusive for ${answer.answer_id}`),
           status: required(answer, 'status', `answer ${answer.answer_id}`),
+          score,
         }
       })
 
@@ -224,6 +278,11 @@ export function generate() {
     }
   })
 
+  const scoringModelVersions = [...new Set(answerScores.map((score) => score.scoring_model_version))]
+  if (scoringModelVersions.length !== 1 || !scoringModelVersions[0]) {
+    throw new Error('Quiz generation failed: answer-scores.csv must contain exactly one scoring_model_version')
+  }
+
   const payload = {
     id: initialSet.question_set_id,
     version: integer(initialSet.set_version, 'initial assessment set version'),
@@ -231,12 +290,13 @@ export function generate() {
     description: initialSet.description,
     estimatedMinutes: integer(initialSet.estimated_minutes, 'initial assessment estimated minutes'),
     status: initialSet.status,
+    scoringModelVersion: scoringModelVersions[0],
     questions: generatedQuestions,
   }
 
   fs.mkdirSync(path.dirname(outputPath), { recursive: true })
   const iconKeys = [...(allowed.get('balance_icon_key') ?? [])]
-  const source = `/* eslint-disable */\n// GENERATED FILE — DO NOT EDIT. Run \`npm run generate:quiz\` from app/.\n// Source: ../data/quiz/{questions,answer-options,question-sets,question-set-items,controlled-values}.csv\n\nexport const balanceIconKeys = ${JSON.stringify(iconKeys)} as const\nexport type BalanceIconKey = typeof balanceIconKeys[number]\n\nexport const initialAssessment = ${JSON.stringify(payload, null, 2)} as const\n\nexport type InitialAssessment = typeof initialAssessment\nexport type QuizQuestion = InitialAssessment['questions'][number]\nexport type QuizAnswer = QuizQuestion['answers'][number]\n`
+  const source = `/* eslint-disable */\n// GENERATED FILE — DO NOT EDIT. Run \`npm run generate:quiz\` from app/.\n// Source: ../data/quiz/{questions,answer-options,answer-scores,question-sets,question-set-items,controlled-values}.csv\n\nexport const balanceIconKeys = ${JSON.stringify(iconKeys)} as const\nexport type BalanceIconKey = typeof balanceIconKeys[number]\n\nexport const initialAssessment = ${JSON.stringify(payload, null, 2)} as const\n\nexport type InitialAssessment = typeof initialAssessment\nexport type QuizQuestion = InitialAssessment['questions'][number]\nexport type QuizAnswer = QuizQuestion['answers'][number]\n`
   fs.writeFileSync(outputPath, source)
   console.log(`Generated ${generatedQuestions.length} questions at ${path.relative(appRoot, outputPath)}`)
 }

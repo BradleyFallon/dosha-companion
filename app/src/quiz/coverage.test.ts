@@ -65,7 +65,7 @@ describe('assessment coverage', () => {
     expect(currentGap.nextQuestionId).toBe(current[3].id)
   })
 
-  it('produces an auditable unavailable-scoring result and explicit fixture', () => {
+  it('produces an auditable prototype result and explicit fixture', () => {
     const submittedAnswers = {
       ...answersFor(baseline, 'ordinary'),
       ...answersFor(current, 'ordinary'),
@@ -73,7 +73,12 @@ describe('assessment coverage', () => {
     }
     const real = resolveAssessmentOutcome({ submittedAnswers, skippedQuestionIds: [] })
     expect(real.kind).toBe('coverage-ready')
-    expect(real.scoring).toMatchObject({ kind: 'unavailable', scoringModelVersion: null })
+    expect(real.scoring).toMatchObject({
+      kind: 'calculated',
+      scoringModelVersion: '0.1-draft',
+      baselineLabel: 'Vata',
+      currentLabel: 'Vata is currently more prominent',
+    })
     expect(real.coverage.submittedAnswerIds).toHaveLength(27)
 
     const fixture = resolveAssessmentOutcome(
@@ -82,7 +87,7 @@ describe('assessment coverage', () => {
     )
     expect(fixture.kind).toBe('development-fixture')
     if (fixture.kind === 'development-fixture') {
-      expect(fixture.fixture.notice).toContain('not calculated')
+      expect(fixture.fixture.notice).toContain('interface review')
     }
   })
 })
